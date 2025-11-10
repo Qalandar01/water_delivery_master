@@ -23,7 +23,7 @@ public class BottleImageController {
 
     @GetMapping("/admin/bottle/image/{id}")
     @ResponseBody
-    public void getBottleImage(@PathVariable Integer id, HttpServletResponse response) throws IOException {
+    public void getBottleImage(@PathVariable Long id, HttpServletResponse response) throws IOException {
         Optional<BottleTypes> bottleType = bottleTypesRepository.findById(id);
         if (bottleType.isPresent() && bottleType.get().getImage() != null) {
             byte[] imageBytes = bottleType.get().getImage();

@@ -7,7 +7,7 @@ import uz.pdp.water_delivery.entity.enums.RoleName;
 
 import java.util.List;
 
-public interface RoleRepository extends JpaRepository<Role, Integer> {
+public interface RoleRepository extends JpaRepository<Role, Long> {
     Role findByRoleName(RoleName roleName);
 
     List<Role> findByRoleNameIn(List<RoleName> roleAdmin);

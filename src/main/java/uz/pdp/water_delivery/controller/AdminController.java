@@ -67,7 +67,7 @@ public class AdminController {
 
     @PostMapping("/admin/change-gift-water")
     public String changeGiftWater(
-            @RequestParam("bottleTypeId") Integer bottleTypeId,
+            @RequestParam("bottleTypeId") Long bottleTypeId,
             @RequestParam("sale_amount") Integer saleAmount,
             @RequestParam("sale_discount") Integer saleDiscount,
             @RequestParam(value = "sale_active", required = false) Boolean saleActive,
@@ -121,7 +121,7 @@ public class AdminController {
      * Chegirma o'chirish
      */
     @GetMapping("/admin/delete/{id}")
-    public String deleteDiscount(@PathVariable("id") Integer id, Model model) {
+    public String deleteDiscount(@PathVariable("id") Long id, Model model) {
         try {
             BottleTypes bottleType = bottleTypesRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Bunday ID ga ega butilka topilmadi!"));
@@ -186,7 +186,7 @@ public class AdminController {
 
 
     @GetMapping("/admin/bottle/edit/{id}")
-    public String editBottle(@PathVariable Integer id, Model model) {
+    public String editBottle(@PathVariable Long id, Model model) {
         BottleTypes bottleType = bottleTypesRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Bottle not found"));
         String base64Image = Base64.getEncoder().encodeToString(bottleType.getImage());
@@ -228,7 +228,7 @@ public class AdminController {
     }
 
     @GetMapping("/admin/bottle/delete/{id}")
-    public String deleteBottle(@PathVariable Integer id, RedirectAttributes redirectAttributes) {
+    public String deleteBottle(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         if (!bottleTypesRepository.existsById(id)) {
             redirectAttributes.addFlashAttribute("errorMessage", "Bottle not found.");
             return "redirect:/operator/bottle/menu";
@@ -269,7 +269,7 @@ public class AdminController {
     }
 
     @GetMapping("/admin/delete/user/{id}")
-    public String deleteUser(@PathVariable UUID id, Model model) {
+    public String deleteUser(@PathVariable Long id, Model model) {
         try {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
@@ -294,7 +294,7 @@ public class AdminController {
 
 
     @GetMapping("/admin/edit/user/{id}")
-    public String editUser(@PathVariable UUID id, Model model) {
+    public String editUser(@PathVariable Long id, Model model) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
         model.addAttribute("user", user);
@@ -302,7 +302,7 @@ public class AdminController {
     }
 
     @PostMapping("/admin/edit/user/{id}")
-    public String updateUser(@PathVariable UUID id, @ModelAttribute User user, BindingResult result) {
+    public String updateUser(@PathVariable Long id, @ModelAttribute User user, BindingResult result) {
         if (result.hasErrors()) {
             return "admin/edit-user";
         }

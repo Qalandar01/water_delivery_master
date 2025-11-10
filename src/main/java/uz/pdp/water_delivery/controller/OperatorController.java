@@ -129,7 +129,7 @@ public class OperatorController {
 
     @Transactional
     @GetMapping("/operator/currentUser/{userId}")
-    public String userVerify(@PathVariable("userId") UUID tgUserId, Model model) {
+    public String userVerify(@PathVariable("userId") Long tgUserId, Model model) {
         try {
             TelegramUser telegramUser = telegramUserRepository.findById(tgUserId)
                     .orElseThrow(() -> new RuntimeException("tg user not found"));
@@ -142,7 +142,7 @@ public class OperatorController {
     }
 
     @PostMapping("/operator/wronglocation")
-    public String wrongLocation(@RequestParam(name = "userId") UUID tgUserId) {
+    public String wrongLocation(@RequestParam(name = "userId") Long tgUserId) {
         try {
             TelegramUser tgUser = telegramUserRepository.findById(tgUserId)
                     .orElseThrow(() -> new RuntimeException("tg user not found"));
@@ -219,7 +219,7 @@ public class OperatorController {
     @PostMapping("/operator/orders/assign")
     public String assignOrderToCourier(
             @RequestParam(name = "orders") String ordersIdsJson,
-            @RequestParam UUID courierId) {
+            @RequestParam Long courierId) {
         try {
             Long[] orderIds = objectMapper.readValue(ordersIdsJson, Long[].class);
             List<Order> orders = orderRepository.findAllById(Arrays.asList(orderIds));
@@ -254,7 +254,7 @@ public class OperatorController {
     public String unAssignOrderFromCourier(
             @RequestParam Long orderId) {
         Optional<CurrentOrders> currentOrdersOptional = currentOrdersRepository.findByOrderId(orderId);
-        UUID currentCourierId = null;
+        Long currentCourierId = null;
         if (currentOrdersOptional.isPresent()) {
             var item = currentOrdersOptional.get();
             Order order = item.getOrder();
@@ -306,7 +306,7 @@ public class OperatorController {
     @Transactional
     @PostMapping("/operator/update/order")
     public String updateOrder(@RequestParam("orderId") Long orderId,
-                              @RequestParam("deliveryTime") Integer deliveryTimeId, Model model) {
+                              @RequestParam("deliveryTime") Long deliveryTimeId, Model model) {
         try {
             Optional<Order> orderOptional = orderRepository.findById(orderId);
             if (orderOptional.isPresent()) {
@@ -422,7 +422,7 @@ public class OperatorController {
 
 
     @GetMapping("/operator/userdeleted/{userId}")
-    public String deleteUser(@PathVariable UUID userId, RedirectAttributes redirectAttributes) {
+    public String deleteUser(@PathVariable Long userId, RedirectAttributes redirectAttributes) {
         try {
             if (telegramUserRepository.existsById(userId)) {
                 telegramUserRepository.deleteById(userId);
@@ -475,7 +475,7 @@ public class OperatorController {
         for (Object[] result : results) {
             String fullName = (String) result[0];
             String carType = (String) result[1];
-            UUID courierId = (UUID) result[2];
+            Long courierId = (Long) result[2];
             Integer deliveryTimeId = result[3] != null ? ((Number) result[3]).intValue() : null;
             Long orderSize = result[4] != null ? ((Number) result[4]).longValue() : 0L;
             Long completedOrders = result[5] != null ? ((Number) result[5]).longValue() : 0L;
@@ -493,7 +493,7 @@ public class OperatorController {
 
 
     @GetMapping("/operator/update/courier/{courierId}")
-    public String checkCourier(@PathVariable UUID courierId, Model model) {
+    public String checkCourier(@PathVariable Long courierId, Model model) {
         Courier courier = courierRepository.findById(courierId).orElseThrow(() -> new IllegalArgumentException("Invalid courier Id:" + courierId));
         model.addAttribute("courier", courier);
         return "operator/orders-payment";
@@ -504,7 +504,7 @@ public class OperatorController {
         try {
             List<Courier> couriers = courierRepository.findAll();
             List<Order> orders = orderRepository.findAllByOrderStatus(OrderStatus.CREATED);
-            Map<UUID, Integer> courierIndexesByDistrict = new HashMap<>();
+            Map<Long, Integer> courierIndexesByDistrict = new HashMap<>();
 
             for (Order order : orders) {
                 if (order.getCourier() == null) {

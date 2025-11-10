@@ -26,13 +26,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     boolean existsByCourier(Courier courier);
 
-    List<Order> findAllByCourierIdAndOrderStatusAndDeliveryTime(UUID id, OrderStatus orderStatus, DeliveryTime currentOrderDeliveryTime);
+    List<Order> findAllByCourierIdAndOrderStatusAndDeliveryTime(Long id, OrderStatus orderStatus, DeliveryTime currentOrderDeliveryTime);
 
-    List<Order> findAllByCourierIdAndOrderStatusInAndDeliveryTime(UUID courier_id, Collection<OrderStatus> orderStatus, DeliveryTime deliveryTime);
+    List<Order> findAllByCourierIdAndOrderStatusInAndDeliveryTime(Long courier_id, Collection<OrderStatus> orderStatus, DeliveryTime deliveryTime);
 
     List<Order> findAllByOrderStatusAndDay(OrderStatus orderStatus, LocalDate selectedDay);
 
-    List<Order> findAllByOrderStatusAndDeliveryTimeIdAndDay(OrderStatus orderStatus, Integer id, LocalDate selectedDay);
+    List<Order> findAllByOrderStatusAndDeliveryTimeIdAndDay(OrderStatus orderStatus, Long id, LocalDate selectedDay);
 
     @Query(value = "SELECT\n" +
             "    u.first_name || ' ' || u.last_name AS fullName,\n" +

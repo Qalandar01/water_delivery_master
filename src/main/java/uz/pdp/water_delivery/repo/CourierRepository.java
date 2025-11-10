@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface CourierRepository extends JpaRepository<Courier, UUID> {
+public interface CourierRepository extends JpaRepository<Courier, Long> {
     List<Courier> findAllByIsActive(boolean isActive);
-    boolean existsByUserPhoneOrIdNot(String phone, UUID id);
-    Courier findByUserId(UUID id);
+    boolean existsByUserPhoneOrIdNot(String phone, Long id);
+    Courier findByUserId(Long id);
 
-    boolean existsByUserPhoneAndIdNot(String repairedPhone, UUID id);
+    boolean existsByUserPhoneAndIdNot(String repairedPhone, Long id);
 
     @Query(value = "SELECT DISTINCT c.* " +
             "FROM courier c " +

@@ -1,7 +1,7 @@
 bot:
-    token: 7826483382:AAGyy3aONmiVdkMrDFi6LXYLNNja75r78ik  # Bot token
+    token: 7524788008:AAEV5P69b9hW1CtbvrDDATfyyjewbkVkBwA # Bot token
     secret_token_for_webhook: uOSSV0HFzadbgby4tf6behLf5cp6c8iEz5xiRGV3KME7PH6IRTqmevYx9aze1ruk
-    webhook_url: https://a3f20dee0d3f.ngrok-free.app/api/webhook
+    webhook_url: https://anh-chololithic-transitively.ngrok-free.dev
 #    token: 7976713391:AAE8P3Xx4MzEYDJ5tZhOHvaVP3z_bhxV8zU  # Bot token
 #    token: 7812481635:AAFabkOGeOTZFCTfwWGA7mKhGIK27sntY1s  # Alternative bot token
 
@@ -53,7 +53,7 @@ distance:
         key: AIzaSyC_j-4_IPUad1H_OCLYXgbJ0sooww78usg  # API key for distance calculation (e.g., Google Distance Matrix API)
 
 server:
-    port: 8888
+    port: 8080
 
 
 

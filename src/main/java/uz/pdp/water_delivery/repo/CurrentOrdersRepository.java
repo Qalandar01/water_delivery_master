@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface CurrentOrdersRepository extends JpaRepository<CurrentOrders, UUID> {
+public interface CurrentOrdersRepository extends JpaRepository<CurrentOrders, Long> {
 
     @Query("SELECT co FROM CurrentOrders co " +
             "JOIN co.order o " +
@@ -20,7 +20,7 @@ public interface CurrentOrdersRepository extends JpaRepository<CurrentOrders, UU
             "AND o.orderStatus = :orderStatus " +
             "OR o.orderStatus = :waitingPhone " +
             "ORDER BY co.orderCount asc")
-    List<CurrentOrders> findSortedOrders(@Param("courierId") UUID courierId,
+    List<CurrentOrders> findSortedOrders(@Param("courierId") Long courierId,
                                          @Param("orderStatus") OrderStatus orderStatus, OrderStatus waitingPhone);
 
 
@@ -45,7 +45,7 @@ public interface CurrentOrdersRepository extends JpaRepository<CurrentOrders, UU
             "AND o.orderStatus = :orderStatus " +
             "OR o.orderStatus = :waitingPhone " +
             "ORDER BY co.orderCount desc limit 1")
-    Optional<Integer> getLastCount(@Param("courierId") UUID courierId,
+    Optional<Integer> getLastCount(@Param("courierId") Long courierId,
                                          @Param("orderStatus") OrderStatus orderStatus, OrderStatus waitingPhone);
 
 

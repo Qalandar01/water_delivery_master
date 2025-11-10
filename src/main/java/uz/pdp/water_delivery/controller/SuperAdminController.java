@@ -68,7 +68,7 @@ public class SuperAdminController {
     }
 
     @GetMapping("/super-admin/delete/user/{id}")
-    public String deleteUser(@PathVariable UUID id) {
+    public String deleteUser(@PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
         userRepository.deleteById(user.getId());
@@ -76,7 +76,7 @@ public class SuperAdminController {
     }
 
     @GetMapping("/super-admin/edit/user/{id}")
-    public String editUser(@PathVariable UUID id, Model model) {
+    public String editUser(@PathVariable Long id, Model model) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
         model.addAttribute("user", user);
@@ -84,7 +84,7 @@ public class SuperAdminController {
     }
 
     @PostMapping("/super-admin/edit/user/{id}")
-    public String updateUser(@PathVariable UUID id, @ModelAttribute User user, BindingResult result) {
+    public String updateUser(@PathVariable Long id, @ModelAttribute User user, BindingResult result) {
         if (result.hasErrors()) {
             return "superAdmin/edit-user";
         }

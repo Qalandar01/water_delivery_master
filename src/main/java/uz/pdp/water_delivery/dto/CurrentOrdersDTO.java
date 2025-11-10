@@ -5,7 +5,7 @@ import java.util.UUID;
 public record CurrentOrdersDTO(
         Long orderId,
         Location location,
-        UUID courierId
+        Long courierId
 ) {
 
 

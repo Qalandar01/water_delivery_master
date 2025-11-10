@@ -11,10 +11,10 @@ import java.util.UUID;
 @NoArgsConstructor
 public class VerifyUserDTO {
 
-    private UUID tgUserId;
+    private Long tgUserId;
     private Double longitude;
     private Double latitude;
-    private UUID districtId;
+    private Long districtId;
     private String addressLine;
     private String phone;
     private boolean isHome = false;

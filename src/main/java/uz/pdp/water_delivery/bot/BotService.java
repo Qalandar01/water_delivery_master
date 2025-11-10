@@ -597,7 +597,7 @@ public class BotService implements BotServiceIn {
 
 
     private DeliveryTime extractDeliveryTimeFromCallbackQuery(CallbackQuery callbackQuery) {
-        int deliveryTimeId = Integer.parseInt(callbackQuery.data());
+        Long deliveryTimeId = Long.parseLong(callbackQuery.data());
         return deliveryTimeRepository.findById(deliveryTimeId).orElseThrow(() -> new RuntimeException("delivery time not found"));
     }
 
@@ -978,7 +978,7 @@ public class BotService implements BotServiceIn {
         String[] splitData = data.contains("_") ? data.split("_") : new String[]{data};
         String basketId = splitData.length > 1 ? splitData[1] : null;
         if (basketId != null) {
-            Optional<Basket> basketOptional = basketRepository.findById(Integer.valueOf(basketId));
+            Optional<Basket> basketOptional = basketRepository.findById(Long.valueOf(basketId));
             basketOptional.ifPresent(basket -> {
                 basketRepository.delete(basket);
                 showBasket(telegramUser);
@@ -1000,7 +1000,7 @@ public class BotService implements BotServiceIn {
 
     @Override
     public void removeBasketProduct(TelegramUser telegramUser, String data) {
-        int basketId = Integer.parseInt(data.split("_")[1]);
+        long basketId = Long.parseLong(data.split("_")[1]);
         basketRepository.deleteById(basketId);
         deleteMessageService.deleteMessageAll(telegramBot, telegramUser);
         showBasket(telegramUser);

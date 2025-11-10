@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @Builder
 public class BottleTypeDTO {
-    private Integer id;
+    private Long id;
     private String type;
     private boolean active;
     private String description;
