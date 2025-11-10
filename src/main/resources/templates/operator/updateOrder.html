@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update Order</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 500px;
+      position: relative;
+    }
+    h2 {
+      text-align: center;
+      color: #333333;
+      margin-bottom: 20px;
+    }
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .cancel-button {
+      background-color: #dc3545;
+    }
+    .cancel-button:hover {
+      background-color: #c82333;
+    }
+    .back-button {
+      background-color: #6c757d;
+    }
+    .back-button:hover {
+      background-color: #5a6268;
+    }
+    .order-info {
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #555555;
+    }
+    .popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 1000;
+    }
+    .popup.error {
+      background-color: #f44336;
+    }
+    .popup.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    #confirmDialog {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Update Order</h2>
+
+  <div class="order-info">
+    <p><strong>Sanasi:</strong> <span th:text="${order.day}"></span></p>
+    <p><strong>Tanlangan vaqt:</strong>
+      <span th:text="${order.deliveryTime.startTime}"></span> -
+      <span th:text="${order.deliveryTime.endTime}"></span></p>
+    <p><strong>Tuman:</strong> <span th:text="${order.district.name}"></span></p>
+    <p><strong>Manzil:</strong> <span th:text="${order.telegramUser.addressLine}"></span></p>
+    <p><strong>Telefon raqami:</strong> <span th:text="${order.phone}"></span></p>
+
+    <p><strong>Mahsulot turlari:</strong></p>
+    <ul>
+      <li th:each="product : ${orderProducts}">
+        <strong>Mahsulot turi:</strong> <span th:text="${product.bottleTypes.type}"></span>
+        <strong>Soni:</strong> <span th:text="${product.amount} + ' ta'"></span>
+        <p th:if="${product.bottleTypes.sale_active == true}">
+          <strong>Chegirma:</strong> <span th:text="${product.bottleTypes.sale_amount} + ' ta'"></span>
+        </p>
+      </li>
+    </ul>
+  </div>
+
+
+  <form th:action="@{/operator/update/order}" method="post">
+    <input type="hidden" name="orderId" th:value="${order.id}"/>
+
+    <label for="deliveryTime" class="mt-4 mb-2">Vaqtni tanlang:</label>
+    <select name="deliveryTime" id="deliveryTime" class="form-control" required>
+      <option th:each="time : ${availableTimes}"
+              th:value="${time.id}"
+              th:text="${time.day} + ' ' + ${time.startTime} + ' - ' + ${time.endTime}"
+              th:selected="${time.id == selectedTimeId}">
+      </option>
+    </select>
+
+    <button type="submit" class="btn btn-primary mt-4">Yangilash</button>
+  </form>
+
+  <button type="button" class="cancel-button" onclick="showConfirmDialog()">Bekor qilish</button>
+  <div id="confirmDialog">
+    <p style="font-size: 16px; color: #333333;">Ishonchingiz komilmi bekor qilishga?</p>
+    <button onclick="confirmCancel(true)" style="background-color: #007bff; color: white; border: none; padding: 10px; width: 45%; margin-right: 10px; border-radius: 4px; cursor: pointer;">Ha</button>
+    <button onclick="confirmCancel(false)" style="background-color: #dc3545; color: white; border: none; padding: 10px; width: 45%; border-radius: 4px; cursor: pointer;">Yo'q</button>
+  </div>
+
+  <button type="button" class="back-button" onclick="window.history.back();">Back</button>
+</div>
+
+<script>
+  function showPopup(message, isError) {
+    const popup = document.createElement('div');
+    popup.className = `popup ${isError ? 'error' : ''}`;
+    popup.innerText = message;
+    document.body.appendChild(popup);
+    setTimeout(() => {
+      popup.classList.add('show');
+    }, 100);
+    setTimeout(() => {
+      popup.classList.remove('show');
+      setTimeout(() => {
+        document.body.removeChild(popup);
+      }, 300);
+    }, 3000);
+  }
+
+  function showConfirmDialog() {
+    document.getElementById('confirmDialog').style.display = 'block';
+  }
+
+  function confirmCancel(isConfirmed) {
+    document.getElementById('confirmDialog').style.display = 'none';
+    if (isConfirmed) {
+      const form = document.createElement('form');
+      form.method = 'post';
+      form.action = '/operator/cancel/order';
+      const orderIdInput = document.createElement('input');
+      orderIdInput.type = 'hidden';
+      orderIdInput.name = 'orderId';
+      orderIdInput.value = document.querySelector('[name="orderId"]').value;
+      form.appendChild(orderIdInput);
+      document.body.appendChild(form);
+      form.submit();
+      showPopup('Buyurtma muvaffaqiyatli bekor qilindi.', false);
+    } else {
+      showPopup('Bekor qilish rad etildi.', true);
+    }
+  }
+</script>
+
+</body>
+</html>

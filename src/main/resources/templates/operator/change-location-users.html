@@ -1,0 +1,78 @@
+
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Operator Page</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/menu.css}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <a class="navbar-brand" th:href="@{/}"><i class="fa-solid fa-home"></i> Home</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+</nav>
+
+
+<div class="container-fluid section-padding">
+  <h4 class="text-center text-success-emphasis m-3"><i class="fa-solid fa-users"></i> Manzilini o'zgartirgan mijozlar <span class="badge badge-pill badge-danger" th:text="${users.size()}"></span></h4>
+  <div class="row">
+    <div class="col-md-11">
+      <div class="shadow p-3 mb-5 bg-white rounded">
+        <div class="d-flex justify-content-between align-items-center">
+        </div>
+        <table class="table table-bordered table-hover ">
+          <thead class="thead-blue">
+          <tr>
+            <th scope="col"> <i class="fa-solid fa-phone"></i> Telefon raqamlar </th>
+            <th scope="col"> <i class="fa-solid fa-gear"></i> Sozlamalar </th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="user : ${users}">
+            <td th:text="${user.getUserPhone()}"></td>
+            <td>
+              <a th:href="@{/operator/currentUser/{userId}(userId=${user.getId()})}" class="btn btn-success  col-lg-2 offset-7" ><i class="fa-solid fa-play"></i> Start</a>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    connectWebSocket();
+  });
+  var stompClient = null;
+  function connectWebSocket() {
+    var socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+      console.log('Connected: ' + frame);
+      stompClient.subscribe('/topic/status', function (message) {
+        console.log('Received message: ' + message.body);
+        window.location.reload();
+      });
+    }, function (error) {
+      console.error('Error connecting WebSocket: ', error);
+      setTimeout(connectWebSocket, 5000);
+    });
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Time Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/super-admin.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-custom">
+    <a class="navbar-brand" th:href="@{/}"><i class="fas fa-home"></i> Home </a>
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link text-white" href="/logout"><i class="fas fa-arrow-left"></i> Logout</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="container">
+    <h1 class="text-center my-4">Delivery Time Management</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>No</th>
+            <th>Day</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tbody>
+        <tr th:each="time, iterStat : ${deliveryTimes}" th:data-id="${time.id}">
+            <input type="hidden" name="id" th:value="${time.id}" />
+            <td th:text="${iterStat.index + 1}"></td>
+            <td th:text="${time.day}" class="text-muted"></td>
+            <td><input type="time" class="form-control start-time" name="startTime" th:value="${time.startTime}" /></td>
+            <td><input type="time" class="form-control end-time" name="endTime" th:value="${time.endTime}" /></td>
+            <td class="text-center">
+                <button type="button" class="btn btn-success btn-save mr-2" style="display: none;">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </td>
+        </tr>
+        </tbody>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.start-time, .end-time').on('input', function () {
+            const row = $(this).closest('tr');
+            const saveButton = row.find('.btn-save');
+            saveButton.show();
+        });
+
+        $('.btn-save').on('click', function () {
+            const row = $(this).closest('tr');
+            const id = row.data('id');
+
+            const startTime = row.find('.start-time').val();
+            const endTime = row.find('.end-time').val();
+
+            const formData = {
+                startTime: startTime,
+                endTime: endTime
+            };
+
+            $.ajax({
+                url: '/admin/update/delivery-time/' + id,
+                method: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                data: formData,
+                success: function (response) {
+                    alert('Changes saved successfully!');
+                    row.find('.btn-save').hide();
+                },
+                error: function (xhr, status, error) {
+                    const errorMessage = xhr.responseText ? xhr.responseText : 'An unknown error occurred!';
+                    alert(`Error saving changes: ${errorMessage}`);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Role Selection</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #4caf50, #2e7d32);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px 30px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 90%;
+      max-width: 400px;
+      color: #333;
+    }
+    h1 {
+      color: #4caf50;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      appearance: none;
+      background: #f9f9f9;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #388e3c;
+    }
+    p {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Rollaringizni tanlang</h1>
+
+  <form id="role-form" action="/switch-role" method="get">
+    <select id="role-select" name="roleName">
+      <option value="" disabled selected>Tanlang</option>
+      <th:block th:each="role : ${roles}">
+        <option th:value="${role.roleName}" th:text="${role.roleName}"></option>
+      </th:block>
+    </select>
+    <button type="submit">Tasdiqlash</button>
+  </form>
+
+  <p id="no-role-message" th:if="${roles.isEmpty()}">Sizda hech qanday rol mavjud emas</p>
+</div>
+
+<script>
+  const roleSelect = document.getElementById("role-select");
+
+  document.getElementById("role-form").addEventListener("submit", function (event) {
+    if (!roleSelect.value) {
+      event.preventDefault();
+      alert("Iltimos, ro'l tanlang!");
+    }
+  });
+</script>
+</body>
+</html>

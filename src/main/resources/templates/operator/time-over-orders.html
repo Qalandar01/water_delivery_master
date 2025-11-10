@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Order Management</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+        body, html {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: #10208c;
+        }
+
+        .navbar-custom {
+            background-color: #042d56;
+            border-bottom: 2px solid #04AA6D;
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-custom .navbar-brand {
+            font-weight: bold;
+            color: #fff;
+            transition: color 0.3s;
+        }
+
+        .navbar-custom .navbar-brand:hover {
+            color: #ffc107;
+        }
+
+        .navbar-custom .nav-link {
+            color: #fff;
+            margin-right: 1rem;
+            transition: color 0.3s;
+        }
+
+        .navbar-custom .nav-link:hover {
+            color: #ffc107;
+        }
+
+        .navbar-custom .navbar-toggler {
+            border: none;
+            color: #fff;
+        }
+
+        .btn-custom {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .btn-custom:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-custom.active {
+            background-color: #ffc107;
+            color: #fff;
+        }
+
+        .section-padding {
+            width: 85%;
+            margin: 20px auto;
+            border-radius: 12px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .section-heading {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #07427e;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .section-heading i {
+            color: #0c4d93;
+            margin-right: 10px;
+
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .text-white {
+            color: #fff;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #dddddd;
+        }
+
+        th, td {
+            padding: 12px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <a class="navbar-brand" th:href="@{/}"><i class="fa-solid fa-home"></i> Home</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="javascript:void(0);" onclick="goBack()"><i class="fa-solid fa-arrow-left"></i> Back</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="section-padding">
+    <div class="section-heading"><i class="fa-solid fa-clock"></i> Vaqtida yetkazilmagan buyurtmalar </div>
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-hover text-center">
+                <thead class="bg-success text-white text-center">
+                <tr>
+                    <th><i class="fa-solid fa-user"></i> Full Name</th>
+                    <th><i class="fa-solid fa-map-marker-alt"></i> District</th>
+                    <th><i class="fa-solid fa-phone"></i> Phone</th>
+                    <th><i class="fa-solid fa-check"></i> Status</th>
+                    <th><i class="fa-solid fa-cog"></i> Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.telegramUser?.user?.firstName ?: 'N/A'} + ' ' + ${order.telegramUser?.user?.lastName ?: ''}"></td>
+                    <td th:text="${order.district?.name ?: 'No District'}"></td>
+                    <td th:text="${order.phone ?: 'No Phone'}"></td>
+                    <td th:text="${order.orderStatus ?: 'Unknown'}"></td>
+                    <td>
+                        <a th:href="@{'/operator/update/order/' + ${order.id}}" class="btn btn-info col-12">
+                            <i class="fa-solid fa-edit"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function goBack() {
+        window.location.href = "/operator/orders";
+    }
+</script>
+</body>
+</html>

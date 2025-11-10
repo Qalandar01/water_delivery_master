@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .container-fluid {
+            height: 100%;
+            padding: 20px;
+        }
+
+        .navbar {
+            background-color: #042d56;
+            border-bottom: 2px solid #04AA6D;
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            max-width: 100%;
+        }
+
+        .form-container h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .form-container form {
+            background-color: #ffffff;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .form-group label {
+            font-weight: 600;
+        }
+
+        .form-container .btn {
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .map-container {
+            height: calc(100% - 60px);
+            background-color: #e9ecef;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            background-color: #f8f9fa;
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+
+            .form-container form {
+                width: 100%;
+            }
+
+            .form-container {
+                flex-direction: column;
+            }
+        }
+        ::placeholder {
+            color: #999;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-light shadow-sm mb-4">
+        <a th:href="@{/operator}" class="btn btn-light">
+            <i class="fa-solid fa-circle-chevron-left mr-1"></i> Back
+        </a>
+        <h1 class="navbar-brand mx-auto text-center text-white">🧾 Mijoz haqida ma'lumot</h1>
+        <form id="noPhoneForm" action="/operator/noPhone" method="post">
+            <input type="hidden" th:value="${userInfo.id}" name="tgUserId">
+            <button id="noPhoneButton" class="btn btn-danger btn-block mb-2">
+                <i class="fa-solid fa-phone-slash"></i> Telefonni olmadi
+            </button>
+        </form>
+    </nav>
+
+    <div class="row h-100">
+        <div class="col-md-4 form-container">
+            <form id="verifyForm" action="/operator/verify" method="post" class="border p-4 rounded shadow-sm bg-light mb-3">
+                <input type="hidden" th:value="${userInfo.id}" name="tgUserId">
+
+                <h3>☎️ Tel: <span th:text="${userInfo.user.phone}"></span></h3>
+
+                <hr>
+                <div class="form-group">
+                    <label for="addressLine">🏡 Manzil</label>
+                    <textarea name="addressLine" id="addressLine" class="form-control" rows="3" required
+                              th:placeholder="${userInfo.addressLine == null ? 'Manzilni kiriting' : ''}"
+                              th:text="${userInfo.addressLine != null ? userInfo.addressLine : ''}"
+                              placeholder="Manzilni kiriting"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="isApartment">🏠 Kvartirami Xonadonmi?</label>
+                    <select name="isApartment" id="isApartment" class="form-control" onchange="toggleApartmentFields()">
+                        <option value="false" selected>Xonadon</option>
+                        <option value="true">Kvartira</option>
+                    </select>
+                </div>
+
+                <div id="apartmentFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="podyez">🏢 Podyez</label>
+                        <input type="text" name="podyez" id="podyez" class="form-control"
+                               th:value="${userInfo.podyez != null ? userInfo.podyez : ''}" placeholder="Podyezni kiriting">
+                    </div>
+                    <div class="form-group">
+                        <label for="qavat">🛗 Qavat</label>
+                        <input type="text" name="qavat" id="qavat" class="form-control"
+                               th:value="${userInfo.qavat != null ? userInfo.qavat : ''}" placeholder="Qavatni kiriting">
+                    </div>
+                    <div class="form-group">
+                        <label for="kvRaqami">🏠 Kvartira raqami</label>
+                        <input type="text" name="kvRaqami" id="kvRaqami" class="form-control"
+                               th:value="${userInfo.kvRaqami != null ? userInfo.kvRaqami : ''}" placeholder="Kvartira raqamini kiriting">
+                    </div>
+                </div>
+
+                <div id="houseFields">
+                    <div class="form-group">
+                        <label for="xonadon">🏡 Xonadon</label>
+                        <input type="text" name="xonadon" id="xonadon" class="form-control"
+                               th:value="${userInfo.xonadon != null ? userInfo.xonadon : ''}" placeholder="Xonadonni kiriting">
+                    </div>
+                </div>
+
+                <div class="card p-2 my-2">
+                    <p>📍 Latitude: <span id="latitude"></span></p>
+                    <input type="hidden" name="latitude" id="latitude_inp">
+                    <p>📍 Longitude: <span id="longitude"></span></p>
+                    <input type="hidden" name="longitude" id="longitude_inp">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Telefon raqamini o'zgartirish</label>
+                    <input type="text" name="phone" id="phone" class="form-control"
+                           th:value="${userInfo.user.doublePhone != null ? userInfo.user.doublePhone : userInfo.user.phone}"/>
+                </div>
+                <button id="verifyButton" class="btn btn-success btn-block mb-2">
+                    ✅ Tasdiqlash
+                </button>
+            </form>
+        </div>
+
+        <div class="col-md-8 map-container">
+            <div id="map" style="height: 90%; width: 100%;" class="border rounded shadow-sm"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://api-maps.yandex.ru/2.1/?lang=en_US" type="text/javascript"></script>
+<script>
+    ymaps.ready(function() {
+        let latitude = parseFloat([[${userInfo.location.latitude}]]);
+        let longitude = parseFloat([[${userInfo.location.longitude}]]);
+
+        if (isNaN(latitude) || isNaN(longitude)) {
+            console.error('Invalid coordinates:', latitude, longitude);
+            return;
+        }
+
+        document.getElementById('latitude').innerText = latitude;
+        document.getElementById('latitude_inp').value = latitude;
+        document.getElementById('longitude').innerText = longitude;
+        document.getElementById('longitude_inp').value = longitude;
+
+        var myMap = new ymaps.Map("map", {
+            center: [latitude, longitude],
+            zoom: 18
+        });
+
+        var myPlacemark = new ymaps.Placemark([latitude, longitude], {
+            hintContent: 'Drag me!',
+            balloonContent: 'Center of the map'
+        }, {
+            draggable: true
+        });
+
+        myMap.geoObjects.add(myPlacemark);
+
+        myPlacemark.events.add('dragend', function (e) {
+            var coords = e.get('target').geometry.getCoordinates();
+            myMap.setCenter(coords);
+            document.getElementById('latitude').innerText = coords[0];
+            document.getElementById('latitude_inp').value = coords[0];
+            document.getElementById('longitude').innerText = coords[1];
+            document.getElementById('longitude_inp').value = coords[1];
+        });
+    });
+    function toggleApartmentFields() {
+        const isApartment = document.getElementById('isApartment').value === 'true';
+        document.getElementById('apartmentFields').style.display = isApartment ? 'block' : 'none';
+        document.getElementById('houseFields').style.display = isApartment ? 'none' : 'block';
+        const apartmentFields = document.querySelectorAll('#apartmentFields input');
+        apartmentFields.forEach(field => field.required = isApartment);
+        const houseField = document.getElementById('xonadon');
+        houseField.required = !isApartment;
+    }
+
+
+</script>
+</body>
+</html>

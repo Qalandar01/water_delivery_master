@@ -1,0 +1,236 @@
+/* Global Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f9fa;
+    color: #042d56;
+}
+
+/* Navbar Styles */
+.navbar-custom {
+    background-color: #042d56;
+    padding: 0.5rem 1rem;
+}
+
+.navbar-custom .navbar-brand {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.navbar-custom .navbar-brand:hover {
+    color: #ffc107;
+}
+
+/* Container */
+.container {
+    margin-top: 40px;
+}
+
+/* Table Styles */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 1em;
+    text-align: left;
+    border: 1px solid #ffffff;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+    text-align: center;
+}
+
+.styled-table thead tr {
+    background-color: #042d56;
+    color: #ffffff;
+    text-align: center;
+}
+
+.styled-table tbody tr:nth-child(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #ddd;
+}
+
+/* Switch Button Styles */
+.btn3_container {
+    width: 60px;
+    height: 30px;
+    background-color: #fff;
+    display: flex;
+    position: relative;
+    border: 3px solid #111;
+    border-color: #fff;
+    border-radius: 50px;
+    background-color: #fff;
+    box-shadow: -1px 3px 22px 0px rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    margin: 0 auto;
+}
+
+.main {
+    width: 30px;
+    height: 30px;
+    background-color: red;
+    border-radius: 50%;
+    transition: all 300ms ease;
+}
+
+.active3 {
+    transform: translateX(30px);
+    background-color: green;
+}
+
+/* Alerts */
+.alert {
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+/* From Uiverse.io by Awadhesh684827 */
+.switch {
+    position: relative;
+    width: 5.5em;
+    height: 5.5em;
+}
+
+.checkbox,
+.slider,
+.svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.checkbox,
+.svg {
+    width: 100%;
+    height: 100%;
+}
+
+.checkbox {
+    background-color: hsl(3, 90%, 40%);
+    border-radius: 50%;
+    box-shadow:
+            0 0 0 0.1em hsl(3, 90%, 25%) inset,
+            0 0 0 0.2em hsl(3, 90%, 65%) inset,
+            -0.3em 0.5em 0 hsl(3, 90%, 50%) inset,
+            0 0.15em 0 hsla(0, 0%, 0%, 0.2);
+    filter: brightness(1);
+    transition:
+            background-color 0.15s linear,
+            box-shadow 0.15s linear,
+            filter 0.15s linear,
+            transform 0.15s linear;
+    appearance: none;
+}
+
+.checkbox:active {
+    box-shadow:
+            0 0 0 0.1em hsl(3, 90%, 25%) inset,
+            0 0 0 0.2em hsl(3, 90%, 65%) inset,
+            -0.3em 0.5em 0 hsl(3, 90%, 50%) inset,
+            0 0.05em 0 hsla(0, 0%, 0%, 0.2);
+}
+
+.checkbox:active,
+.checkbox:active + .svg {
+    transform: scale(0.9);
+}
+
+.checkbox:checked {
+    background-color: hsl(123, 90%, 30%);
+    box-shadow:
+            0 0 0 0.1em hsl(123, 90%, 15%) inset,
+            0 0 0 0.2em hsl(123, 90%, 55%) inset,
+            -0.3em 0.5em 0 hsl(123, 90%, 40%) inset,
+            0 0.15em 0 hsla(0, 0%, 0%, 0.2);
+}
+
+.checkbox:checked:active {
+    box-shadow:
+            0 0 0 0.1em hsl(123, 90%, 15%) inset,
+            0 0 0 0.2em hsl(123, 90%, 55%) inset,
+            -0.3em 0.5em 0 hsl(123, 90%, 40%) inset,
+            0 0.05em 0 hsla(0, 0%, 0%, 0.2);
+}
+
+.checkbox:focus,
+.checkbox:hover {
+    filter: brightness(1.2);
+}
+
+.checkbox:focus {
+    outline: 0;
+}
+
+.slider {
+    clip: rect(1px, 1px, 1px, 1px);
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+}
+
+.svg {
+    pointer-events: none;
+    transition: transform 0.15s linear;
+}
+
+.svg-ring,
+.svg-line {
+    stroke: hsl(223, 90%, 100%);
+}
+
+.svg-ring {
+    stroke-dasharray: 0 5 27.7 5;
+    transition:
+            stroke 0.15s ease-in-out,
+            stroke-dasharray 0.3s 0.25s ease-in-out;
+}
+
+.checkbox:checked + .svg .svg-ring {
+    stroke-dasharray: 0 0 0 37.7;
+    transition-delay: 0s;
+}
+
+.svg-line {
+    stroke-dashoffset: 3;
+    transition:
+            stroke 0.15s linear,
+            stroke-dashoffset 0.3s ease-in-out;
+}
+
+.svg-line:nth-of-type(1) {
+    transition-delay: 0s, 0.25s;
+}
+
+.checkbox:checked + .svg .svg-line:nth-of-type(1) {
+    stroke-dashoffset: -6;
+    transition-delay: 0s;
+}
+
+.svg-line:nth-of-type(2) {
+    stroke-dashoffset: 6;
+}
+
+.checkbox:checked + .svg .svg-line:nth-of-type(2) {
+    stroke-dashoffset: -3;
+    transition-delay: 0s, 0.25s;
+}
+

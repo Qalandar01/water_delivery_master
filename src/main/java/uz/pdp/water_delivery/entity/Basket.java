@@ -1,0 +1,36 @@
+package uz.pdp.water_delivery.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import uz.pdp.water_delivery.bot.TelegramUser;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "baskets")
+public class Basket {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    private TelegramUser telegramUser;
+
+    @ManyToOne
+    private BottleTypes bottleType;
+
+    private Integer amount;
+
+    private Integer messageId;
+
+
+    public Double getTotalPrice() {
+        return (double) (amount * bottleType.getPrice());
+    }
+}

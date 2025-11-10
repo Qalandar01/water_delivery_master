@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idishni O'zgartirish</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #042d56;
+        }
+        .navbar-custom {
+            background-color: #042d56;
+            padding: 0.5rem 1rem;
+        }
+        .navbar-custom .navbar-brand {
+            color: #fff;
+        }
+        .navbar-custom .navbar-brand:hover {
+            color: #ffc107;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .bottle-img {
+            width: 100px;
+            height: 200px;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            display: block;
+        }
+        .switch-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .switch {
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background: #ccc;
+            border-radius: 15px;
+            transition: background 0.3s ease;
+        }
+        .switch.active {
+            background: #4caf50;
+        }
+        .switch-circle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .switch.active .switch-circle {
+            transform: translateX(25px);
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <a class="navbar-brand" th:href="@{/admin/bottle/menu}"><i class="fa-solid fa-home"></i> Bottle Menu</a>
+</nav>
+
+<div class="container">
+    <h3 class="text-center mb-4">Idishni O'zgartirish</h3>
+
+    <form th:action="@{/admin/bottle/update}" th:object="${bottleType}" method="post" enctype="multipart/form-data">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="form-group text-center">
+            <img th:src="'data:image/jpeg;base64,' + ${base64Image}" class="bottle-img" id="previewImage" alt="Bottle Image">
+        </div>
+
+        <div class="form-group">
+            <label for="image">Rasm yuklash</label>
+            <input type="file" class="form-control-file" id="image" th:field="*{image}" accept="image/*" onchange="previewImage(event)">
+        </div>
+
+        <div class="form-group">
+            <label for="type">Idish Turi</label>
+            <input type="text" th:field="*{type}" class="form-control" id="type" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Tavsif</label>
+            <textarea th:field="*{description}" class="form-control" id="description" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Narx</label>
+            <input type="number" th:field="*{price}" class="form-control" id="price" required>
+        </div>
+
+        <div class="form-group">
+            <label for="active">Faol</label>
+            <div class="switch-container" onclick="toggleSwitch('active')">
+                <div id="activeSwitch" class="switch">
+                    <div class="switch-circle"></div>
+                </div>
+            </div>
+            <input type="checkbox" th:field="*{active}" class="d-none" id="active">
+        </div>
+
+        <div class="form-group">
+            <label for="isReturnable">Qaytariladigan idish</label>
+            <div class="switch-container" onclick="toggleSwitch('isReturnable')">
+                <div id="isReturnableSwitch" class="switch">
+                    <div class="switch-circle"></div>
+                </div>
+            </div>
+            <input type="checkbox" th:field="*{returnable}" class="d-none" id="isReturnable">
+        </div>
+
+        <button type="submit" class="btn btn-success">Saqlash</button>
+        <a href="/admin/bottle/menu" class="btn btn-secondary">Bekor qilish</a>
+    </form>
+</div>
+
+<script>
+    function previewImage(event) {
+        const image = document.getElementById('previewImage');
+        image.src = URL.createObjectURL(event.target.files[0]);
+        image.onload = () => URL.revokeObjectURL(image.src);
+    }
+
+    function toggleSwitch(id) {
+        const switchElement = document.getElementById(id + 'Switch');
+        const checkbox = document.getElementById(id);
+
+        if (checkbox.checked) {
+            switchElement.classList.remove('active');
+        } else {
+            switchElement.classList.add('active');
+        }
+
+        checkbox.checked = !checkbox.checked;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        ['active', 'isReturnable'].forEach(id => {
+            const checkbox = document.getElementById(id);
+            const switchElement = document.getElementById(id + 'Switch');
+
+            if (checkbox.checked) {
+                switchElement.classList.add('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

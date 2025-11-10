@@ -1,0 +1,115 @@
+package uz.pdp.water_delivery.bot;
+
+import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.request.DeleteMessage;
+import jakarta.persistence.*;
+import lombok.*;
+import uz.pdp.water_delivery.dto.Location;
+import uz.pdp.water_delivery.entity.*;
+import uz.pdp.water_delivery.entity.abs.AbsEntity;
+import uz.pdp.water_delivery.entity.enums.TelegramState;
+
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.util.Locale;
+
+@Getter
+@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "telegram_user")
+public class TelegramUser extends AbsEntity {
+
+    private Long chatId;
+
+    @Enumerated(EnumType.STRING)
+    private TelegramState state = TelegramState.START;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private User user;
+
+    private Integer getDeletingMessage;
+
+    @Embedded
+    private Location location;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Region region;
+
+    @ManyToOne
+    private District district;
+
+    private boolean isHome = false;
+
+    private String xonadon;
+
+    private String podyez;
+
+    private String qavat;
+
+    private String kvRaqami;
+
+    private String password;
+
+
+
+    private Integer deletingMessage;
+
+    private Boolean verified = false;
+
+    private String addressLine;
+
+    private Integer bottleCount = 1;
+
+    private Integer editingMessageId;
+
+    private Integer orderCount = 1;
+
+    private Integer currentOrderCount = 0;
+
+    private Boolean phoneOff = false;
+
+    private Boolean changeLocation = false;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private BottleTypes bottleTypes;
+
+    @ManyToOne
+    private DeliveryTime currentOrderDeliveryTime;
+
+    private LocalDate currentOrderDay;
+
+    private Long currentOrderId;
+
+    private Integer editingCurrentMessageId;
+
+    public TelegramUser(Long chatId) {
+        this.chatId = chatId;
+    }
+
+    public Long generateOrderId() {
+        return Long.parseLong(chatId + "" + orderCount++);
+    }
+
+    public String calcTotalAmountOfCurrentOrder() {
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.FRANCE);
+        return numberFormat.format(bottleTypes.getPrice() * bottleCount);
+    }
+
+
+
+    public void deleteMessage(TelegramBot telegramBot, Integer messageId) {
+        if (messageId != null) {
+            telegramBot.execute(new DeleteMessage(chatId, messageId));
+        }
+    }
+
+    public void deleteMessage(TelegramBot telegramBot, Integer messageId, Integer deletingMessage) {
+        if (messageId != null && deletingMessage != null) {
+            telegramBot.execute(new DeleteMessage(chatId, messageId));
+            telegramBot.execute(new DeleteMessage(chatId, deletingMessage));
+        }
+    }
+}

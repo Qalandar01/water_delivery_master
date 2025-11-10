@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/super-admin.css">
+</head>
+<body>
+<nav class="navbar navbar-custom">
+    <a class="navbar-brand" th:href="@{/}">Admin Panel</a>
+</nav>
+
+<div class="container mt-4">
+    <h2 class="text-center">Edit User</h2>
+    <form th:action="@{/admin/edit/user/{id}(id=${user.id})}" th:object="${user}" method="post">
+        <div class="form-group">
+            <label for="firstName"><i class="fas fa-user"></i> First Name</label>
+            <input type="text" id="firstName" class="form-control" th:field="*{firstName}" placeholder="Enter first name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="lastName"><i class="fas fa-user"></i> Last Name</label>
+            <input type="text" id="lastName" class="form-control" th:field="*{lastName}" placeholder="Enter last name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="phone"><i class="fas fa-phone"></i> Phone</label>
+            <input type="text" id="phone" class="form-control" th:field="*{phone}" placeholder="Enter phone number" required>
+        </div>
+
+        <div class="form-group">
+            <label class="switch">
+                <input class="checkbox" id="active" th:field="*{active}" type="checkbox" />
+                <svg
+                        class="svg"
+                        width="24px"
+                        height="24px"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                >
+                    <ellipse
+                            class="svg-dot"
+                            cx="6"
+                            cy="6"
+                            rx="2"
+                            ry="1"
+                            fill="#fff"
+                            transform="rotate(-45,6,6)"
+                    ></ellipse>
+                    <circle
+                            class="svg-ring"
+                            cx="12"
+                            cy="12"
+                            r="6"
+                            fill="none"
+                            stroke="#fff"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-dasharray="0 5 27.7 5"
+                            stroke-dashoffset="0.01"
+                            transform="rotate(-90,12,12)"
+                    ></circle>
+                    <line
+                            class="svg-line"
+                            x1="12"
+                            y1="6"
+                            x2="12"
+                            y2="15"
+                            stroke="#fff"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-dasharray="9 9"
+                            stroke-dashoffset="3"
+                    ></line>
+                    <line
+                            class="svg-line"
+                            x1="12"
+                            y1="6"
+                            x2="12"
+                            y2="12"
+                            stroke="#fff"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-dasharray="6 6"
+                            stroke-dashoffset="6"
+                    ></line>
+                </svg>
+            </label>
+            <label for="active">Active</label>
+        </div>
+        <div class="form-group">
+            <label class="switch">
+                <input class="checkbox" id="paid" th:field="*{paid}" type="checkbox" />
+                <svg
+                        class="svg"
+                        width="24px"
+                        height="24px"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                >
+                    <ellipse
+                            class="svg-dot"
+                            cx="6"
+                            cy="6"
+                            rx="2"
+                            ry="1"
+                            fill="#fff"
+                            transform="rotate(-45,6,6)"
+                    ></ellipse>
+                    <circle
+                            class="svg-ring"
+                            cx="12"
+                            cy="12"
+                            r="6"
+                            fill="none"
+                            stroke="#fff"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-dasharray="0 5 27.7 5"
+                            stroke-dashoffset="0.01"
+                            transform="rotate(-90,12,12)"
+                    ></circle>
+                    <line
+                            class="svg-line"
+                            x1="12"
+                            y1="6"
+                            x2="12"
+                            y2="15"
+                            stroke="#fff"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-dasharray="9 9"
+                            stroke-dashoffset="3"
+                    ></line>
+                    <line
+                            class="svg-line"
+                            x1="12"
+                            y1="6"
+                            x2="12"
+                            y2="12"
+                            stroke="#fff"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-dasharray="6 6"
+                            stroke-dashoffset="6"
+                    ></line>
+                </svg>
+            </label>
+            <label for="paid"><i class="fas fa-money-bill-wave"></i> Paid</label>
+        </div>
+
+
+
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

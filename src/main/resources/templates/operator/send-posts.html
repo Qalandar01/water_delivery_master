@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Image to Telegram Users</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            width: 100%;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .container {
+            background-color: white;
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            margin-top: 80px; /* Navbardan keyin joy qoldirish */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .file-input {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .file-input input[type="file"] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        #preview {
+            display: none;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            resize: none;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            height: 100px;
+        }
+
+        #sendButton {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #sendButton:hover {
+            background-color: #45a049;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #4CAF50;
+            text-decoration: none;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .back-btn i {
+            margin-right: 8px;
+        }
+
+        .back-btn:hover {
+            color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <a href="/">Home</a>
+    <a href="javascript:history.back()" class="back-btn"><i>&#8592;</i> Back</a>
+</div>
+<div class="container">
+    <h1>Send Image to Telegram Users</h1>
+    <label class="file-input">
+        Upload Image
+        <input type="file" id="imageInput" accept="image/*"/>
+    </label>
+    <img id="preview" src="#" alt="Image Preview"/>
+    <textarea id="description" placeholder="Enter description here"></textarea>
+    <button id="sendButton" onclick="sendImage()">Send</button>
+</div>
+
+<script>
+    const imageInput = document.getElementById("imageInput");
+    const preview = document.getElementById("preview");
+
+    imageInput.addEventListener("change", function () {
+        const file = imageInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function sendImage() {
+        const formData = new FormData();
+        formData.append("image", imageInput.files[0]);
+        formData.append("description", document.getElementById("description").value);
+
+        fetch("/send-image", {
+            method: "POST",
+            headers: {"Accept": "application/json"},
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Server response was not ok.");
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert("Image sent successfully!");
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+    }
+</script>
+</body>
+</html>

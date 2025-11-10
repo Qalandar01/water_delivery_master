@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Order Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            width: 100%;
+            height: 850px;
+        }
+
+        .row {
+            display: flex;
+        }
+
+        .col-3 {
+            flex: 0 0 15%;
+            max-width: 25%;
+            padding: 10px;
+            border-right: 1px solid #ccc;
+        }
+
+        .col-9 {
+            flex: 0 0 84%;
+            max-width: 85%;
+            padding: 20px;
+        }
+
+        .text-muted {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .courier-card {
+            transition: background-color 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        .courier-card.show {
+            background-color: #d4edda; /* Success background */
+        }
+
+        .courier-card.hide {
+            background-color: #f8d7da; /* Danger background */
+        }
+
+        .toggle-visibility {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .toggle-visibility i {
+            margin-right: 8px;
+        }
+
+        #alert-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+        .courier-card.selected {
+            border: 2px solid #198754; /* green border */
+            background-color: #e6f7ec; /* light green background */
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" th:href="@{/}"><i class="fa-solid fa-home"></i> Home</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</nav>
+
+<div class="row">
+    <div class="col-3">
+        <h2 class="text-muted">Couriers</h2>
+        <div th:each="courier : ${couriers}" class="mb-3">
+            <a th:href="|?courier=${courier.id}|">
+                <div th:class="|card courier-card ${courier.id.equals(currentCourier.id)? 'selected':''}|">
+                    <div class="card-body">
+                        <button class="btn btn-success"
+                                type="button">
+                            <i class="bi bi-person"></i>
+                            <span th:text="${courier.user.firstName}"></span>
+                        </button>
+                        <div class="courier-info m-2">
+                            <p th:utext="${courier.getFullName()}"></p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-9">
+        <div class="row">
+            <div class="col-2">
+                <div class="">🟢 Bugun</div>
+                <div class="">🟠 Kecha</div>
+                <div class="">🔴 2 kun oldin</div>
+            </div>
+            <div class="col-3">
+                <label>
+                    <input checked type="checkbox" onchange="onChangeAll(this)"> show all
+                </label>
+                <input type="text" placeholder="search..." onkeyup="handleSearchOrders(this)">
+            </div>
+            <div class="col-2 offset-5">
+                <form method="post" action="/operator/orders/assign" id="myForm">
+                    <input type="hidden" name="orders" id="ordersInput">
+                    <input type="hidden" name="courierId" th:value="${currentCourier.id}">
+                    <button class="btn btn-success"> Assign</button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="alert-message" class="alert alert-warning hide">
+    <span id="alert-text"></span>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://api-maps.yandex.ru/2.1/?apikey=fadc504f-5c7e-4ec3-8862-cf391038453b&lang=en_US"></script>
+
+<script th:inline="javascript">/*<![CDATA[*/
+
+let orders = [
+
+]
+let currentOrders = /*[[${currentOrders}]]*/ [];
+let couriers = /*[[${couriers}]]*/ [];
+let company = /*[[${company}]]*/ [];
+let placemarks = [];
+const companyCoords = [company.latitude, company.longitude];
+
+let currentCourier = /*[[${currentCourier}]]*/ [];
+let selectedIdsPerCourier = loadIdsFromLocalStorage();
+// let selectedIdsPerCourier = {}
+let selectedPointsPerCourier = loadPointsFromLocalStorage();
+// let selectedPointsPerCourier = {}
+
+// <-- Minimal change: only set defaults if not already present (don't overwrite saved data)
+if (!selectedIdsPerCourier[currentCourier.id] || selectedIdsPerCourier[currentCourier.id].length === 0) {
+    selectedIdsPerCourier[currentCourier.id] = ['company'];
+}
+if (!selectedPointsPerCourier[currentCourier.id] || selectedPointsPerCourier[currentCourier.id].length === 0) {
+    if (currentOrders.filter(item => item.courierId === currentCourier.id).length !== 0) {
+        let lastLocation = [currentOrders[currentOrders.length - 1].location.latitude, currentOrders[currentOrders.length - 1].location.longitude];
+        selectedPointsPerCourier[currentCourier.id] = [lastLocation];
+    } else {
+        selectedPointsPerCourier[currentCourier.id] = [companyCoords];
+    }
+}
+
+let map;
+ymaps.ready(initMap);
+
+
+function initMap() {
+    // Use [latitude, longitude]
+    map = new ymaps.Map('map', {
+        center: companyCoords,
+        zoom: 15,
+        type: "yandex#map"
+    });
+
+    const companyPlacemark = new ymaps.Placemark(
+        companyCoords,
+        {hintContent: 'Company'},
+        {
+            preset: 'islands#blueHomeIcon',
+            iconColor: "blue",
+            cursor: 'pointer'
+        }
+    );
+
+    let polyline = null;
+
+    // === Clicking company: reset everything ===
+    companyPlacemark.events.add('click', function () {
+        if (currentOrders.filter(item => item.courierId === currentCourier.id).length > 0) return;
+        if (polyline) {
+            map.geoObjects.remove(polyline);
+            polyline = null;
+        }
+
+        // optional UX niceties:
+        map.setCenter(companyCoords);
+        if (map.balloon) map.balloon.close();
+    });
+
+    orders.forEach(order => {
+        const lat = order[0];
+        const lon = order[1]
+        if (lat == null || lon == null) return;
+
+        // keep these for later use if you want
+        order.latitude = lat;
+        order.longitude = lon;
+
+        const color = getOrderColor(order);
+        const placemark = new ymaps.Placemark(
+            [lat, lon],
+            {
+                hintContent: buildHint(order) + (order.status==="ASSIGNED" ?`
+            <form action="/operator/orders/unassign" method="post" id="unassign_form">
+                <input type="hidden" value="${order.id}" name="orderId">
+                 <button class="btn btn-danger" >
+                    🚚 Release
+                 </button>
+            </form>
+            `:'')
+            },
+            {
+                preset: 'islands#icon',
+                iconColor: color,
+                cursor: 'pointer'
+            }
+        );
+
+        placemark.events.add('click', function () {
+            if (order.status === "ASSIGNED") {
+                let co = currentOrders.filter(item => item.courierId === currentCourier.id);
+                if (co.length > 0) {
+                    let last = co[co.length - 1];
+                    if (last.orderId === order.id) {
+                        selectedIdsPerCourier[currentCourier.id] = ['company'];
+                        let currentLocation = [last.location.latitude, last.location.longitude];
+                        selectedPointsPerCourier[currentCourier.id] = [currentLocation];
+                        polyline.geometry.setCoordinates(selectedPointsPerCourier[currentCourier.id]);
+                        saveData();
+                    }
+                }
+                return;
+            }
+            const point = [lat, lon];
+            const id = order.id;
+            const existingIndex = selectedIdsPerCourier[currentCourier.id].indexOf(id);
+
+            if (existingIndex !== -1) {
+                // rollback (but never remove the first company point)
+                selectedPointsPerCourier[currentCourier.id] =
+                    selectedPointsPerCourier[currentCourier.id].slice(0, existingIndex + 1);
+                selectedIdsPerCourier[currentCourier.id] =
+                    selectedIdsPerCourier[currentCourier.id].slice(0, existingIndex + 1);
+                saveData()
+            } else {
+                if (Object.values(selectedIdsPerCourier).flat().filter(item => item === order.id).length > 0) {
+                    return;
+                }
+                // add new point after last
+                selectedPointsPerCourier[currentCourier.id].push(point);
+                selectedIdsPerCourier[currentCourier.id].push(id);
+            }
+
+            // draw or update polyline, or remove if only 1 point left
+            if (selectedPointsPerCourier[currentCourier.id].length >= 2) {
+                if (polyline) {
+                    polyline.geometry.setCoordinates(selectedPointsPerCourier[currentCourier.id]);
+                } else {
+                    polyline = new ymaps.Polyline(
+                        selectedPointsPerCourier[currentCourier.id],
+                        {},
+                        {
+                            strokeColor: "#0000FF",
+                            strokeWidth: 7,
+                            strokeOpacity: 0.8
+                        }
+                    );
+                    map.geoObjects.add(polyline);
+                }
+            } else {
+                if (polyline) {
+                    map.geoObjects.remove(polyline);
+                    polyline = null;
+                }
+            }
+
+            saveData()
+        });
+
+        placemarks.push({placemark, orderId: order.id});
+        map.geoObjects.add(placemark);
+    });
+
+    map.geoObjects.add(companyPlacemark);
+    companyPlacemark.events.add('click', function () {
+        selectedIdsPerCourier[currentCourier.id] = ['company'];
+        if (currentOrders.filter(item => item.courierId === currentCourier.id).length === 0)
+            selectedPointsPerCourier[currentCourier.id] = [companyCoords];
+        saveData();
+    })
+
+    // === draw saved polyline on refresh ===
+
+
+    for (let courier of couriers) {
+        if (courier.id !== currentCourier.id) {
+            debugger;
+            let locations = [companyCoords];
+            currentOrders.filter(item => item.courierId === courier.id).forEach(item => {
+                locations.push([item.location.latitude, item.location.longitude])
+            });
+            let p;
+            let arr = [...locations];
+            if (selectedPointsPerCourier[courier.id]) {
+                arr = [...arr, ...selectedPointsPerCourier[courier.id]];
+            }
+            if (
+                arr.length >= 2
+            ) {
+                p = new ymaps.Polyline(
+                    arr,
+                    {},
+                    {
+                        strokeColor: "rgba(0,0,0,0.35)",
+                        strokeWidth: 7,
+                        strokeOpacity: 0.8
+                    }
+                );
+                p.events.add("click", function (e) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("courier", courier.id); // replace courier param
+                    window.location.href = url.toString();
+                });
+                map.geoObjects.add(p);
+            }
+        }
+    }
+
+    if (selectedPointsPerCourier[currentCourier.id]
+        && selectedPointsPerCourier[currentCourier.id].length >= 2) {
+        polyline = new ymaps.Polyline(
+            selectedPointsPerCourier[currentCourier.id],
+            {},
+            {
+                strokeColor: "#0000FF",
+                strokeWidth: 7,
+                strokeOpacity: 0.8
+            }
+        );
+        map.geoObjects.add(polyline);
+    }
+
+    let locationsOfAssignedOrders = [companyCoords]
+    let arr = currentOrders.filter(item => item.courierId === currentCourier.id);
+    for (let currentOrder of arr) {
+        locationsOfAssignedOrders.push([currentOrder.location.latitude, currentOrder.location.longitude])
+    }
+    let assignedOrderLines = new ymaps.Polyline(
+        locationsOfAssignedOrders,
+        {},
+        {
+            strokeColor: "#11ff00",
+            strokeWidth: 7,
+            strokeOpacity: 0.8
+        }
+    );
+    map.geoObjects.add(assignedOrderLines);
+
+}
+
+
+function getOrderColor(order) {
+    if (selectedIdsPerCourier[currentCourier.id].filter(item => item === order.id).length === 0
+        &&
+        Object.values(selectedIdsPerCourier).flat().filter(item => item === order.id).length > 0)
+        return "gray";
+    let orderDate = order.day;
+    const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0];
+
+    if (orderDate === today) return 'green';
+    if (orderDate === yesterday) return 'orange';
+    return 'red';
+}
+
+
+function saveData() {
+    localStorage.setItem("ids", JSON.stringify(selectedIdsPerCourier));
+    localStorage.setItem("points", JSON.stringify(selectedPointsPerCourier));
+}
+
+function loadPointsFromLocalStorage() {
+    let data = localStorage.getItem("points");
+    if (data) {
+        return JSON.parse(data);
+    } else {
+        let obj = {};
+        // company is the first fixed point
+        let co = currentOrders.filter(item => item.courierId === currentCourier.id);
+        if (co.length > 0) {
+            let last = co[co.length - 1];
+            let lastL = [last.location.latitude, last.location.longitude];
+            obj[currentCourier.id] = [lastL];
+        } else {
+            obj[currentCourier.id] = [companyCoords];
+        }
+        return obj;
+    }
+}
+
+function loadIdsFromLocalStorage() {
+    let data = localStorage.getItem("ids");
+    if (data) {
+        return JSON.parse(data);
+    } else {
+        let obj = {};
+        // keep 'company' as a symbolic id for first point
+        obj[currentCourier.id] = ['company'];
+        return obj;
+    }
+}
+
+function onChangeAll(element) {
+    let checked = element.checked;
+    placemarks.forEach(pm => map.geoObjects.remove(pm.placemark));
+    if (checked) {
+        placemarks.forEach(pm => map.geoObjects.add(pm.placemark));
+    } else {
+        for (let p of placemarks) {
+            let placemark = p.placemark;
+            let order = orders.filter(item => item.id === p.orderId)[0];
+            let allOrderIdsGivenToCourier = Object.values(selectedIdsPerCourier).flat();
+            if (
+                selectedIdsPerCourier[currentCourier.id].filter(item => item === order.id).length > 0
+                ||
+                allOrderIdsGivenToCourier.filter(item => item === order.id).length === 0
+
+            ) {
+                if (order.status === 'ASSIGNED' && currentOrders.filter(item => item.orderId === order.id && item.courierId !== currentCourier.id).length > 0) {
+                    continue;
+                }
+                map.geoObjects.add(placemark);
+            }
+        }
+    }
+
+}
+
+function buildHint(order) {
+    const productsHtml = order.products
+        .map(
+            (p) => `
+        <li>
+            <span class="product-name">${p.name}</span>
+            <span class="product-amount">x${p.amount}</span>
+        </li>`
+        )
+        .join("");
+
+    return `
+    <div style="
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.4;
+      padding: 6px 8px;
+      max-width: 220px;
+    ">
+      <div style="
+        font-weight: bold;
+        font-size: 13px;
+        margin-bottom: 4px;
+        color: #2c3e50;
+      ">
+        🆔 Order #${order.id}
+      </div>
+
+      <div style="color: #555; margin-bottom: 2px;">
+        📅 ${order.date}
+      </div>
+      <div style="color: #555; margin-bottom: 6px;">
+        📞 ${order.phone}
+      </div>
+
+      <ul style="
+        margin: 0 0 8px 0;
+        padding-left: 16px;
+        color: #333;
+      ">
+        ${productsHtml}
+      </ul>
+    </div>
+  `;
+}
+
+
+function handleSearchOrders(element) {
+    let val = element.value;
+    resetPlaceMarkStyles();
+    if (!val) {
+        return;
+    }
+    let filteredOrders = orders.filter(item => item.phone.includes(val));
+    let orderId = null;
+    if (filteredOrders.length > 0) {
+        orderId = filteredOrders[0].id
+        let placemark = placemarks.filter(item => item.orderId === orderId)[0].placemark;
+        map.setCenter(placemark.geometry.getCoordinates(), 15);
+        placemark.options.set({preset: 'islands#redCircleDotIcon'});
+    }
+}
+
+function resetPlaceMarkStyles() {
+    for (let placemark of placemarks) {
+        let p = placemark.placemark;
+        p.options.set({preset: 'islands#icon'});
+    }
+}
+
+
+document.getElementById("myForm").addEventListener("submit", function () {
+    let sendingOrdersToAssign = selectedIdsPerCourier[currentCourier.id];
+    document.getElementById("ordersInput").value = JSON.stringify(sendingOrdersToAssign.slice(1));
+    localStorage.removeItem("ids");
+    localStorage.removeItem("points");
+});
+
+
+document.getElementById("unassign_form").addEventListener("submit", function () {
+    localStorage.removeItem("ids");
+    localStorage.removeItem("points");
+});
+
+
+</script>
+
+</body>
+</html>

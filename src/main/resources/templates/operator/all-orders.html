@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>All Orders</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .navbar {
+      background-color: #042d56;
+      border-bottom: 2px solid #04AA6D;
+      padding: 0.5rem 1rem;
+    }
+
+    .navbar-custom .navbar-brand,
+    .navbar-custom .nav-link {
+      color: #ffffff;
+    }
+
+    .section-padding {
+      width: 90%;
+      margin: 20px auto;
+    }
+
+    .table {
+      font-size: 12px;
+    }
+
+    .table th, .table td {
+      text-align: center;
+      padding: 0.3rem;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .pagination .active a {
+      background-color: #04AA6D;
+      color: white;
+    }
+
+    .pagination a {
+      margin: 0 5px;
+      text-decoration: none;
+      padding: 5px 10px;
+      border: 1px solid #ddd;
+      color: #042d56;
+      border-radius: 5px;
+    }
+
+    .pagination a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .pagination .disabled a {
+      pointer-events: none;
+      color: #ccc;
+    }
+    .btn-sm {
+      padding: 0.2rem 0.5rem;
+      font-size: 0.875rem;
+    }
+
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <a class="navbar-brand" href="/operator">
+    <i class="fa-solid fa-arrow-left"></i> Back
+  </a>
+  <h2 class="text-center text-white w-100">Orders</h2>
+</nav>
+
+<div class="section-padding">
+  <!-- Filter Form -->
+  <form class="filter-form" id="filterForm">
+    <div class="row">
+      <div class="col-md-3">
+        <label for="orderStatus">Order Status</label>
+        <select id="orderStatus" class="form-control" onchange="filterOrders()">
+          <option value="">All</option>
+          <option value="CREATED">Created</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELED">Canceled</option>
+          <option value="DELIVERING">Delivering</option>
+          <option value="ASSIGNED">Assigned</option>
+          <option value="PHONE_OFF">Phone Off</option>
+          <option value="NEXT_ORDER">Next Order</option>
+          <option value="END_TIME">End Time</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="datetime">Date</label>
+        <input type="date" id="datetime" class="form-control" onchange="filterOrders()">
+      </div>
+      <div class="col-md-3">
+        <label for="courier">Courier</label>
+        <input type="text" id="courier" class="form-control" placeholder="Courier name" oninput="filterOrders()">
+      </div>
+      <div class="col-md-3">
+        <label for="phone">Customer Phone</label>
+        <input type="text" id="phone" class="form-control" placeholder="Phone number" oninput="filterOrders()">
+      </div>
+    </div>
+  </form>
+
+  <!-- Orders Table -->
+  <table class="table table-bordered table-hover">
+    <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Order Status</th>
+      <th>Date</th>
+      <th>Courier</th>
+      <th>Customer Phone</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="orderTable">
+    <tr th:each="order : ${ordersPage.content}">
+      <td th:text="${order.id != null ? order.id : 'N/A'}"></td>
+      <td th:text="${order.orderStatus != null ? order.orderStatus : 'N/A'}"></td>
+      <td th:text="${order.deliveryTime != null ? order.day + ' ' + order.deliveryTime.getLabel() : 'N/A'}"></td>
+      <td th:text="${order.courier != null && order.courier.user != null ? order.courier.user.firstName + ' ' + order.courier.user.lastName : 'N/A'}"></td>
+      <td th:text="${order.telegramUser != null && order.telegramUser.user != null ? order.telegramUser.user.phone : 'N/A'}"></td>
+      <td>
+        <a th:href="@{/operator/update/order/{id}(id=${order.id})}" class="btn btn-info btn-sm" role="button">View</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <ul class="pagination">
+      <!-- Pagination faqat totalPages > 1 bo'lganda chiqadi -->
+      <li th:if="${totalPages > 1}">
+        <!-- Previous Page -->
+      <li th:classappend="${currentPage == 1} ? 'disabled' : ''">
+        <a th:href="@{/operator/all/orders(page=${currentPage - 1}, size=${pageSize})}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+
+      <!-- Page Numbers -->
+      <li th:each="i : ${#numbers.sequence(1, totalPages)}" th:classappend="${i == currentPage} ? 'active' : ''">
+        <a th:href="@{/operator/all/orders(page=${i}, size=${pageSize})}" th:text="${i}"></a>
+      </li>
+
+      <!-- Next Page -->
+      <li th:classappend="${currentPage == totalPages} ? 'disabled' : ''">
+        <a th:href="@{/operator/all/orders(page=${currentPage + 1}, size=${pageSize})}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  function filterOrders() {
+    const status = document.getElementById('orderStatus').value.toLowerCase();
+    const dateInput = document.getElementById('datetime').addEventListener('change', filterOrders);
+    const courier = document.getElementById('courier').value.toLowerCase();
+    const phone = document.getElementById('phone').value.toLowerCase();
+
+    const formattedDate = dateInput ? new Date(dateInput).toISOString().split('T')[0] : '';
+
+    const rows = document.querySelectorAll('#orderTable tr');
+    rows.forEach(row => {
+      const orderStatus = row.cells[1].innerText.toLowerCase();
+      const orderDate = row.cells[2].innerText;
+      const orderCourier = row.cells[3].innerText.toLowerCase();
+      const orderPhone = row.cells[4].innerText.toLowerCase();
+
+      const matchesStatus = status === '' || orderStatus.includes(status);
+      const matchesDate = formattedDate === '' || orderDate === formattedDate;
+      const matchesCourier = courier === '' || orderCourier.includes(courier);
+      const matchesPhone = phone === '' || orderPhone.includes(phone);
+
+      if (matchesStatus && matchesDate && matchesCourier && matchesPhone) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+</script>
+</body>
+</html>

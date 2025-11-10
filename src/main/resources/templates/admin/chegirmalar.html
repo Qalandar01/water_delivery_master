@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chegirma boshqaruvi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #042d56;
+        }
+
+        .navbar-custom {
+            background-color: #042d56;
+            padding: 0.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .navbar-custom .navbar-brand {
+            color: #fff;
+        }
+
+        .navbar-custom .navbar-brand:hover {
+            color: #ffc107;
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            border: 2px solid #042d56;
+            padding: 20px;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .custom-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .custom-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #28a745;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .icon {
+            font-size: 2rem;
+            transition: color 0.3s;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+
+        .text-success {
+            color: #28a745 !important;
+        }
+
+        .switch-container.active {
+            background-color: #e0f7e9;
+            border-color: #28a745;
+        }
+
+        .switch-container.active .text-danger {
+            color: #ccc;
+        }
+
+        .switch-container.active .text-success {
+            color: #28a745;
+        }
+
+        .date-container {
+            position: relative;
+        }
+
+        .date-container input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <a class="navbar-brand" th:href="@{/}"><i class="fa-solid fa-home"></i> Bosh sahifa</a>
+</nav>
+
+<div class="container mt-3" style="max-width: 600px;">
+    <div th:if="${errorMessage}" class="alert alert-danger" id="errorMessage" role="alert">
+        <p th:text="${errorMessage}"></p>
+    </div>
+    <div th:if="${successMessage}" class="alert alert-success" id="successMessage" role="alert">
+        <p th:text="${successMessage}"></p>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>No</th>
+            <th>Mahsulot</th>
+            <th>Sovg'a soni</th>
+            <th>Minimal xarid qilish miqdori</th>
+            <th>Hozirgi holat</th>
+            <th>Amallar</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="bottleType, stat : ${bottleTypes}">
+            <td th:text="${stat.count + 1}"></td>
+            <td th:text="${bottleType.getType()}"></td>
+            <td th:text="${bottleType.getSale_amount()}"></td>
+            <td th:text="${bottleType.getSale_discount()}"></td>
+            <td>
+                <span th:if="${bottleType.sale_active == true}" class="badge bg-success">Faol</span>
+                <span th:if="${bottleType.sale_active == false}" class="badge bg-danger">Faol emas</span>
+            </td>
+            <td>
+                <a th:href="@{'/admin/delete/' + ${bottleType.id}}" class="btn btn-danger btn-sm">O'chirish</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h4 class="text-center mb-4">Chegirma kiritish</h4>
+    <form action="/admin/change-gift-water" method="post" class="card p-4">
+        <div class="mb-3">
+            <label for="bottleType" class="form-label">Chegirma qo'shish uchun butilkasini tanlang:</label>
+            <select id="bottleType" name="bottleTypeId" class="form-select" required>
+                <option value="" disabled selected>Butilkani tanlang...</option>
+                <option th:each="bottleType : ${bottleTypes}"
+                        th:value="${bottleType.id}"
+                        th:text="${bottleType.type}"></option>
+            </select>
+        </div>
+
+        <div class="switch-container" id="switchContainer">
+            <i class="fas fa-times-circle icon text-danger" id="inactiveIcon"></i>
+            <label class="custom-switch">
+                <input type="checkbox" id="activeSwitch" name="sale_active" onclick="toggleActive()">
+                <span class="slider"></span>
+            </label>
+            <i class="fas fa-check-circle icon text-success" id="activeIcon"></i>
+        </div>
+
+        <div class="mb-3">
+            <label for="amount" class="form-label">Sovg'a soni:</label>
+            <input type="number" id="amount" name="sale_amount" class="form-control" required placeholder="Sovg'a uchun sonini kiriting">
+        </div>
+
+        <div class="mb-3">
+            <label for="discount" class="form-label">Minimal xarid qilish miqdori:</label>
+            <input type="number" id="discount" name="sale_discount" class="form-control" required placeholder="Minimal xarid qilish miqdorini kiriting">
+        </div>
+
+        <div class="mb-3 date-container">
+            <label for="startDate" class="form-label">Boshlanish sanasi:</label>
+            <input type="date" id="startDate" name="sale_start_time" class="form-control" required>
+        </div>
+
+        <div class="mb-3 date-container">
+            <label for="endDate" class="form-label">Tugash sanasi:</label>
+            <input type="date" id="endDate" name="sale_end_time" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Saqlash</button>
+    </form>
+
+</div>
+
+<script>
+    setTimeout(function() {
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        if (errorMessage) errorMessage.style.display = 'none';
+        if (successMessage) successMessage.style.display = 'none';
+    }, 3000);
+
+    function toggleActive() {
+        const switchContainer = document.getElementById('switchContainer');
+        const isActive = document.getElementById('activeSwitch').checked;
+        switchContainer.classList.toggle('active', isActive);
+    }
+</script>
+</body>
+</html>
