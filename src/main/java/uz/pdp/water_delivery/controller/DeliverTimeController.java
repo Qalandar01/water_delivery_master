@@ -35,7 +35,7 @@ public class DeliverTimeController {
 
     @PostMapping("/admin/update/delivery-time/{id}")
     @ResponseBody
-    public ResponseEntity<?> updateDeliveryTime(@PathVariable Integer id,
+    public ResponseEntity<?> updateDeliveryTime(@PathVariable Long id,
                                                 @RequestParam String startTime,
                                                 @RequestParam String endTime) {
         LocalTime start;

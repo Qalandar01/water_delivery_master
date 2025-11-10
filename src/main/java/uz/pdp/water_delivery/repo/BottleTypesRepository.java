@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface BottleTypesRepository extends JpaRepository<BottleTypes, Integer> {
+public interface BottleTypesRepository extends JpaRepository<BottleTypes, Long> {
     List<BottleTypes> findAllByActiveTrue();
 
     Optional<BottleTypes> findByType(String type);

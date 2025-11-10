@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface TelegramUserRepository extends JpaRepository<TelegramUser, UUID> {
+public interface TelegramUserRepository extends JpaRepository<TelegramUser, Long> {
 
     Optional<TelegramUser> findByChatId(Long chatId);
 

@@ -142,7 +142,7 @@ public class CourierController {
     }
 
     @GetMapping("/admin/couriers/edit/{id}")
-    public String editCourierForm(@PathVariable UUID id, Model model) {
+    public String editCourierForm(@PathVariable Long id, Model model) {
         Courier courier = courierRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid courier Id:" + id));
         List<District> districts = districtRepository.getAllDistricts();
         model.addAttribute("courier", courier);
@@ -152,7 +152,7 @@ public class CourierController {
 
     @Transactional
     @PostMapping("/admin/couriers/update/{id}")
-    public String updateCourier(@PathVariable UUID id, @ModelAttribute Courier courier, Model model) {
+    public String updateCourier(@PathVariable Long id, @ModelAttribute Courier courier, Model model) {
         try {
             Courier existingCourier = courierRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Noto'g'ri kuryer ID:" + id));
@@ -187,7 +187,7 @@ public class CourierController {
 
     @Transactional
     @GetMapping("/admin/couriers/delete/{id}")
-    public String deleteCourier(@PathVariable UUID id, Model model) {
+    public String deleteCourier(@PathVariable Long id, Model model) {
         try {
             Courier courier = courierRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid courier ID: " + id));

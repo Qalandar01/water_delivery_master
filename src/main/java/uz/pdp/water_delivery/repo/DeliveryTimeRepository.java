@@ -6,7 +6,7 @@ import uz.pdp.water_delivery.entity.DeliveryTime;
 
 import java.util.List;
 
-public interface DeliveryTimeRepository extends JpaRepository<DeliveryTime, Integer> {
+public interface DeliveryTimeRepository extends JpaRepository<DeliveryTime, Long> {
 
     List<DeliveryTime> findAllByDayOrderByIdAsc(String bugun);
 

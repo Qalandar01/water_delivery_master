@@ -9,7 +9,7 @@ import uz.pdp.water_delivery.entity.BottleTypes;
 import java.util.List;
 
 @Repository
-public interface BasketRepository extends JpaRepository<Basket, Integer> {
+public interface BasketRepository extends JpaRepository<Basket, Long> {
     List<Basket> findAllByTelegramUser(TelegramUser telegramUser);
 
     Basket findByTelegramUserAndBottleType(TelegramUser telegramUser, BottleTypes bottleTypes);

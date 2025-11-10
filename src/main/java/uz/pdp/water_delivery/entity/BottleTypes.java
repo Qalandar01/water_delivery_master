@@ -16,7 +16,7 @@ import java.util.Objects;
 public class BottleTypes {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(length = 255)
     private String type;

@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.UUID;
 
-public interface DistrictRepository extends JpaRepository<District, UUID> {
+public interface DistrictRepository extends JpaRepository<District, Long> {
 
 
     @Query(value = """

@@ -74,7 +74,7 @@ public class BotUtils {
 
 
     public InlineKeyboardMarkup generateBottleButton10L() {
-        BottleTypes bottleTypes = bottleTypesRepository.findById(1).get();
+        BottleTypes bottleTypes = bottleTypesRepository.findById(1L).get();
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton button10L = new InlineKeyboardButton("\uD83C\uDF79 10L")
                 .callbackData(BotConstant.BOTTLE_TYPE + bottleTypes.getId());
@@ -83,7 +83,7 @@ public class BotUtils {
     }
 
     public InlineKeyboardMarkup generateBottleButton20L() {
-        BottleTypes bottleTypes = bottleTypesRepository.findById(2).get();
+        BottleTypes bottleTypes = bottleTypesRepository.findById(2L).get();
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton button20L = new InlineKeyboardButton("\uD83C\uDF79 20L")
                 .callbackData(BotConstant.BOTTLE_TYPE + bottleTypes.getId());

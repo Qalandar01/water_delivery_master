@@ -15,7 +15,7 @@ import uz.pdp.water_delivery.entity.enums.RoleName;
 public class Role implements GrantedAuthority {
     @Id
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private RoleName roleName;

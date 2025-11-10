@@ -9,7 +9,7 @@ import java.util.UUID;
 public class OrderSummaryDTO {
     private String fullName;
     private String carType;
-    private UUID courierId;
+    private Long courierId;
     private Integer deliveryTimeId;
     private Long orderSize;
     private Long completedOrders;
@@ -17,7 +17,7 @@ public class OrderSummaryDTO {
     private Long notInTime;
     private Long bottlesCount;
 
-    public OrderSummaryDTO(String fullName, String carType, UUID courierId, Integer deliveryTimeId, Long orderSize, Long completedOrders, Long notAnswered, Long notInTime, Long bottlesCount) {
+    public OrderSummaryDTO(String fullName, String carType, Long courierId, Integer deliveryTimeId, Long orderSize, Long completedOrders, Long notAnswered, Long notInTime, Long bottlesCount) {
         this.fullName = fullName;
         this.carType = carType;
         this.courierId = courierId;

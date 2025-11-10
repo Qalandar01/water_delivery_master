@@ -1,0 +1,59 @@
+bot:
+    token: 7524788008:AAEV5P69b9hW1CtbvrDDATfyyjewbkVkBwA # Bot token
+    secret_token_for_webhook: uOSSV0HFzadbgby4tf6behLf5cp6c8iEz5xiRGV3KME7PH6IRTqmevYx9aze1ruk
+    webhook_url: https://anh-chololithic-transitively.ngrok-free.dev
+#    token: 7976713391:AAE8P3Xx4MzEYDJ5tZhOHvaVP3z_bhxV8zU  # Bot token
+#    token: 7812481635:AAFabkOGeOTZFCTfwWGA7mKhGIK27sntY1s  # Alternative bot token
+
+spring:
+    jackson:
+        time-zone: Asia/Tashkent # Set the timezone to Tashkent
+
+    main:
+        allow-circular-references: true  # Allow circular references in beans if needed
+    application:
+        name: water_delivery  # Application name
+
+    datasource:
+        driverClassName: org.postgresql.Driver  # PostgreSQL driver
+        url: jdbc:postgresql://localhost:5432/water_delivery_db # Database URL
+        username: postgres  # Database username
+        password: root123 # Database password
+        # Uncomment these if using Docker environment variables:
+        # url: ${SPRING_DATASOURCE_URL}
+        # username: ${SPRING_DATASOURCE_USERNAME}
+        # password: ${SPRING_DATASOURCE_PASSWORD}
+
+    jpa:
+        hibernate:
+            ddl-auto: none  # Automatically create database schema based on JPA entities
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect # Hibernate dialect for PostgreSQL
+                format_sql: true  # Format SQL queries for easier reading
+                use_sql_comments: true  # Add comments in SQL output for easier debugging
+                connection:
+                    characterEncoding: UTF-8
+
+    servlet:
+        multipart:
+            max-file-size: 5MB  # Set maximum file size for uploads
+            max-request-size: 50MB
+
+    # Set maximum request size for uploads
+
+    messages:
+        basename: messages
+        encoding: UTF-8
+        cache-duration: 3600
+
+
+distance:
+    api:
+        key: AIzaSyC_j-4_IPUad1H_OCLYXgbJ0sooww78usg  # API key for distance calculation (e.g., Google Distance Matrix API)
+
+server:
+    port: 8080
+
+
+

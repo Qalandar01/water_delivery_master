@@ -5,6 +5,6 @@ import uz.pdp.water_delivery.entity.Region;
 
 import java.util.UUID;
 
-public interface RegionRepository extends JpaRepository<Region, UUID> {
+public interface RegionRepository extends JpaRepository<Region, Long> {
     Region findByName(String toshkent);
 }
