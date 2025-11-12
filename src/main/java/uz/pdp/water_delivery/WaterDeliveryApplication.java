@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.TimeZone;
@@ -18,6 +19,7 @@ import java.util.TimeZone;
 @EnableScheduling
 @EnableAsync
 @EnableJpaRepositories
+@EnableJdbcHttpSession
 public class WaterDeliveryApplication {
 
     @Value("${bot.token}")
