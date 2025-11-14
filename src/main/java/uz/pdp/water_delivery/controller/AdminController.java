@@ -12,12 +12,18 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import uz.pdp.water_delivery.dto.BottleEditView;
 import uz.pdp.water_delivery.dto.BottleTypeDTO;
+import uz.pdp.water_delivery.dto.UserDTO;
+import uz.pdp.water_delivery.dto.request.GiftWaterRequest;
+import uz.pdp.water_delivery.dto.request.UserRequestDTO;
 import uz.pdp.water_delivery.entity.BottleTypes;
 import uz.pdp.water_delivery.entity.Role;
 import uz.pdp.water_delivery.entity.User;
 import uz.pdp.water_delivery.entity.enums.RoleName;
 import uz.pdp.water_delivery.repo.*;
+import uz.pdp.water_delivery.services.service.BottleService;
+import uz.pdp.water_delivery.services.service.UserServiceImpl;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
 import java.io.IOException;
@@ -40,290 +46,207 @@ public class AdminController {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final OrderRepository orderRepository;
+    private final UserServiceImpl userServiceImpl;
+    private final BottleService bottleService;
 
     @GetMapping("/admin")
     public String admin(Model model) {
-        List<User> users = userRepository.findAllByRolesRoleName(RoleName.ROLE_OPERATOR);
-        model.addAttribute("users", users);
+        List<User> operators = userServiceImpl.getUsersByRole(RoleName.ROLE_OPERATOR);
+        model.addAttribute("users", operators);
         return "admin/admin";
     }
 
 
     @GetMapping("/admin/change-gift-water")
     public String changeGiftWater(Model model) {
-        getBottleTypeIsTrue(model);
+        model.addAttribute("bottleTypes", bottleService.getActiveBottleTypesWithOrderCount());
         return "admin/chegirmalar";
-    }
-
-    private void getBottleTypeIsTrue(Model model) {
-        List<BottleTypes> bottleTypes = bottleTypesRepository.findAllByActiveTrue();
-        for (BottleTypes bottleType : bottleTypes) {
-            long orderCount = orderProductRepository.countByBottleTypes(bottleType);
-            bottleType.setOrderCount(orderCount);
-            bottleTypesRepository.save(bottleType);
-        }
-        model.addAttribute("bottleTypes", bottleTypes);
     }
 
     @PostMapping("/admin/change-gift-water")
-    public String changeGiftWater(
-            @RequestParam("bottleTypeId") Long bottleTypeId,
-            @RequestParam("sale_amount") Integer saleAmount,
-            @RequestParam("sale_discount") Integer saleDiscount,
-            @RequestParam(value = "sale_active", required = false) Boolean saleActive,
-            @RequestParam("sale_start_time") LocalDate saleStartTime,
-            @RequestParam("sale_end_time") LocalDate saleEndTime,
-            Model model) {
-
-        if (saleActive == null) {
-            saleActive = false;
-        }
-
-        boolean isValidDateRange = saleStartTime.isBefore(saleEndTime);
-        if (!isValidDateRange) {
-            model.addAttribute("errorMessage", "Tugash sanasi boshlanish sanasidan kichik bo'lishi kerak.");
-            return "redirect:/admin/change-gift-water";
-        }
-
-        boolean isValidDiscount = saleDiscount <= 100 && saleDiscount >= 0;
-        if (!isValidDiscount) {
-            model.addAttribute("errorMessage", "Chegirma miqdori 0 va 100 orasida bo'lishi kerak.");
-            return "redirect:/admin/change-gift-water";
-        }
-
-        if (!saleActive) {
-            saleStartTime = null;
-            saleEndTime = null;
-        }
+    public String changeGiftWater(GiftWaterRequest request, RedirectAttributes redirectAttributes) {
 
         try {
-            BottleTypes bottleType = bottleTypesRepository.findById(bottleTypeId)
-                    .orElseThrow(() -> new IllegalArgumentException("Bunday ID ga ega butilka topilmadi!"));
-
-            bottleType.setSale_amount(saleAmount);
-            bottleType.setSale_discount(saleDiscount);
-            bottleType.setSale_active(saleActive);
-            bottleType.setSale_startDate(saleStartTime);
-            bottleType.setSale_endDate(saleEndTime);
-
-            bottleTypesRepository.save(bottleType);
-
-            model.addAttribute("successMessage", "Chegirma muvaffaqiyatli saqlandi.");
+            bottleService.updateGiftWater(request);
+            redirectAttributes.addFlashAttribute("successMessage", "Chegirma muvaffaqiyatli saqlandi.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Xatolik yuz berdi: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Xatolik yuz berdi: " + e.getMessage());
         }
-        getBottleTypeIsTrue(model);
-        return "admin/chegirmalar";
+
+        return "redirect:/admin/change-gift-water";
     }
 
 
     /**
      * Chegirma o'chirish
      */
-    @GetMapping("/admin/delete/{id}")
-    public String deleteDiscount(@PathVariable("id") Long id, Model model) {
+
+    @GetMapping("/admin/discount/delete/{id}")
+    public String deleteDiscount(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+
         try {
-            BottleTypes bottleType = bottleTypesRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Bunday ID ga ega butilka topilmadi!"));
-
-            bottleType.setSale_amount(null);
-            bottleType.setSale_discount(null);
-            bottleType.setSale_active(false);
-            bottleType.setSale_startDate(null);
-            bottleType.setSale_endDate(null);
-
-            bottleTypesRepository.save(bottleType);
-
-            model.addAttribute("successMessage", "Chegirma muvaffaqiyatli o'chirildi.");
+            bottleService.deleteDiscount(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Chegirma muvaffaqiyatli o'chirildi.");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         } catch (Exception e) {
-            model.addAttribute("errorMessage", "Xatolik yuz berdi: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Xatolik yuz berdi: " + e.getMessage());
         }
 
         return "redirect:/admin/change-gift-water";
     }
 
+
     @GetMapping("/admin/add/bottle")
-    public String addBottle(Model model) {
+    public String showAddBottleForm(Model model) {
         model.addAttribute("bottleTypeDTO", new BottleTypeDTO());
         return "admin/bottle/add-bottle-type";
     }
 
-    @Transactional
     @PostMapping("/admin/add/bottle")
-    public String addBottle(@ModelAttribute BottleTypeDTO bottleTypeDTO, Model model) {
+    public String addBottle(
+            @ModelAttribute BottleTypeDTO bottleTypeDTO,
+            RedirectAttributes redirectAttributes
+    ) {
         try {
-            BottleTypes bottleTypes = new BottleTypes();
-            bottleTypes.setType(bottleTypeDTO.getType().trim());
-            bottleTypes.setPrice(bottleTypeDTO.getPrice());
-            bottleTypes.setActive(bottleTypeDTO.isActive());
-            bottleTypes.setDescription(bottleTypeDTO.getDescription());
-            bottleTypes.setReturnable(bottleTypeDTO.isReturnable());
-
-            MultipartFile file = bottleTypeDTO.getImage();
-            if (!file.isEmpty()) {
-                byte[] imageBytes = file.getBytes();
-                bottleTypes.setImage(imageBytes);
-            }
-            if (bottleTypesRepository.existsByType(bottleTypes.getType())) {
-                model.addAttribute("errorMessage", "Bunday idish turi mavjud!");
-                return "admin/bottle/add-bottle-type";
-            }
-            bottleTypesRepository.save(bottleTypes);
-            model.addAttribute("successMessage", "Idish turi qo'shildi");
+            bottleService.createBottle(bottleTypeDTO);
+            redirectAttributes.addFlashAttribute("successMessage", "Idish turi qo'shildi!");
             return "redirect:/admin/bottle/menu";
+
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/admin/add/bottle";
+
         } catch (Exception e) {
             logErrorFile.logError(e, "addBottle", null);
-            model.addAttribute("errorMessage", "Ma'lumotni saqlashda yoki faylni yuklashda xatolik yuz berdi!");
-            return "admin/bottle/add-bottle-type";
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Ma'lumotni saqlashda yoki faylni yuklashda xatolik yuz berdi!");
+            return "redirect:/admin/add/bottle";
         }
     }
 
     @GetMapping("/admin/bottle/menu")
     public String bottleMenu(Model model) {
-        getBottleTypeIsTrue(model);
+        model.addAttribute("bottleTypes", bottleService.getActiveBottleTypesWithOrderCount());
         return "admin/bottle/bottle-menu";
     }
 
-
     @GetMapping("/admin/bottle/edit/{id}")
     public String editBottle(@PathVariable Long id, Model model) {
-        BottleTypes bottleType = bottleTypesRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Bottle not found"));
-        String base64Image = Base64.getEncoder().encodeToString(bottleType.getImage());
-
-        BottleTypeDTO bottleTypeDTO = new BottleTypeDTO();
-        bottleTypeDTO.setId(bottleType.getId());
-        bottleTypeDTO.setType(bottleType.getType());
-        bottleTypeDTO.setDescription(bottleType.getDescription());
-        bottleTypeDTO.setPrice(bottleType.getPrice());
-        bottleTypeDTO.setActive(bottleType.isActive());
-        bottleTypeDTO.setReturnable(bottleType.isReturnable());
-        model.addAttribute("base64Image", base64Image);
-        model.addAttribute("bottleType", bottleTypeDTO);
+        BottleEditView view = bottleService.getBottleEditView(id);
+        model.addAttribute("bottleType", view.getDto());
+        model.addAttribute("base64Image", view.getBase64Image());
         return "admin/bottle/bottle-edit";
     }
 
-    @Transactional
     @PostMapping("/admin/bottle/update")
-    public String updateBottle(@ModelAttribute BottleTypeDTO bottleTypeDTO) throws IOException {
+    public String updateBottle(@ModelAttribute BottleTypeDTO bottleTypeDTO) {
         try {
-            BottleTypes bottleType = bottleTypesRepository.findById(bottleTypeDTO.getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Bottle not found"));
-
-            bottleType.setType(bottleTypeDTO.getType());
-            bottleType.setDescription(bottleTypeDTO.getDescription());
-            bottleType.setPrice(bottleTypeDTO.getPrice());
-            bottleType.setActive(bottleTypeDTO.isActive());
-            bottleType.setReturnable(bottleTypeDTO.isReturnable());
-            MultipartFile image = bottleTypeDTO.getImage();
-            if (image != null && !image.isEmpty()) {
-                bottleType.setImage(image.getBytes());
-            }
-            bottleTypesRepository.save(bottleType);
+            bottleService.updateBottle(bottleTypeDTO);
             return "redirect:/admin/bottle/menu";
         } catch (Exception e) {
-            logErrorFile.logError(e, "updateBottle", null);
+            logErrorFile.logError(e, "updateBottle", bottleTypeDTO.getId());
+            return "redirect:/admin/bottle/menu?error=true";
         }
-        return "redirect:/admin/bottle/menu";
     }
 
     @GetMapping("/admin/bottle/delete/{id}")
     public String deleteBottle(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        if (!bottleTypesRepository.existsById(id)) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Bottle not found.");
-            return "redirect:/operator/bottle/menu";
+        try {
+            bottleService.deleteBottle(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Bottle type deleted successfully.");
+        } catch (EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (DataIntegrityViolationException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Cannot delete bottle type as it is associated with existing orders.");
+            logErrorFile.logError(e, "deleteBottle", id);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Unexpected error occurred.");
+            logErrorFile.logError(e, "deleteBottle", id);
         }
 
-        try {
-            bottleTypesRepository.deleteById(id);
-        } catch (DataIntegrityViolationException ex) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Cannot delete bottle type as it is associated with existing orders.");
-            logErrorFile.logError(ex, "deleteBottle", null);
-        }
         return "redirect:/admin/bottle/menu";
     }
 
 
-    @GetMapping("/admin/add/user")
-    public String addUser(Model model) {
-        User user = new User();
-        model.addAttribute("user", user);
+    @GetMapping("/admin/users/new")
+    public String showAddUserForm(Model model) {
+        model.addAttribute("user", new User());
         return "admin/add-user";
     }
 
-    @PostMapping("/admin/add/user")
-    public String addUser(@Valid @ModelAttribute User user, BindingResult result, Model model) {
+    @PostMapping("/admin/users")
+    public String createUser(
+            @Valid @ModelAttribute("user") User user,
+            BindingResult result,
+            RedirectAttributes redirectAttributes
+    ) {
         if (userRepository.existsByPhone(user.getPhone())) {
             result.rejectValue("phone", "error.user", "This phone number is already in use.");
         }
 
         if (result.hasErrors()) {
-            model.addAttribute("user", user);
             return "admin/add-user";
         }
-        Role roleOperator = roleRepository.findByRoleName(RoleName.ROLE_OPERATOR);
-        user.setRoles(List.of(roleOperator));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+
+        try {
+            userServiceImpl.createOperatorUser(user);
+            redirectAttributes.addFlashAttribute("successMessage", "User created successfully!");
+            return "redirect:/admin/users";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error occurred while creating user.");
+            return "redirect:/admin/users/new";
+        }
+    }
+
+
+    @GetMapping("/admin/users/delete/{id}")
+    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userServiceImpl.deleteOrUpdateUserRoles(id);
+            redirectAttributes.addFlashAttribute("successMessage", "User updated or deleted successfully.");
+        } catch (EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            logErrorFile.logError(e, "deleteUser", id);
+            redirectAttributes.addFlashAttribute("errorMessage", "Error occurred while updating user roles.");
+        }
         return "redirect:/admin";
     }
 
-    @GetMapping("/admin/delete/user/{id}")
-    public String deleteUser(@PathVariable Long id, Model model) {
-        try {
-            User user = userRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
-
-            Set<Role> updatedRoles = user.getRoles().stream()
-                    .filter(role -> !role.getRoleName().equals(RoleName.ROLE_OPERATOR))
-                    .collect(Collectors.toSet());
-            if (updatedRoles.isEmpty()) {
-                userRepository.delete(user);
-                return "redirect:/admin";
-            }
-            user.setRoles(List.copyOf(updatedRoles));
-            userRepository.save(user);
-
-            return "redirect:/admin";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", "Foydalanuvchini rollarini o'zgartirishda xatolik yuz berdi.");
-            return "redirect:/admin";
-        }
-    }
-
-
-
-    @GetMapping("/admin/edit/user/{id}")
-    public String editUser(@PathVariable Long id, Model model) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
+    @GetMapping("/admin/users/edit/{id}")
+    public String showEditUserForm(@PathVariable Long id, Model model) {
+        User user = userServiceImpl.getUserById(id);
         model.addAttribute("user", user);
         return "admin/edit-user";
     }
 
-    @PostMapping("/admin/edit/user/{id}")
-    public String updateUser(@PathVariable Long id, @ModelAttribute User user, BindingResult result) {
+    @PostMapping("/admin/users/edit/{id}")
+    public String updateUser(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("user") UserRequestDTO userRequestDTO,
+            BindingResult result,
+            RedirectAttributes redirectAttributes
+    ) {
         if (result.hasErrors()) {
             return "admin/edit-user";
         }
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
 
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setActive(user.getActive());
-        existingUser.setPaid(user.getPaid());
-
-        if (user.getPaid()) { // Agar foydalanuvchi to'lov qilgan bo'lsa
-            existingUser.setPaidDate(LocalDate.now()); // To'lov sanasini yangilash
-            existingUser.setNextMonthDate(LocalDate.now().plusMonths(1)); // Keyingi to'lov sanasi
+        try {
+            userServiceImpl.updateUser(id, userRequestDTO);
+            redirectAttributes.addFlashAttribute("successMessage", "User updated successfully.");
+        } catch (EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            logErrorFile.logError(e, "updateUser", id);
+            redirectAttributes.addFlashAttribute("errorMessage", "Unexpected error occurred while updating the user.");
         }
 
-        userRepository.save(existingUser);
         return "redirect:/admin";
     }
-
 
 
 }
