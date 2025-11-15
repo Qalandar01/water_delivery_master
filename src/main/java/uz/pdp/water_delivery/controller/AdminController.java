@@ -4,21 +4,18 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uz.pdp.water_delivery.dto.BottleEditView;
 import uz.pdp.water_delivery.dto.BottleTypeDTO;
-import uz.pdp.water_delivery.dto.UserDTO;
 import uz.pdp.water_delivery.dto.request.GiftWaterRequest;
 import uz.pdp.water_delivery.dto.request.UserRequestDTO;
-import uz.pdp.water_delivery.entity.BottleTypes;
-import uz.pdp.water_delivery.entity.Role;
 import uz.pdp.water_delivery.entity.User;
 import uz.pdp.water_delivery.entity.enums.RoleName;
 import uz.pdp.water_delivery.repo.*;
@@ -26,26 +23,15 @@ import uz.pdp.water_delivery.services.service.BottleService;
 import uz.pdp.water_delivery.services.service.UserServiceImpl;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Base64;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 public class AdminController {
 
 
-    private final BottleTypesRepository bottleTypesRepository;
-    private final OrderProductRepository orderProductRepository;
     private final LogErrorFile logErrorFile;
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final OrderRepository orderRepository;
     private final UserServiceImpl userServiceImpl;
     private final BottleService bottleService;
 
