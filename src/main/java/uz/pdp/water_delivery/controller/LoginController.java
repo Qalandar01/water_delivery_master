@@ -8,28 +8,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import uz.pdp.water_delivery.auth.AuthenticationService;
 import uz.pdp.water_delivery.entity.Role;
 import uz.pdp.water_delivery.entity.User;
 import uz.pdp.water_delivery.entity.enums.RoleName;
-import uz.pdp.water_delivery.repo.TelegramUserRepository;
 import uz.pdp.water_delivery.repo.UserRepository;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 public class LoginController {
 
-    private final AuthenticationService authenticationService;
-    private final TelegramUserRepository telegramUserRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
