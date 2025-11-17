@@ -15,7 +15,7 @@
 
 <div class="container mt-4">
     <h2 class="text-center">Add New Operator</h2>
-    <form th:action="@{/admin/add/user}" th:object="${user}" method="post">
+    <form th:action="@{/admin/users}" th:object="${user}" method="post">
         <div class="form-group">
             <label for="firstName"><i class="fas fa-user"></i> First Name</label>
             <input type="text" id="firstName" class="form-control" th:field="*{firstName}" placeholder="Enter first name" required>
