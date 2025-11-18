@@ -1,8 +1,11 @@
 package uz.pdp.water_delivery.bot;
 
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.CallbackQuery;
+import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.AnswerCallbackQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -36,17 +39,47 @@ public class BotController {
     }
 
     private void noHandlerFound(Update update) {
-        Message message = update.message();
-        if (message == null || message.chat() == null) {
-            log.warn("Unhandled update without message: {}", update);
+        if (update.callbackQuery() != null) {
+            handleUnmatchedCallback(update.callbackQuery());
             return;
         }
 
-        log.info("No handler found for message from chatId={}", message.chat().id());
+        Message message = update.message();
 
-        var telegramUser = botService.getTelegramUserOrCreate(message.chat().id());
-        if (telegramUser != null) {
+        if (message == null) {
+            throw new UnsupportedOperationException(
+                    "Update has no message and no callbackQuery: " + update
+            );
+        }
+        handleUnmatchedMessage(message);
+    }
+
+    private void handleUnmatchedMessage(Message message) {
+        Chat chat = message.chat();
+        if (chat == null) {
+            throw new IllegalStateException("Message has no chat: " + message);
+        }
+
+        long chatId = chat.id();
+        log.info("No handler found for message from chatId={}", chatId);
+
+        TelegramUser telegramUser = botService.getTelegramUserOrCreate(chatId);
+        if (telegramUser == null) {
+            throw new IllegalStateException("Could not load/create TelegramUser for chatId=" + chatId);
+        }
+
+        try {
             telegramUser.deleteMessage(telegramBot, message.messageId());
+        } catch (Exception e) {
+            log.error("Failed to delete message {} for chatId={}", message.messageId(), chatId, e);
         }
     }
+    private void handleUnmatchedCallback(CallbackQuery callbackQuery) {
+        long chatId = callbackQuery.from().id();
+        log.warn("No handler found for callback data='{}' from chatId={}",
+                callbackQuery.data(), chatId);
+        telegramBot.execute(new AnswerCallbackQuery(callbackQuery.id()));
+    }
+
+
 }

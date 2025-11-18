@@ -14,6 +14,7 @@ import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,11 +65,16 @@ public class BotService  {
 
     @Transactional
     public TelegramUser getTelegramUserOrCreate(Long chatId) {
-        return telegramUserRepository.findByChatId(chatId).orElseGet(() -> {
-            TelegramUser newUser = new TelegramUser(chatId);
-            telegramUserRepository.save(newUser);
-            return newUser;
-        });
+        try {
+            return telegramUserRepository.findByChatId(chatId).orElseGet(() -> {
+                TelegramUser newUser = new TelegramUser(chatId);
+                return telegramUserRepository.saveAndFlush(newUser); // Use saveAndFlush
+            });
+        } catch (DataIntegrityViolationException e) {
+            // If another thread created it, fetch it
+            return telegramUserRepository.findByChatId(chatId)
+                    .orElseThrow(() -> new RuntimeException("Failed to get or create user"));
+        }
     }
 
 

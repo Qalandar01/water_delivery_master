@@ -24,7 +24,15 @@ public class TelegramWebhookController {
             @RequestBody String rawJson,
             @RequestHeader("X-Telegram-Bot-Api-Secret-Token") String token
     ) {
+        System.out.println("=== WEBHOOK RECEIVED ===");
+        System.out.println("Raw JSON: " + rawJson);
+        System.out.println("Token received: " + token);
+        System.out.println("Token expected: " + secret);
+        System.out.println("Token matches: " + token.equals(secret));
+
         Update update = gson.fromJson(rawJson, Update.class);
+        System.out.println("Update parsed: " + update);
+        System.out.println("Update ID: " + (update != null ? update.updateId() : "NULL"));
         if (token.equals(secret)) {
             botController.handleUpdate(update);
             return ResponseEntity.status(HttpStatus.OK).build();

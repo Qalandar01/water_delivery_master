@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -18,12 +19,39 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
+    //    @Bean
+//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//        http.userDetailsService(userDetailsService);
+//        http.authorizeHttpRequests(authorize -> authorize
+//                        .requestMatchers("/api/webhook").permitAll()
+//                        .requestMatchers("/login","/change-password", "/forgot-password", "/change-password-phone", "/css/**", "/static/**", "/js/**", "/registration", "/topic").permitAll()
+//                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/user/**").hasRole("USER")
+//                        .requestMatchers("/operator/**").hasRole("OPERATOR")
+//                        .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
+//                        .anyRequest().authenticated()
+//                )
+//                .formLogin(formLogin -> formLogin
+//                        .loginPage("/login")
+//                        .loginProcessingUrl("/login")       // POST handled by Spring
+//                        .defaultSuccessUrl("/", true)
+//                        .failureHandler(customAuthenticationFailureHandler())
+//                        .permitAll()
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/logout")
+//                        .logoutSuccessUrl("/login")
+//                        .permitAll()
+//                )
+//                .csrf(AbstractHttpConfigurer::disable);
+//        return http.build();
+//    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.userDetailsService(userDetailsService);
-        http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/webhook").permitAll()
-                        .requestMatchers("/login","/change-password", "/forgot-password", "/change-password-phone", "/css/**", "/static/**", "/js/**", "/registration", "/topic").permitAll()
+        http
+                .securityMatcher(request -> !request.getRequestURI().startsWith("/api/webhook"))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/login", "/change-password", "/forgot-password", "/change-password-phone", "/css/**", "/static/**", "/js/**", "/registration", "/topic").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/operator/**").hasRole("OPERATOR")
@@ -32,7 +60,7 @@ public class SecurityConfig {
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")       // POST handled by Spring
+                        .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/", true)
                         .failureHandler(customAuthenticationFailureHandler())
                         .permitAll()
@@ -42,7 +70,9 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 )
+                .userDetailsService(userDetailsService)
                 .csrf(AbstractHttpConfigurer::disable);
+
         return http.build();
     }
 
