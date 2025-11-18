@@ -3,18 +3,18 @@ package uz.pdp.water_delivery.bot.commands;
 import com.pengrad.telegrambot.model.Message;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotServiceIn;
+import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 
 @Service
 public class OrderBtnCommand implements BotCommand {
 
     private final String command;
-    private final BotServiceIn botServiceIn;
+    private final BotService botService;
 
-    public OrderBtnCommand(BotServiceIn botServiceIn) {
+    public OrderBtnCommand(BotService botService) {
         this.command = BotConstant.ORDER_BTN;
-        this.botServiceIn = botServiceIn;
+        this.botService = botService;
     }
 
     @Override
@@ -24,6 +24,6 @@ public class OrderBtnCommand implements BotCommand {
 
     @Override
     public void execute(Message message, TelegramUser telegramUser) {
-        botServiceIn.startOrdering(message, telegramUser);
+        botService.startOrdering(message, telegramUser);
     }
 }

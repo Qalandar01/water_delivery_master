@@ -14,7 +14,6 @@ import uz.pdp.water_delivery.entity.enums.RoleName;
 import uz.pdp.water_delivery.exception.DuplicatePhoneNumberException;
 import uz.pdp.water_delivery.repo.RoleRepository;
 import uz.pdp.water_delivery.repo.UserRepository;
-import uz.pdp.water_delivery.services.serviceImple.UserService;
 import uz.pdp.water_delivery.utils.PhoneRepairUtil;
 
 import java.time.LocalDate;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -38,7 +37,6 @@ public class UserServiceImpl implements UserService {
         return users.orElseGet(() -> userRepository.save(user));
     }
 
-    @Override
     public User createOrUpdateUser(UserDTO userDTO) throws DuplicatePhoneNumberException {
         String repairedPhone = PhoneRepairUtil.repair(userDTO.getPhone());
         Optional<User> existingUser = userRepository.findByPhone(repairedPhone);
@@ -54,12 +52,10 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    @Override
     public User findByPhone(String phone) {
         return userRepository.findByPhone(PhoneRepairUtil.repair(phone)).orElse(null);
     }
 
-    @Override
     public List<User> getUsersByRole(RoleName roleName) {
         return userRepository.findAllByRolesRoleName(roleName);
     }

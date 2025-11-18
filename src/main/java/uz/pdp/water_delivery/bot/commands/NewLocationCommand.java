@@ -2,10 +2,9 @@ package uz.pdp.water_delivery.bot.commands;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotServiceIn;
+import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
 
@@ -13,12 +12,12 @@ import uz.pdp.water_delivery.entity.enums.TelegramState;
 public class NewLocationCommand implements BotCommand {
 
     private final String command;
-    private final BotServiceIn botServiceIn;
+    private final BotService botService;
     private final TelegramBot telegramBot;
 
-    public NewLocationCommand(BotServiceIn botServiceIn, TelegramBot telegramBot) {
+    public NewLocationCommand(BotService botService, TelegramBot telegramBot) {
         this.command = BotConstant.NEW_LOCATION;
-        this.botServiceIn = botServiceIn;
+        this.botService = botService;
         this.telegramBot = telegramBot;
     }
 
@@ -30,7 +29,7 @@ public class NewLocationCommand implements BotCommand {
     @Override
     public void execute(Message message , TelegramUser telegramUser) {
         if (telegramUser.getState().equals(TelegramState.SETTING)) {
-            botServiceIn.sendNewLocationButton(message, telegramUser);
+            botService.sendNewLocationButton(message, telegramUser);
         } else {
             telegramUser.deleteMessage(telegramBot, message.messageId());
         }

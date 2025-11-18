@@ -1,21 +1,20 @@
 package uz.pdp.water_delivery.bot.commands;
 
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotServiceIn;
+import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 
 @Service
 public class ShareContactCommand implements BotCommand {
 
     private final String command;
-    private final BotServiceIn botServiceIn;
+    private final BotService botService;
 
-    public ShareContactCommand(BotServiceIn botServiceIn) {
+    public ShareContactCommand(BotService botService) {
         this.command = BotConstant.SHARE_CONTACT;
-        this.botServiceIn = botServiceIn;
+        this.botService = botService;
     }
 
     @Override
@@ -25,6 +24,6 @@ public class ShareContactCommand implements BotCommand {
 
     @Override
     public void execute(Message message, TelegramUser telegramUser) {
-        botServiceIn.saveContactSendMessage(message, telegramUser);
+        botService.saveContactSendMessage(message, telegramUser);
     }
 }

@@ -3,16 +3,16 @@ package uz.pdp.water_delivery.bot.commands;
 import com.pengrad.telegrambot.model.Message;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotServiceIn;
+import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 
 @Service
 public class StartCommand implements BotCommand {
-    private final BotServiceIn botServiceIn;
+    private final BotService botService;
     private final String command;
 
-    public StartCommand(BotServiceIn botServiceIn) {
-        this.botServiceIn = botServiceIn;
+    public StartCommand(BotService botService) {
+        this.botService = botService;
         this.command = BotConstant.START;
     }
 
@@ -23,6 +23,6 @@ public class StartCommand implements BotCommand {
 
     @Override
     public void execute(Message message, TelegramUser telegramUser) {
-        botServiceIn.acceptStartSendShareContact(message, telegramUser);
+        botService.acceptStartSendShareContact(message, telegramUser);
     }
 }

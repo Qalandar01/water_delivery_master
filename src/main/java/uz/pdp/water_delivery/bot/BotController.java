@@ -17,7 +17,7 @@ import java.util.List;
 public class BotController {
 
     private final List<UpdateHandler> updateHandlers;
-    private final BotServiceIn botServiceIn;
+    private final BotService botService;
     private final TelegramBot telegramBot;
 
     @Async
@@ -44,7 +44,7 @@ public class BotController {
 
         log.info("No handler found for message from chatId={}", message.chat().id());
 
-        var telegramUser = botServiceIn.getTelegramUserOrCreate(message.chat().id());
+        var telegramUser = botService.getTelegramUserOrCreate(message.chat().id());
         if (telegramUser != null) {
             telegramUser.deleteMessage(telegramBot, message.messageId());
         }

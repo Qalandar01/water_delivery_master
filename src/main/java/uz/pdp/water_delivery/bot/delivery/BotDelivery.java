@@ -9,7 +9,6 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.water_delivery.bot.BotConstant;
@@ -21,16 +20,13 @@ import uz.pdp.water_delivery.entity.*;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
 import uz.pdp.water_delivery.repo.*;
-import uz.pdp.water_delivery.services.service.BotConstantService;
 import uz.pdp.water_delivery.services.service.DeleteMessageService;
-import uz.pdp.water_delivery.services.serviceImple.UserService;
 import uz.pdp.water_delivery.utils.DistanceUtil;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 import uz.pdp.water_delivery.utils.RouteDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +40,6 @@ public class BotDelivery {
 
     private final TelegramBot telegramBot;
     private final TelegramUserRepository telegramUserRepository;
-    private final UserRepository userRepository;
-    private final UserService userService;
-    private final RegionRepository regionRepository;
-    private final SimpMessagingTemplate messagingTemplate;
-    private final BottleTypesRepository bottleTypesRepository;
-    private final DeliveryTimeRepository deliveryTimeRepository;
     private final OrderRepository orderRepository;
     private final BotUtils botUtils;
     private final CourierRepository courierRepository;

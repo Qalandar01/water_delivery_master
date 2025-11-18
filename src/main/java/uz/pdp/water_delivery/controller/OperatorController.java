@@ -4,32 +4,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import uz.pdp.water_delivery.bot.BotServiceIn;
+import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
-import uz.pdp.water_delivery.dto.*;
+import uz.pdp.water_delivery.dto.Location;
+import uz.pdp.water_delivery.dto.OrderSummaryDTO;
+import uz.pdp.water_delivery.dto.OrdersPageData;
+import uz.pdp.water_delivery.dto.VerifyUserDTO;
 import uz.pdp.water_delivery.entity.*;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
+import uz.pdp.water_delivery.exception.TelegramUserNotFoundException;
 import uz.pdp.water_delivery.projection.SimpleWaitingUser;
 import uz.pdp.water_delivery.repo.*;
 import uz.pdp.water_delivery.services.service.DeleteMessageService;
-import uz.pdp.water_delivery.utils.Base64Utils;
-import uz.pdp.water_delivery.utils.DistrictUtil;
+import uz.pdp.water_delivery.services.service.OperatorService;
+import uz.pdp.water_delivery.services.service.TelegramUserService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -42,111 +42,64 @@ public class OperatorController {
 
     private final TelegramUserRepository telegramUserRepository;
     private final DistrictRepository districtRepository;
-    private final DistrictUtil districtUtil;
-    private final BotServiceIn botServiceIn;
+    private final BotService botService;
     private final OrderRepository orderRepository;
-    private final RegionRepository regionRepository;
     private final CourierRepository courierRepository;
     private final DeliveryTimeRepository deliveryTimeRepository;
-    private final HttpSession httpSession;
-    private final UserRepository userRepository;
-    private final BottleTypesRepository bottleTypesRepository;
     private final LogErrorFile logErrorFile;
-    private final Base64Utils base64Utils;
     private final TelegramBot telegramBot;
     private final DeleteMessageService deleteMessageService;
     private final OrderProductRepository orderProductRepository;
     private final ObjectMapper objectMapper;
     private final CurrentOrdersRepository currentOrdersRepository;
+    private final OperatorService operatorService;
+    private final TelegramUserService telegramUserService;
 
     public String ApiKey = "23c60e9b-0d03-4854-b8cc-b1ef6ae33d78";
 
     @GetMapping("/operator")
-    public String registration(Model model) {
-        List<TelegramState> states = List.of(TelegramState.WAITING_OPERATOR);
-        List<SimpleWaitingUser> users = telegramUserRepository.findAllByStateInOrderByCreatedAt(states);
-        Integer count = telegramUserRepository.countByChangeLocation(true);
-        model.addAttribute("users", users);
-        model.addAttribute("countTelegramUser", count);
+    public String operatorMenu(Model model) {
+        model.addAttribute("users", operatorService.getWaitingUsers());
+        model.addAttribute("countTelegramUser", operatorService.countUsersWithChangedLocation());
+
         return "operator/menu";
     }
 
     @GetMapping("/operator/orders")
     public String orders(
-            Model model,
-            @RequestParam(defaultValue = "") UUID courier
+            @RequestParam(required = false) Long courier,
+            Model model
     ) {
-        List<Courier> couriers = courierRepository.findAllByIsActive(true);
-        List<Order> orders = orderRepository.findAllByOrderStatusIn(List.of(OrderStatus.CREATED, OrderStatus.ASSIGNED, OrderStatus.WAITING_PHONE));
-        List<OrderProduct> orderProducts = orderProductRepository.findAllByOrderIn(orders);
-//        List<OrderDto> list = orders.stream().map(item -> new OrderDto(
-//                item.getId(),
-//                item.getOrderStatus(),
-//                item.getLocation(),
-//                item.getDay(),
-//                item.getCreatedAt(),
-//                item.getPhone(),
-//                OrderProductDto.makeListFromEntity(orderProducts
-//                        .stream()
-//                        .filter(orderProduct -> orderProduct.getOrder().getId().equals(item.getId()))
-//                        .toList())
-//        )).toList();
-
-//        List<OrderDto> orders = List.of(
-//                new OrderDto(100L, OrderStatus.CREATED, new Location(41.310, 69.290), LocalDate.now().minusDays(1), LocalDateTime.now().minusDays(1), "998901111111", List.of(new OrderProductDto("20l", 5), new OrderProductDto("10l", 5))),
-//                new OrderDto(200L, OrderStatus.CREATED, new Location(41.312, 69.295), LocalDate.now(), LocalDateTime.now(), "998902222222", List.of(new OrderProductDto("20l", 10))),
-//                new OrderDto(300L, OrderStatus.CREATED, new Location(41.315, 69.300), LocalDate.now(), LocalDateTime.now(), "998903333333", List.of(new OrderProductDto("20l", 4))),
-//                new OrderDto(400L, OrderStatus.ASSIGNED, new Location(41.318, 69.305), LocalDate.now(), LocalDateTime.now(), "998904444444", List.of(new OrderProductDto("20l", 3))),
-//                new OrderDto(500L, OrderStatus.ASSIGNED, new Location(41.320, 69.310), LocalDate.now(), LocalDateTime.now(), "998905555555", List.of(new OrderProductDto("20l", 7))),
-//                new OrderDto(600L, OrderStatus.ASSIGNED, new Location(41.322, 69.315), LocalDate.now(), LocalDateTime.now(), "998906666666", List.of(new OrderProductDto("20l", 8))),
-//                new OrderDto(700L, OrderStatus.CREATED, new Location(41.325, 69.320), LocalDate.now(), LocalDateTime.now(), "998907777777", List.of(new OrderProductDto("20l", 2))),
-//                new OrderDto(800L, OrderStatus.CREATED, new Location(41.328, 69.325), LocalDate.now(), LocalDateTime.now(), "998908888888", List.of(new OrderProductDto("20l", 10))),
-//                new OrderDto(900L, OrderStatus.CREATED, new Location(41.330, 69.330), LocalDate.now().minusDays(2), LocalDateTime.now().minusDays(2), "998909999999", List.of(new OrderProductDto("20l", 15))),
-//                new OrderDto(1000L, OrderStatus.CREATED, new Location(41.332, 69.335), LocalDate.now(), LocalDateTime.now(), "998901010101", List.of(new OrderProductDto("20l", 20)))
-//        );
-        Optional<Courier> currentCourierOpt = couriers.stream().filter(c -> c.getId().equals(courier)).findFirst();
-        Courier currentCourier = currentCourierOpt.orElseGet(() -> couriers.get(0));
-
-        List<CurrentOrders> currentOrders = currentOrdersRepository.findSortedOrders(OrderStatus.ASSIGNED, OrderStatus.WAITING_PHONE);
-        List<CurrentOrdersDTO> currentOrdersDTOS = currentOrders.stream().map(item -> new CurrentOrdersDTO(item.getOrder().getId(), item.getOrder().getLocation(), item.getOrder().getCourier().getId())).toList();
-//        List<CurrentOrdersDTO> currentOrders = new ArrayList<>();
-//        currentOrders.add(new CurrentOrdersDTO(400L, new Location(41.318, 69.305), couriers.get(0).getId()));
-//        currentOrders.add(new CurrentOrdersDTO(500L, new Location(41.320, 69.310), couriers.get(0).getId()));
-//        currentOrders.add(new CurrentOrdersDTO(600L, new Location(41.322, 69.315), couriers.get(0).getId()));
-        model.addAttribute("currentOrders", currentOrdersDTOS);
+        OrdersPageData data = operatorService.getOrdersPageData(courier);
 
         model.addAttribute("yandexMapsApiKey", ApiKey);
-        model.addAttribute("orders", new ArrayList<>());
-        model.addAttribute("couriers", couriers);
-        model.addAttribute("currentCourier", currentCourier);
-        model.addAttribute("company", new CompanyDTO(
-                "Shift Academy",
-                69.280697,
-                41.327692
-        ));
+        model.addAttribute("couriers", data.getCouriers());
+        model.addAttribute("currentCourier", data.getCurrentCourier());
+        model.addAttribute("currentOrders", data.getOrders());
+        model.addAttribute("company", data.getCompany());
+        model.addAttribute("orders", data.getOrders());   // Future use
+
         return "operator/orderMenu";
     }
 
-    @Transactional
     @GetMapping("/operator/currentUser/{userId}")
-    public String userVerify(@PathVariable("userId") Long tgUserId, Model model) {
+    public String userVerify(@PathVariable Long userId, Model model) {
         try {
-            TelegramUser telegramUser = telegramUserRepository.findById(tgUserId)
-                    .orElseThrow(() -> new RuntimeException("tg user not found"));
-            model.addAttribute("userInfo", telegramUser);
+            TelegramUser user = telegramUserService.getUserById(userId);
+            model.addAttribute("userInfo", user);
             return "operator/currentUser";
-        } catch (Exception e) {
-            logErrorFile.logError(e, "userVerify", null);
+        } catch (TelegramUserNotFoundException e) {
             return "redirect:/operator?error=userNotFound";
         }
     }
+
 
     @PostMapping("/operator/wronglocation")
     public String wrongLocation(@RequestParam(name = "userId") Long tgUserId) {
         try {
             TelegramUser tgUser = telegramUserRepository.findById(tgUserId)
                     .orElseThrow(() -> new RuntimeException("tg user not found"));
-            botServiceIn.sendLocationButton(tgUser);
+            botService.sendLocationButton(tgUser);
             return "redirect:/operator";
         } catch (Exception e) {
             logErrorFile.logError(e, "wrongLocation", 0L);
@@ -177,7 +130,7 @@ public class OperatorController {
             tgUser.setChangeLocation(false);
             tgUser.getUser().setDoublePhone(verifyUserDTO.getPhone() != null ? verifyUserDTO.getPhone() : tgUser.getUser().getPhone());
             telegramUserRepository.save(tgUser);
-            botServiceIn.sendCabinet(tgUser);
+            botService.sendCabinet(tgUser);
             return "redirect:/operator";
         } catch (Exception e) {
             logErrorFile.logError(e, "verify", 0L);
@@ -206,7 +159,7 @@ public class OperatorController {
             tgUser.setPhoneOff(true);
             tgUser.setState(TelegramState.NO_PHONE);
             telegramUserRepository.save(tgUser);
-            botServiceIn.sendUserDidNotAnswerPhone(tgUser);
+            botService.sendUserDidNotAnswerPhone(tgUser);
 
             return "redirect:/operator";
         } catch (Exception e) {
@@ -352,7 +305,7 @@ public class OperatorController {
                 deleteMessageService.archivedForDeletingMessages(order.getTelegramUser(), messageId, "Buyurtmangiz bekor qilindi");
                 order.getTelegramUser().setState(TelegramState.CABINET);
                 orderRepository.save(order);
-                botServiceIn.sendCabinet(order.getTelegramUser());
+                botService.sendCabinet(order.getTelegramUser());
                 model.addAttribute("successMessage", "Buyurtma muvaffaqiyatli bekor qilindi");
             } else {
                 model.addAttribute("errorMessage", "Buyurtma topilmadi");

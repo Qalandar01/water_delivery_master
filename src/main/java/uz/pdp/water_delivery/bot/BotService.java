@@ -27,7 +27,7 @@ import uz.pdp.water_delivery.entity.enums.RoleName;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
 import uz.pdp.water_delivery.repo.*;
 import uz.pdp.water_delivery.services.service.DeleteMessageService;
-import uz.pdp.water_delivery.services.serviceImple.UserService;
+import uz.pdp.water_delivery.services.service.UserService;
 import uz.pdp.water_delivery.utils.PhoneRepairUtil;
 
 import java.time.LocalDate;
@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class BotService implements BotServiceIn {
+public class BotService  {
 
     private final TelegramBot telegramBot;
     private final TelegramUserRepository telegramUserRepository;
@@ -61,7 +61,7 @@ public class BotService implements BotServiceIn {
         this.botDelivery = botDelivery;
     }
 
-    @Override
+
     @Transactional
     public TelegramUser getTelegramUserOrCreate(Long chatId) {
         return telegramUserRepository.findByChatId(chatId).orElseGet(() -> {
@@ -71,7 +71,7 @@ public class BotService implements BotServiceIn {
         });
     }
 
-    @Override
+
     public void acceptStartSendShareContact(Message message, TelegramUser telegramUser) {
 //        telegramStateDispatcher.dispatch(message, telegramUser);
         if (telegramUser.getState().equals(TelegramState.HAS_ORDER)) {
@@ -101,7 +101,7 @@ public class BotService implements BotServiceIn {
     }
 
 
-    @Override
+
     public void saveContactSendMessage(Message message, TelegramUser telegramUser) {
         String contact = PhoneRepairUtil.repair(message.contact().phoneNumber());
         User user = userService.createdOrFindUser(contact);
@@ -174,7 +174,7 @@ public class BotService implements BotServiceIn {
     }*/
 
 
-    @Override
+
     public void saveLocationSendMessage(Message message, TelegramUser telegramUser) {
         ReplyKeyboardRemove removeKeyboard = new ReplyKeyboardRemove(true);
         telegramUser.setLocation(new Location(message.location().latitude().doubleValue(), message.location().longitude().doubleValue()));
@@ -260,7 +260,7 @@ public class BotService implements BotServiceIn {
         return sendMessage;
     }
 
-    @Override
+
     public void startOrdering(Message message, TelegramUser telegramUser) {
         String text = message.text();
         if (text.equals(BotConstant.ORDER_BTN)) {
@@ -294,7 +294,7 @@ public class BotService implements BotServiceIn {
     }
 
 
-    @Override
+
     public void acceptBottleTypeShowSelectNumber(Message message, TelegramUser telegramUser) {
         String type = message.text();
         if (handlePredefinedActions(type, telegramUser)) return;
@@ -372,7 +372,7 @@ public class BotService implements BotServiceIn {
     }
 
 
-    @Override
+
     public void changeBottleNumber(CallbackQuery message, TelegramUser telegramUser) {
         String data = message.data();
         switch (data) {
@@ -459,7 +459,7 @@ public class BotService implements BotServiceIn {
 //    }
 
 
-    @Override
+
     public void acceptOrderTimeAndShowConfirmation(CallbackQuery callbackQuery, TelegramUser tgUser) {
         if ("ignore".equals(callbackQuery.data())) {
             return;
@@ -610,7 +610,7 @@ public class BotService implements BotServiceIn {
         }
     }
 
-    @Override
+
     public void sendCabinetDelivery(Message message, TelegramUser telegramUser) {
         User user = getOrCreateUser(telegramUser);
         user.setPassword(message.text());
@@ -621,7 +621,7 @@ public class BotService implements BotServiceIn {
     }
 
 
-    @Override
+
     public void sendCabinetConfirmCode(Message message, TelegramUser telegramUser) {
         if (message.text().equals(telegramUser.getUser().getPassword())) {
             telegramUser.setState(TelegramState.START_DELIVERY);
@@ -641,7 +641,7 @@ public class BotService implements BotServiceIn {
         }
     }
 
-    @Override
+
     public void sendCabinetOldPassword(Message message, TelegramUser telegramUser) {
         if (isPasswordCorrect(message.text(), telegramUser)) {
             telegramUser.getUser().setPassword(passwordEncoder.encode(message.text()));
@@ -656,7 +656,7 @@ public class BotService implements BotServiceIn {
     }
 
 
-    @Override
+
     public void sendUserDidNotAnswerPhone(TelegramUser tgUser) {
         SendMessage sendMessage = new SendMessage(
                 tgUser.getChatId(),
@@ -687,7 +687,7 @@ public class BotService implements BotServiceIn {
         deleteMessageService.archivedForDeletingMessages(chatId, messageId, messageText);
     }
 
-    @Override
+
     public void setting(Message message, TelegramUser telegramUser) {
         SendMessage sendMessage = new SendMessage(
                 telegramUser.getChatId(),
@@ -702,7 +702,7 @@ public class BotService implements BotServiceIn {
         telegramUserRepository.save(telegramUser);
     }
 
-    @Override
+
     public void saveNewLocation(Message message, TelegramUser telegramUser) {
         Location location = new Location(message.location().latitude().doubleValue(), message.location().longitude().doubleValue());
         telegramUser.setLocation(location);
@@ -722,7 +722,7 @@ public class BotService implements BotServiceIn {
         messagingTemplate.convertAndSend("/topic/status", "Order created for user: " + telegramUser.getChatId());
     }
 
-    @Override
+
     public void sendNewLocationButton(Message message, TelegramUser telegramUser) {
         SendMessage sendMessage = new SendMessage(
                 telegramUser.getChatId(),
@@ -779,13 +779,13 @@ public class BotService implements BotServiceIn {
     }
 
 
-    @Override
+
     public void sendPleaseWaitingOperator(Message message, TelegramUser telegramUser) {
         deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), "Please waiting operator");
         sendMessage(telegramUser, BotConstant.PLEASE_WAITING_OPERATOR);
     }
 
-    @Override
+
     public void showBasket(Message message, TelegramUser telegramUser) {
         deleteMessageService.deleteMessageAll(telegramBot, telegramUser);
         deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), "Show basket");
@@ -867,7 +867,7 @@ public class BotService implements BotServiceIn {
     }
 
 
-    @Override
+
     public void settingMenu(Message message, TelegramUser telegramUser) {
         switch (message.text()) {
             case BotConstant.NEW_LOCATION -> {
@@ -888,7 +888,7 @@ public class BotService implements BotServiceIn {
         }
     }
 
-//    @Override
+//
 //    public void decreaseBasketAmount(Integer basketId, TelegramUser telegramUser) {
 //        Optional<Basket> basketOptional = basketRepository.findById(basketId);
 //
@@ -907,7 +907,7 @@ public class BotService implements BotServiceIn {
 //    }
 
 
-//    @Override
+//
 //    public void increaseBasketAmount(Integer uuid, TelegramUser telegramUser) {
 //        Optional<Basket> basket = basketRepository.findById(uuid);
 //
@@ -953,7 +953,7 @@ public class BotService implements BotServiceIn {
         this.basketRepository = basketRepository;
     }
 
-//    @Override
+//
 //    public void updateBasketAmount(String data, TelegramUser telegramUser) {
 //        String[] splitData = data.contains("_") ? data.split("_") : new String[]{data};
 //        String action = splitData[0];
@@ -973,7 +973,7 @@ public class BotService implements BotServiceIn {
 //
 //    }
 
-    @Override
+
     public void deleteBasket(String data, TelegramUser telegramUser) {
         String[] splitData = data.contains("_") ? data.split("_") : new String[]{data};
         String basketId = splitData.length > 1 ? splitData[1] : null;
@@ -987,7 +987,7 @@ public class BotService implements BotServiceIn {
 
     }
 
-    @Override
+
     public void showDeliveryTimeMenu(CallbackQuery messageCallback, TelegramUser telegramUser, String data) {
         telegramUser.setState(TelegramState.CONFIRM_ORDER);
         telegramUserRepository.save(telegramUser);
@@ -998,7 +998,7 @@ public class BotService implements BotServiceIn {
         this.orderProductRepository = orderProductRepository;
     }
 
-    @Override
+
     public void removeBasketProduct(TelegramUser telegramUser, String data) {
         long basketId = Long.parseLong(data.split("_")[1]);
         basketRepository.deleteById(basketId);
