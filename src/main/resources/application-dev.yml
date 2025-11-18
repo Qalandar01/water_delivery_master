@@ -1,7 +1,7 @@
 bot:
   token: 7524788008:AAGcItw7DxDuUELLoDmO-nB-CnW_lQKfbWU # Bot token
   secret_token_for_webhook: uOSSV0HFzadbgby4tf6behLf5cp6c8iEz5xiRGV3KME7PH6IRTqmevYx9aze1ruk
-  webhook_url: https://anh-chololithic-transitively.ngrok-free.dev
+  webhook_url: https://anh-chololithic-transitively.ngrok-free.dev/api/webhook
 
 spring:
   application:
