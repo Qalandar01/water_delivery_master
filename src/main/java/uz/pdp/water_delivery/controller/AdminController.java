@@ -20,7 +20,7 @@ import uz.pdp.water_delivery.entity.User;
 import uz.pdp.water_delivery.entity.enums.RoleName;
 import uz.pdp.water_delivery.repo.*;
 import uz.pdp.water_delivery.services.service.BottleService;
-import uz.pdp.water_delivery.services.service.UserServiceImpl;
+import uz.pdp.water_delivery.services.service.UserService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
 import java.util.List;
@@ -32,12 +32,12 @@ public class AdminController {
 
     private final LogErrorFile logErrorFile;
     private final UserRepository userRepository;
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
     private final BottleService bottleService;
 
     @GetMapping("/admin")
     public String admin(Model model) {
-        List<User> operators = userServiceImpl.getUsersByRole(RoleName.ROLE_OPERATOR);
+        List<User> operators = userService.getUsersByRole(RoleName.ROLE_OPERATOR);
         model.addAttribute("users", operators);
         return "admin/admin";
     }
@@ -179,7 +179,7 @@ public class AdminController {
         }
 
         try {
-            userServiceImpl.createOperatorUser(user);
+            userService.createOperatorUser(user);
             redirectAttributes.addFlashAttribute("successMessage", "User created successfully!");
             return "redirect:/admin/users";
         } catch (Exception e) {
@@ -192,7 +192,7 @@ public class AdminController {
     @GetMapping("/admin/users/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            userServiceImpl.deleteOrUpdateUserRoles(id);
+            userService.deleteOrUpdateUserRoles(id);
             redirectAttributes.addFlashAttribute("successMessage", "User updated or deleted successfully.");
         } catch (EntityNotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -205,7 +205,7 @@ public class AdminController {
 
     @GetMapping("/admin/users/edit/{id}")
     public String showEditUserForm(@PathVariable Long id, Model model) {
-        User user = userServiceImpl.getUserById(id);
+        User user = userService.getUserById(id);
         model.addAttribute("user", user);
         return "admin/edit-user";
     }
@@ -222,7 +222,7 @@ public class AdminController {
         }
 
         try {
-            userServiceImpl.updateUser(id, userRequestDTO);
+            userService.updateUser(id, userRequestDTO);
             redirectAttributes.addFlashAttribute("successMessage", "User updated successfully.");
         } catch (EntityNotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

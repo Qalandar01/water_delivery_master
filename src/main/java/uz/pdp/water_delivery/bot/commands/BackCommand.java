@@ -1,10 +1,9 @@
 package uz.pdp.water_delivery.bot.commands;
 
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotServiceIn;
+import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
 import uz.pdp.water_delivery.repo.TelegramUserRepository;
@@ -16,13 +15,13 @@ public class BackCommand implements BotCommand {
     private final String command;
     private final TelegramUserRepository telegramUserRepository;
     private final DeleteMessageService deleteMessageService;
-    private final BotServiceIn botServiceIn;
+    private final BotService botService;
 
-    public BackCommand(TelegramUserRepository telegramUserRepository, DeleteMessageService deleteMessageService, BotServiceIn botServiceIn) {
+    public BackCommand(TelegramUserRepository telegramUserRepository, DeleteMessageService deleteMessageService, BotService botService) {
         this.command = BotConstant.BACK;
         this.telegramUserRepository = telegramUserRepository;
         this.deleteMessageService = deleteMessageService;
-        this.botServiceIn = botServiceIn;
+        this.botService = botService;
     }
 
     @Override
@@ -36,12 +35,12 @@ public class BackCommand implements BotCommand {
             telegramUser.setState(TelegramState.CABINET);
             telegramUserRepository.save(telegramUser);
             deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), BotConstant.BACK);
-            botServiceIn.sendCabinet(telegramUser);
+            botService.sendCabinet(telegramUser);
         } else if (telegramUser.getState().equals(TelegramState.SAVE_NEW_LOCATION)) {
             telegramUser.setState(TelegramState.SETTING);
             telegramUserRepository.save(telegramUser);
             deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), BotConstant.BACK);
-            botServiceIn.setting(message, telegramUser);
+            botService.setting(message, telegramUser);
         }
     }
 }

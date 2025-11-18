@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public interface SimpleWaitingUser {
 
-    UUID getId();
+    Long getId();
     String getUserPhone();
     LocalDateTime getCreatedAt();
 
