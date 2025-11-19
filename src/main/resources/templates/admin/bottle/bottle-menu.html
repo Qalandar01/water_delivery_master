@@ -108,7 +108,7 @@
 
         <div class="col-md-4" th:each="bottleType : ${bottleTypes}">
             <div class="card card-custom">
-                <img th:src="@{/admin/bottle/image/{id}(id=${bottleType.id})}" alt="Bottle Image">
+                <img th:src="@{/admin/product/image/{id}(id=${bottleType.id})}" alt="Bottle Image">
                 <div class="card-body card-body-custom">
                     <h5 class="card-title"><i class="fa-solid fa-wine-bottle"></i> <span th:text="${bottleType.type}">Idish Turi</span></h5>
                     <p class="card-text"><i class="fa-solid fa-align-left"></i> <span th:text="${bottleType.description}">Tavsif</span></p>

@@ -39,7 +39,7 @@ public class CallbackHandler implements UpdateHandler {
 
     private void handleUserCallbackQuery(CallbackQuery message, TelegramUser telegramUser, String data) {
         switch (telegramUser.getState()) {
-            case SELECT_BOTTLE_NUMBER -> botService.changeBottleNumber(message, telegramUser);
+            case SELECT_BOTTLE_NUMBER -> botService.changeProductNumber(message, telegramUser);
 
             case CONFIRM_ORDER -> botService.acceptOrderTimeAndShowConfirmation(message, telegramUser);
 

@@ -15,7 +15,6 @@ import java.util.Locale;
 
 @Getter
 @Setter
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -61,7 +60,7 @@ public class TelegramUser extends AbsEntity {
 
     private String addressLine;
 
-    private Integer bottleCount = 1;
+    private Integer productCount = 1;
 
     private Integer editingMessageId;
 
@@ -74,7 +73,7 @@ public class TelegramUser extends AbsEntity {
     private Boolean changeLocation = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private BottleTypes bottleTypes;
+    private Product product;
 
     @ManyToOne
     private DeliveryTime currentOrderDeliveryTime;
@@ -95,7 +94,7 @@ public class TelegramUser extends AbsEntity {
 
     public String calcTotalAmountOfCurrentOrder() {
         NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.FRANCE);
-        return numberFormat.format(bottleTypes.getPrice() * bottleCount);
+        return numberFormat.format((long) product.getPrice() * productCount);
     }
 
 

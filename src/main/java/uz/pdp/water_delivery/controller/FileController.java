@@ -4,40 +4,40 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import uz.pdp.water_delivery.entity.BottleTypes;
-import uz.pdp.water_delivery.repo.BottleTypesRepository;
+import uz.pdp.water_delivery.entity.Product;
+import uz.pdp.water_delivery.repo.ProductRepository;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 @Controller
-public class BottleImageController {
+public class FileController {
 
-    private final BottleTypesRepository bottleTypesRepository;
+    private final ProductRepository productRepository;
 
-    public BottleImageController(BottleTypesRepository bottleTypesRepository) {
-        this.bottleTypesRepository = bottleTypesRepository;
+    public FileController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
-    @GetMapping("/admin/bottle/image/{id}")
-    public void getBottleImage(
+    @GetMapping("/admin/product/image/{id}")
+    public void getImage(
             @PathVariable Long id,
             HttpServletResponse response
     ) throws IOException {
 
-        BottleTypes bottleType = bottleTypesRepository.findById(id)
+        Product product = productRepository.findById(id)
                 .orElse(null);
 
-        if (bottleType == null || bottleType.getImage() == null) {
+        if (product == null || product.getImage() == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Image not found");
             return;
         }
 
         response.setContentType("image/jpeg");
-        response.setContentLength(bottleType.getImage().length);
+        response.setContentLength(product.getImage().length);
 
         try (OutputStream os = response.getOutputStream()) {
-            os.write(bottleType.getImage());
+            os.write(product.getImage());
         }
     }
 

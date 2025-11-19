@@ -8,9 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.water_delivery.dto.BottleEditView;
 import uz.pdp.water_delivery.dto.BottleTypeDTO;
 import uz.pdp.water_delivery.dto.request.GiftWaterRequest;
-import uz.pdp.water_delivery.entity.BottleTypes;
-import uz.pdp.water_delivery.repo.BottleTypesRepository;
+import uz.pdp.water_delivery.entity.Product;
 import uz.pdp.water_delivery.repo.OrderProductRepository;
+import uz.pdp.water_delivery.repo.ProductRepository;
 
 import java.io.IOException;
 import java.util.Base64;
@@ -20,40 +20,40 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BottleService {
 
-    private final BottleTypesRepository bottleTypesRepository;
+    private final ProductRepository productRepository;
     private final OrderProductRepository orderProductRepository;
 
-    public List<BottleTypes> getActiveBottleTypesWithOrderCount() {
-        List<BottleTypes> bottleTypes = bottleTypesRepository.findAllByActiveTrue();
+    public List<Product> getActiveProductsWithOrderCount() {
+        List<Product> products = productRepository.findAllByActiveTrue();
 
-        for (BottleTypes type : bottleTypes) {
-            long orderCount = orderProductRepository.countByBottleTypes(type);
-            type.setOrderCount(orderCount);
+        for (Product product : products) {
+            long orderCount = orderProductRepository.countByProduct(product);
+            product.setOrderCount(orderCount);
         }
 
-        return bottleTypes;
+        return products;
     }
 
     public void updateGiftWater(GiftWaterRequest req) {
 
         validateRequest(req);
 
-        BottleTypes bottle = bottleTypesRepository.findById(req.getBottleTypeId())
+        Product product = productRepository.findById(req.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("Bunday ID ga ega butilka topilmadi!"));
 
-        bottle.setSale_amount(req.getSaleAmount());
-        bottle.setSale_discount(req.getSaleDiscount());
-        bottle.setSale_active(Boolean.TRUE.equals(req.getSaleActive()));
+        product.setSale_amount(req.getSaleAmount());
+        product.setSale_discount(req.getSaleDiscount());
+        product.setSale_active(Boolean.TRUE.equals(req.getSaleActive()));
 
         if (Boolean.TRUE.equals(req.getSaleActive())) {
-            bottle.setSale_startDate(req.getSaleStartTime());
-            bottle.setSale_endDate(req.getSaleEndTime());
+            product.setSale_startDate(req.getSaleStartTime());
+            product.setSale_endDate(req.getSaleEndTime());
         } else {
-            bottle.setSale_startDate(null);
-            bottle.setSale_endDate(null);
+            product.setSale_startDate(null);
+            product.setSale_endDate(null);
         }
 
-        bottleTypesRepository.save(bottle);
+        productRepository.save(product);
     }
 
     private void validateRequest(GiftWaterRequest req) {
@@ -76,17 +76,17 @@ public class BottleService {
 
     public void deleteDiscount(Long id) {
 
-        BottleTypes bottleType = bottleTypesRepository.findById(id)
+        Product bottleType = productRepository.findById(id)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Bunday ID ga ega butilka topilmadi!")
                 );
 
         clearDiscountFields(bottleType);
 
-        bottleTypesRepository.save(bottleType);
+        productRepository.save(bottleType);
     }
 
-    private void clearDiscountFields(BottleTypes bottleType) {
+    private void clearDiscountFields(Product bottleType) {
         bottleType.setSale_amount(null);
         bottleType.setSale_discount(null);
         bottleType.setSale_active(false);
@@ -99,11 +99,11 @@ public class BottleService {
 
         String type = dto.getType().trim();
 
-        if (bottleTypesRepository.existsByType(type)) {
+        if (productRepository.existsByType(type)) {
             throw new IllegalArgumentException("Bunday idish turi mavjud!");
         }
 
-        BottleTypes bottle = new BottleTypes();
+        Product bottle = new Product();
         bottle.setType(type);
         bottle.setPrice(dto.getPrice());
         bottle.setActive(dto.isActive());
@@ -115,11 +115,11 @@ public class BottleService {
             bottle.setImage(file.getBytes());
         }
 
-        bottleTypesRepository.save(bottle);
+        productRepository.save(bottle);
     }
 
     public BottleEditView getBottleEditView(Long id) {
-        BottleTypes bottleType = bottleTypesRepository.findById(id)
+        Product bottleType = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Bottle not found"));
 
         BottleTypeDTO dto = mapToDTO(bottleType);
@@ -128,7 +128,7 @@ public class BottleService {
         return new BottleEditView(dto, base64Image);
     }
 
-    private BottleTypeDTO mapToDTO(BottleTypes entity) {
+    private BottleTypeDTO mapToDTO(Product entity) {
         BottleTypeDTO dto = new BottleTypeDTO();
         dto.setId(entity.getId());
         dto.setType(entity.getType());
@@ -145,16 +145,16 @@ public class BottleService {
 
     @Transactional
     public void updateBottle(BottleTypeDTO dto) throws IOException {
-        BottleTypes bottle = bottleTypesRepository.findById(dto.getId())
+        Product bottle = productRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Bottle not found"));
 
         mapDtoToEntity(dto, bottle);
         updateImageIfProvided(dto, bottle);
 
-        bottleTypesRepository.save(bottle);
+        productRepository.save(bottle);
     }
 
-    private void mapDtoToEntity(BottleTypeDTO dto, BottleTypes bottle) {
+    private void mapDtoToEntity(BottleTypeDTO dto, Product bottle) {
         bottle.setType(dto.getType().trim());
         bottle.setDescription(dto.getDescription());
         bottle.setPrice(dto.getPrice());
@@ -162,7 +162,7 @@ public class BottleService {
         bottle.setReturnable(dto.isReturnable());
     }
 
-    private void updateImageIfProvided(BottleTypeDTO dto, BottleTypes bottle) throws IOException {
+    private void updateImageIfProvided(BottleTypeDTO dto, Product bottle) throws IOException {
         MultipartFile image = dto.getImage();
         if (image != null && !image.isEmpty()) {
             bottle.setImage(image.getBytes());
@@ -171,9 +171,9 @@ public class BottleService {
 
     @Transactional
     public void deleteBottle(Long id) {
-        BottleTypes bottle = bottleTypesRepository.findById(id)
+        Product bottle = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Bottle not found."));
-        bottleTypesRepository.delete(bottle);
+        productRepository.delete(bottle);
     }
 
 }

@@ -45,7 +45,7 @@ public class AdminController {
 
     @GetMapping("/admin/change-gift-water")
     public String changeGiftWater(Model model) {
-        model.addAttribute("bottleTypes", bottleService.getActiveBottleTypesWithOrderCount());
+        model.addAttribute("bottleTypes", bottleService.getActiveProductsWithOrderCount());
         return "admin/chegirmalar";
     }
 
@@ -115,7 +115,7 @@ public class AdminController {
 
     @GetMapping("/admin/bottle/menu")
     public String bottleMenu(Model model) {
-        model.addAttribute("bottleTypes", bottleService.getActiveBottleTypesWithOrderCount());
+        model.addAttribute("bottleTypes", bottleService.getActiveProductsWithOrderCount());
         return "admin/bottle/bottle-menu";
     }
 

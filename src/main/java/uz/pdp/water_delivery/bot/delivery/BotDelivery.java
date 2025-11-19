@@ -101,7 +101,7 @@ public class BotDelivery {
                 .append("Maxsulotlar: ").append(order.getPhone()).append("\n");
         List<OrderProduct> orderProducts = orderProductRepository.findByOrderId(order.getId());
         for (OrderProduct orderProduct : orderProducts) {
-            BottleTypes product = orderProduct.getBottleTypes();
+            Product product = orderProduct.getProduct();
             stringBuilder
                     .append(product.getType()).append(":").append(orderProduct.getAmount()).append(" ta").append("\n");
         }
@@ -320,34 +320,34 @@ public class BotDelivery {
             boolean isDiscounted = false;
 
             for (OrderProduct orderProduct : orderProducts) {
-                if (orderProduct.getBottleTypes().isReturnable()) {
+                if (orderProduct.getProduct().isReturnable()) {
                     currentOrders.getOrder().getTelegramUser().getUser().setLastBottleCount(orderProduct.getAmount());
                 }
-                double productPrice = orderProduct.getBottleTypes().getPrice();
+                double productPrice = orderProduct.getProduct().getPrice();
                 int productAmount = orderProduct.getAmount();
                 double productTotalPrice = productPrice * productAmount;
 
-                if (orderProduct.getBottleTypes().getSale_active() && orderProduct.getAmount() >= orderProduct.getBottleTypes().getSale_discount()) {
+                if (orderProduct.getProduct().getSale_active() && orderProduct.getAmount() >= orderProduct.getProduct().getSale_discount()) {
                     isDiscounted = true;
-                    productAmount = orderProduct.getAmount() - orderProduct.getBottleTypes().getSale_amount();
+                    productAmount = orderProduct.getAmount() - orderProduct.getProduct().getSale_amount();
                     double discountedTotalPrice = productAmount * productPrice;
                     totalDiscountedPrice += discountedTotalPrice;
 
                     productDetails.append("🔹 <b>")
-                            .append(orderProduct.getBottleTypes().getType())
+                            .append(orderProduct.getProduct().getType())
                             .append("</b> - <i>")
                             .append(orderProduct.getAmount())
                             .append(" ta</i>, Narxi: <b>")
-                            .append(orderProduct.getBottleTypes().getPrice())
+                            .append(orderProduct.getProduct().getPrice())
                             .append(" so'm</b>\n");
                 } else {
                     totalDiscountedPrice += productTotalPrice;
                     productDetails.append("🔹 <b>")
-                            .append(orderProduct.getBottleTypes().getType())
+                            .append(orderProduct.getProduct().getType())
                             .append("</b> - <i>")
                             .append(orderProduct.getAmount())
                             .append(" ta</i>, Narxi: <b>")
-                            .append(orderProduct.getBottleTypes().getPrice())
+                            .append(orderProduct.getProduct().getPrice())
                             .append(" so'm</b>\n");
                 }
 
@@ -549,13 +549,13 @@ public class BotDelivery {
         StringBuilder productsInfo = new StringBuilder("🛒 Mahsulotlar:\n");
         for (OrderProduct orderProduct : orderProducts) {
             String discountInfo = "";
-            if (orderProduct.getBottleTypes().getSale_active()) {
-                int saleAmount = orderProduct.getBottleTypes().getSale_amount();
+            if (orderProduct.getProduct().getSale_active()) {
+                int saleAmount = orderProduct.getProduct().getSale_amount();
                 discountInfo = String.format(" (Chegirma: %d ta)", saleAmount);
             }
             productsInfo.append(String.format(
                     "   - %s: %d ta%s\n",
-                    orderProduct.getBottleTypes().getType(),
+                    orderProduct.getProduct().getType(),
                     orderProduct.getAmount(),
                     discountInfo
             ));
@@ -586,12 +586,12 @@ public class BotDelivery {
         List<OrderProduct> orderProducts = orderProductRepository.findByOrderId(closestOrder.getOrder().getId());
         int price = 0;
         for (OrderProduct orderProduct : orderProducts) {
-            if (orderProduct.getBottleTypes().getSale_active()) {
-                int saleAmount = orderProduct.getBottleTypes().getSale_amount();
+            if (orderProduct.getProduct().getSale_active()) {
+                int saleAmount = orderProduct.getProduct().getSale_amount();
                 int discountedQuantity = Math.max(0, orderProduct.getAmount() - saleAmount);
-                price += discountedQuantity * orderProduct.getBottleTypes().getPrice();
+                price += discountedQuantity * orderProduct.getProduct().getPrice();
             } else {
-                price += orderProduct.getAmount() * orderProduct.getBottleTypes().getPrice();
+                price += orderProduct.getAmount() * orderProduct.getProduct().getPrice();
             }
         }
         return price;
