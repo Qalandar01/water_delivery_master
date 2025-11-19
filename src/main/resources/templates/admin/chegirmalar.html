@@ -165,7 +165,7 @@
     <form action="/admin/change-gift-water" method="post" class="card p-4">
         <div class="mb-3">
             <label for="bottleType" class="form-label">Chegirma qo'shish uchun butilkasini tanlang:</label>
-            <select id="bottleType" name="bottleTypeId" class="form-select" required>
+            <select id="bottleType" name="productId" class="form-select" required>
                 <option value="" disabled selected>Butilkani tanlang...</option>
                 <option th:each="bottleType : ${bottleTypes}"
                         th:value="${bottleType.id}"

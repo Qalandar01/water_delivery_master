@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.dto.Location;
 import uz.pdp.water_delivery.entity.*;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
-import uz.pdp.water_delivery.repo.*;
+import uz.pdp.water_delivery.repo.DeliveryTimeRepository;
+import uz.pdp.water_delivery.repo.ProductRepository;
+import uz.pdp.water_delivery.repo.RegionRepository;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -20,13 +22,8 @@ import java.util.List;
 public class BotUtils {
 
     private final RegionRepository regionRepository;
-    private final BottleTypesRepository bottleTypesRepository;
+    private final ProductRepository productRepository;
     private final DeliveryTimeRepository deliveryTimeRepository;
-    private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
-    private final CurrentOrdersRepository currentOrdersRepository;
-    private final BasketRepository basketRepository;
-    private final TelegramUserRepository telegramUserRepository;
 
     public static Keyboard getGeneratedContactButton() {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(
@@ -74,25 +71,25 @@ public class BotUtils {
 
 
     public InlineKeyboardMarkup generateBottleButton10L() {
-        BottleTypes bottleTypes = bottleTypesRepository.findById(1L).get();
+        Product product = productRepository.findById(1L).orElseThrow();
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton button10L = new InlineKeyboardButton("\uD83C\uDF79 10L")
-                .callbackData(BotConstant.BOTTLE_TYPE + bottleTypes.getId());
+                .callbackData(BotConstant.BOTTLE_TYPE + product.getId());
         inlineKeyboardMarkup.addRow(button10L);
         return inlineKeyboardMarkup;
     }
 
     public InlineKeyboardMarkup generateBottleButton20L() {
-        BottleTypes bottleTypes = bottleTypesRepository.findById(2L).get();
+        Product product = productRepository.findById(2L).orElseThrow();
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         InlineKeyboardButton button20L = new InlineKeyboardButton("\uD83C\uDF79 20L")
-                .callbackData(BotConstant.BOTTLE_TYPE + bottleTypes.getId());
+                .callbackData(BotConstant.BOTTLE_TYPE + product.getId());
         inlineKeyboardMarkup.addRow(button20L);
         return inlineKeyboardMarkup;
     }
 
 
-    public InlineKeyboardMarkup generateBottleNumberButtons(TelegramUser telegramUser) {
+    public InlineKeyboardMarkup generateProductNumberButtons(TelegramUser telegramUser) {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         keyboardMarkup.addRow(createQuantityButtons(telegramUser));
         keyboardMarkup.addRow(createActionButtons());
@@ -102,7 +99,7 @@ public class BotUtils {
     private InlineKeyboardButton[] createQuantityButtons(TelegramUser telegramUser) {
         return new InlineKeyboardButton[]{
                 new InlineKeyboardButton(BotConstant.MINUS).callbackData(BotConstant.MINUS),
-                new InlineKeyboardButton(String.valueOf(telegramUser.getBottleCount())).callbackData("number"),
+                new InlineKeyboardButton(String.valueOf(telegramUser.getProductCount())).callbackData("number"),
                 new InlineKeyboardButton(BotConstant.PLUS).callbackData(BotConstant.PLUS)
         };
     }
@@ -243,19 +240,19 @@ public class BotUtils {
     }
 
 
-    public ReplyKeyboardMarkup generateBottleButton(List<BottleTypes> allBottleTypes) {
+    public ReplyKeyboardMarkup generateProductButton(List<Product> products) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup("");
         List<KeyboardButton> row;
 
-        if (allBottleTypes == null || allBottleTypes.isEmpty()) {
+        if (products == null || products.isEmpty()) {
             return replyKeyboardMarkup;
         }
 
-        for (int i = 0; i < allBottleTypes.size(); i += 2) {
+        for (int i = 0; i < products.size(); i += 2) {
             row = new ArrayList<>();
-            row.add(new KeyboardButton(allBottleTypes.get(i).getType()));
-            if (i + 1 < allBottleTypes.size()) {
-                row.add(new KeyboardButton(allBottleTypes.get(i + 1).getType()));
+            row.add(new KeyboardButton(products.get(i).getType()));
+            if (i + 1 < products.size()) {
+                row.add(new KeyboardButton(products.get(i + 1).getType()));
             }
             replyKeyboardMarkup.addRow(row.toArray(new KeyboardButton[0]));
         }
@@ -284,7 +281,7 @@ public class BotUtils {
 
     public InlineKeyboardMarkup getBasketButton(Basket basket) {
         return new InlineKeyboardMarkup(
-                new InlineKeyboardButton(BotConstant.DELETE + " " + basket.getBottleType().getType())
+                new InlineKeyboardButton(BotConstant.DELETE + " " + basket.getProduct().getType())
                         .callbackData(BotConstant.DELETE + "_" + basket.getId())
         );
     }

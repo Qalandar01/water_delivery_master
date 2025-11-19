@@ -23,14 +23,14 @@ public class Basket {
     private TelegramUser telegramUser;
 
     @ManyToOne
-    private BottleTypes bottleType;
-
+    @JoinColumn(name = "product_id")
+    private Product product;
     private Integer amount;
 
     private Integer messageId;
 
 
     public Double getTotalPrice() {
-        return (double) (amount * bottleType.getPrice());
+        return (double) (amount * product.getPrice());
     }
 }

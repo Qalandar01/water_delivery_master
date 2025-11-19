@@ -46,7 +46,7 @@ public class BotService  {
     private final UserService userService;
     private final RegionRepository regionRepository;
     private final SimpMessagingTemplate messagingTemplate;
-    private final BottleTypesRepository bottleTypesRepository;
+    private final ProductRepository productRepository;
     private final DeliveryTimeRepository deliveryTimeRepository;
     private final OrderRepository orderRepository;
     private final RoleRepository roleRepository;
@@ -55,7 +55,6 @@ public class BotService  {
     private BasketRepository basketRepository;
     private OrderProductRepository orderProductRepository;
     private PasswordEncoder passwordEncoder;
-    private TelegramStateDispatcher telegramStateDispatcher;
 
     @Autowired
     public void setBotDelivery(BotDelivery botDelivery) {
@@ -260,9 +259,9 @@ public class BotService  {
 
     @NotNull
     private SendMessage createBottlePhoto(TelegramUser telegramUser) {
-        List<BottleTypes> allBottleTypes = bottleTypesRepository.findAll();
+        List<Product> products = productRepository.findAll();
         SendMessage sendMessage = new SendMessage(telegramUser.getChatId(), BotConstant.SELECT_BOTTLE_TYPE);
-        sendMessage.replyMarkup(botUtils.generateBottleButton(allBottleTypes));
+        sendMessage.replyMarkup(botUtils.generateProductButton(products));
         return sendMessage;
     }
 
@@ -271,13 +270,13 @@ public class BotService  {
         String text = message.text();
         if (text.equals(BotConstant.ORDER_BTN)) {
             deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), BotConstant.ORDER_BTN);
-            startOrderingFunktion(telegramUser);
+            startOrderingFunction(telegramUser);
         }
     }
 
-    private void startOrderingFunktion(TelegramUser telegramUser) {
-        List<BottleTypes> allBottleTypes = bottleTypesRepository.findAll();
-        if (allBottleTypes.isEmpty()) {
+    private void startOrderingFunction(TelegramUser telegramUser) {
+        List<Product> products = productRepository.findAll();
+        if (products.isEmpty()) {
             SendMessage sendMessage = new SendMessage(
                     telegramUser.getChatId(),
                     BotConstant.NO_BOTTLE_TYPE
@@ -304,14 +303,14 @@ public class BotService  {
     public void acceptBottleTypeShowSelectNumber(Message message, TelegramUser telegramUser) {
         String type = message.text();
         if (handlePredefinedActions(type, telegramUser)) return;
-        BottleTypes bottleTypes = bottleTypesRepository.findByType(type)
+        Product product = productRepository.findByType(type)
                 .orElseThrow(() -> new RuntimeException("Bad bottle type"));
 
-        updateTelegramUserBottleType(telegramUser, bottleTypes);
+        updateTelegramUserProduct(telegramUser, product);
 
-        updateBottleCountFromBasket(telegramUser);
+        updateProductFromBasket(telegramUser);
 
-        sendBottleTypeMessage(telegramUser, bottleTypes);
+        sendProductMessage(telegramUser, product);
 
     }
 
@@ -330,26 +329,26 @@ public class BotService  {
         return false;
     }
 
-    private void updateTelegramUserBottleType(TelegramUser telegramUser, BottleTypes bottleTypes) {
-        telegramUser.setBottleTypes(bottleTypes);
+    private void updateTelegramUserProduct(TelegramUser telegramUser, Product product) {
+        telegramUser.setProduct(product);
         telegramUserRepository.save(telegramUser);
     }
 
-    private void updateBottleCountFromBasket(TelegramUser telegramUser) {
-        Basket basket = basketRepository.findByTelegramUserAndBottleType(
+    private void updateProductFromBasket(TelegramUser telegramUser) {
+        Basket basket = basketRepository.findByTelegramUserAndProduct(
                 telegramUser,
-                telegramUser.getBottleTypes()
+                telegramUser.getProduct()
         );
         if (basket != null) {
-            telegramUser.setBottleCount(basket.getAmount());
+            telegramUser.setProductCount(basket.getAmount());
             telegramUserRepository.save(telegramUser);
         }
     }
 
-    private void sendBottleTypeMessage(TelegramUser telegramUser, BottleTypes bottleTypes) {
-        SendPhoto sendMessage = new SendPhoto(telegramUser.getChatId(), bottleTypes.getImage());
-        sendMessage.caption(generatedTextForBottleType(bottleTypes, telegramUser));
-        sendMessage.replyMarkup(botUtils.generateBottleNumberButtons(telegramUser));
+    private void sendProductMessage(TelegramUser telegramUser, Product product) {
+        SendPhoto sendMessage = new SendPhoto(telegramUser.getChatId(), product.getImage());
+        sendMessage.caption(generatedTextForProduct(product, telegramUser));
+        sendMessage.replyMarkup(botUtils.generateProductNumberButtons(telegramUser));
 
         SendResponse response = telegramBot.execute(sendMessage);
         Integer messageId = response.message().messageId();
@@ -361,17 +360,17 @@ public class BotService  {
     }
 
     @Transactional
-    public String generatedTextForBottleType(BottleTypes bottleTypes, TelegramUser telegramUser) {
-        double price = bottleTypes.getPrice();
-        double totalPrice = telegramUser.getBottleCount() * price;
+    public String generatedTextForProduct(Product product, TelegramUser telegramUser) {
+        double price = product.getPrice();
+        double totalPrice = telegramUser.getProductCount() * price;
 
         return String.format(
                 "🥤 Bakalashka turi: %s\n" +
                         "🔢 Soni: %d ta\n" +
                         "💲 Har birining narxi: %.2f so'm\n" +
                         "💰 Jami narxi: %.2f so'm\n",
-                bottleTypes.getType(),
-                telegramUser.getBottleCount(),
+                product.getType(),
+                telegramUser.getProductCount(),
                 price,
                 totalPrice
         );
@@ -379,12 +378,12 @@ public class BotService  {
 
 
 
-    public void changeBottleNumber(CallbackQuery message, TelegramUser telegramUser) {
+    public void changeProductNumber(CallbackQuery message, TelegramUser telegramUser) {
         String data = message.data();
         switch (data) {
             case BotConstant.ADD_TO_BASKET -> {
                 processAddToBasket(telegramUser);
-                telegramUser.setBottleCount(1);
+                telegramUser.setProductCount(1);
                 telegramUserRepository.save(telegramUser);
                 SendMessage sendMessage = new SendMessage(
                         telegramUser.getChatId(),
@@ -393,63 +392,63 @@ public class BotService  {
                 SendResponse sendResponse = telegramBot.execute(sendMessage);
                 Integer messageId = sendResponse.message().messageId();
                 deleteMessageService.archivedForDeletingMessages(telegramUser, messageId, "Savatchaga qo'shildi!");
-                startOrderingFunktion(telegramUser);
+                startOrderingFunction(telegramUser);
                 return;
             }
             case BotConstant.CANCEL_BTN -> {
                 resetUserState(telegramUser);
                 return;
             }
-            case BotConstant.PLUS -> increaseBottleCount(telegramUser);
-            case BotConstant.MINUS -> decreaseBottleCount(telegramUser);
+            case BotConstant.PLUS -> increaseProductCount(telegramUser);
+            case BotConstant.MINUS -> decreaseProductCount(telegramUser);
             default -> throw new IllegalArgumentException("Unknown action: ");
         }
 
         telegramUserRepository.save(telegramUser);
-        updateMessageWithBottleInfo(telegramUser);
+        updateMessageWithProductInfo(telegramUser);
     }
 
 
     private void resetUserState(TelegramUser telegramUser) {
-        telegramUser.setBottleCount(1);
+        telegramUser.setProductCount(1);
         telegramUser.setState(TelegramState.CABINET);
         telegramUserRepository.save(telegramUser);
         sendCabinet(telegramUser);
     }
 
-    private void increaseBottleCount(TelegramUser telegramUser) {
-        telegramUser.setBottleCount(telegramUser.getBottleCount() + 1);
+    private void increaseProductCount(TelegramUser telegramUser) {
+        telegramUser.setProductCount(telegramUser.getProductCount() + 1);
     }
 
-    private void decreaseBottleCount(TelegramUser telegramUser) {
-        if (telegramUser.getBottleCount() > 1) {
-            telegramUser.setBottleCount(telegramUser.getBottleCount() - 1);
+    private void decreaseProductCount(TelegramUser telegramUser) {
+        if (telegramUser.getProductCount() > 1) {
+            telegramUser.setProductCount(telegramUser.getProductCount() - 1);
         }
     }
 
-    private void updateMessageWithBottleInfo(TelegramUser telegramUser) {
-        String updatedText = generatedTextForBottleType(telegramUser.getBottleTypes(), telegramUser);
+    private void updateMessageWithProductInfo(TelegramUser telegramUser) {
+        String updatedText = generatedTextForProduct(telegramUser.getProduct(), telegramUser);
         EditMessageCaption editMessageText = new EditMessageCaption(
                 telegramUser.getChatId(),
                 telegramUser.getEditingMessageId());
         editMessageText.caption(updatedText);
-        editMessageText.replyMarkup(botUtils.generateBottleNumberButtons(telegramUser));
+        editMessageText.replyMarkup(botUtils.generateProductNumberButtons(telegramUser));
         telegramBot.execute(editMessageText);
     }
 
 
     private void processAddToBasket(TelegramUser telegramUser) {
-        BottleTypes bottleTypes = telegramUser.getBottleTypes();
+        Product product = telegramUser.getProduct();
 
-        Basket existingBasket = basketRepository.findByTelegramUserAndBottleType(telegramUser, bottleTypes);
+        Basket existingBasket = basketRepository.findByTelegramUserAndProduct(telegramUser, product);
         if (existingBasket != null) {
-            existingBasket.setAmount(telegramUser.getBottleCount());
+            existingBasket.setAmount(telegramUser.getProductCount());
             basketRepository.save(existingBasket);
         } else {
             Basket newBasket = Basket.builder()
                     .telegramUser(telegramUser)
-                    .amount(telegramUser.getBottleCount())
-                    .bottleType(bottleTypes)
+                    .amount(telegramUser.getProductCount())
+                    .product(product)
                     .build();
             basketRepository.save(newBasket);
         }
@@ -476,18 +475,18 @@ public class BotService  {
         double totalPrice = 0;
 
         for (Basket basket : baskets) {
-            double discountedPrice = basket.getBottleType().getPrice() * basket.getAmount();
+            double discountedPrice = basket.getProduct().getPrice() * basket.getAmount();
             int remainingAmount = basket.getAmount();
 
-            if (basket.getBottleType().getSale_active()
-                    && basket.getAmount() >= basket.getBottleType().getSale_discount()) {
+            if (basket.getProduct().getSale_active()
+                    && basket.getAmount() >= basket.getProduct().getSale_discount()) {
 
-                int saleAmount = basket.getBottleType().getSale_amount();
-                int saleDiscount = basket.getBottleType().getSale_discount();
+                int saleAmount = basket.getProduct().getSale_amount();
+                int saleDiscount = basket.getProduct().getSale_discount();
 
                 remainingAmount = basket.getAmount() - saleAmount;
 
-                discountedPrice = remainingAmount * basket.getBottleType().getPrice();
+                discountedPrice = remainingAmount * basket.getProduct().getPrice();
             }
 
             totalPrice += discountedPrice;
@@ -525,13 +524,13 @@ public class BotService  {
                 <b>💵 Narxi:</b> %d sum
                 <b>💰 Jami narxi:</b> %d sum
                 """.formatted(
-                basket.getBottleType().getType(),
+                basket.getProduct().getType(),
                 basket.getAmount(),
-                basket.getBottleType().getPrice(),
-                basket.getBottleType().getPrice() * basket.getAmount()
+                basket.getProduct().getPrice(),
+                basket.getProduct().getPrice() * basket.getAmount()
         ));
 
-        if (basket.getBottleType().getSale_active() && basket.getAmount() >= basket.getBottleType().getSale_discount()) {
+        if (basket.getProduct().getSale_active() && basket.getAmount() >= basket.getProduct().getSale_discount()) {
             result.append("""
                     <b>🎁 Sovg'a miqdori:</b> %d ta
                     <b>💰 Chegirma bilan qolgan narx:</b> %s sum
@@ -547,8 +546,8 @@ public class BotService  {
 
     public String generateOrderTxt(TelegramUser tgUser) {
         return BotConstant.ORDER_INFO.formatted(
-                tgUser.getBottleTypes().getType(),
-                tgUser.getBottleCount(),
+                tgUser.getProduct().getType(),
+                tgUser.getProductCount(),
                 tgUser.calcTotalAmountOfCurrentOrder(),
                 tgUser.getCurrentOrderDay(),
                 tgUser.getCurrentOrderDeliveryTime()
@@ -558,7 +557,7 @@ public class BotService  {
     @Transactional
     public void makeAnOrder(CallbackQuery callbackQuery, TelegramUser tgUser) {
         if (callbackQuery.data().equals(BotConstant.CANCEL) && tgUser.getState().equals(TelegramState.CREATE_ORDER)) {
-            tgUser.setBottleCount(1);
+            tgUser.setProductCount(1);
             tgUser.setState(TelegramState.CABINET);
             telegramUserRepository.save(tgUser);
             sendCabinet(tgUser);
@@ -579,10 +578,10 @@ public class BotService  {
                 OrderProduct orderProduct = OrderProduct.builder()
                         .order(order)
                         .amount(basket.getAmount())
-                        .bottleTypes(basket.getBottleType())
-                        .priceAtPurchase(basket.getBottleType().getPrice())
-                        .discountAtPurchase(basket.getBottleType().getSale_active() ? basket.getBottleType().getSale_amount() : null)
-                        .wasOnSale(basket.getBottleType().getSale_active())
+                        .product(basket.getProduct())
+                        .priceAtPurchase(basket.getProduct().getPrice())
+                        .discountAtPurchase(basket.getProduct().getSale_active() ? basket.getProduct().getSale_amount() : null)
+                        .wasOnSale(basket.getProduct().getSale_active())
                         .build();
                 orderProductRepository.save(orderProduct);
             }
@@ -591,7 +590,7 @@ public class BotService  {
             SendResponse sendResponse = telegramBot.execute(message);
             Integer messageId = sendResponse.message().messageId();
             deleteMessageService.archivedForDeletingMessages(tgUser, messageId, BotConstant.ORDER_FINISH_MSG);
-            tgUser.setBottleCount(1);
+            tgUser.setProductCount(1);
             List<Order> orders = orderRepository.findByTelegramUserAndOrderStatus(tgUser, OrderStatus.COMPLETED);
             tgUser.getUser().setNewUser(orders.isEmpty());
             tgUser.setState(TelegramState.HAS_ORDER);
@@ -762,15 +761,15 @@ public class BotService  {
 
                 StringBuilder messageBuilder = new StringBuilder();
                 messageBuilder.append("🆔 Buyurtma raqami: <b>").append(order.getId()).append("</b>\n")
-                        .append("🍼 Mahsulot turi: <b>").append(orderProduct.getBottleTypes().getType()).append("</b>\n")
+                        .append("🍼 Mahsulot turi: <b>").append(orderProduct.getProduct().getType()).append("</b>\n")
                         .append("🔢 Soni: <b>").append(orderProduct.getAmount()).append(" ta</b>\n");
 
                 if (orderProduct.isOnSale()) {
-                    int discountPrice = orderProduct.getBottleTypes().getPrice() * orderProduct.getBottleTypes().getSale_amount();
-                    messageBuilder.append("🔒 Chegirma: <b>").append(orderProduct.getBottleTypes().getSale_amount()).append(" ta</b>\n");
+                    int discountPrice = orderProduct.getProduct().getPrice() * orderProduct.getProduct().getSale_amount();
+                    messageBuilder.append("🔒 Chegirma: <b>").append(orderProduct.getProduct().getSale_amount()).append(" ta</b>\n");
                     messageBuilder.append("💰 Chegirma narxi: <b>").append(discountPrice).append(" so'm</b>\n");
                 } else {
-                    messageBuilder.append("💵 Oddiy narxi: <b>").append(orderProduct.getBottleTypes().getPrice()).append(" so'm</b>\n");
+                    messageBuilder.append("💵 Oddiy narxi: <b>").append(orderProduct.getProduct().getPrice()).append(" so'm</b>\n");
                 }
 
                 messageBuilder.append("💵 Umumiy narxi: <b>").append(orderProduct.getTotalPrice()).append(" so'm</b>\n\n");
@@ -817,20 +816,20 @@ public class BotService  {
         for (Basket basket : baskets) {
             StringBuilder messageBuilder = new StringBuilder();
             int remainingAmount = basket.getAmount();
-            int finalTotalPrice = basket.getBottleType().getPrice() * basket.getAmount();
+            int finalTotalPrice = basket.getProduct().getPrice() * basket.getAmount();
 
             messageBuilder.append("🛒 Mahsulot: ")
-                    .append("<b>").append(basket.getBottleType().getType()).append("</b>\n")
+                    .append("<b>").append(basket.getProduct().getType()).append("</b>\n")
                     .append("🔢 Soni: ")
                     .append("<b>").append(basket.getAmount()).append(" ta</b>\n")
                     .append("💵 Narxi: ")
-                    .append("<b>").append(basket.getBottleType().getPrice()).append(" so'm</b>\n")
+                    .append("<b>").append(basket.getProduct().getPrice()).append(" so'm</b>\n")
                     .append("💰 Jami narx: ")
                     .append("<b>").append(finalTotalPrice).append(" so'm</b>\n\n");
 
-            if (basket.getBottleType().getSale_active() && basket.getAmount() >= basket.getBottleType().getSale_discount()) {
-                int giftAmount = basket.getBottleType().getSale_amount();
-                int giftPrice = giftAmount * basket.getBottleType().getPrice();
+            if (basket.getProduct().getSale_active() && basket.getAmount() >= basket.getProduct().getSale_discount()) {
+                int giftAmount = basket.getProduct().getSale_amount();
+                int giftPrice = giftAmount * basket.getProduct().getPrice();
 
                 finalTotalPrice -= giftPrice;
 
@@ -934,11 +933,11 @@ public class BotService  {
     private void updateBasketMessage(TelegramUser telegramUser, Basket basket, Integer messageId) {
         StringBuilder messageBuilder = new StringBuilder();
         messageBuilder.append("🛒 Mahsulot: ")
-                .append("<b>").append(basket.getBottleType().getType()).append("</b>\n")
+                .append("<b>").append(basket.getProduct().getType()).append("</b>\n")
                 .append("🔢 Soni: ")
                 .append("<b>").append(basket.getAmount()).append(" ta</b>\n")
                 .append("💵 Narxi: ")
-                .append("<b>").append(basket.getBottleType().getPrice()).append(" so'm</b>\n")
+                .append("<b>").append(basket.getProduct().getPrice()).append(" so'm</b>\n")
                 .append("💰 Jami: ")
                 .append("<b>").append(String.format("%.2f", basket.getTotalPrice())).append(" so'm</b>\n\n");
 
@@ -1019,6 +1018,5 @@ public class BotService  {
 
     @Autowired
     public void setTelegramStateDispatcher(TelegramStateDispatcher telegramStateDispatcher) {
-        this.telegramStateDispatcher = telegramStateDispatcher;
     }
 }

@@ -1,14 +1,14 @@
 package uz.pdp.water_delivery.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import uz.pdp.water_delivery.dto.BottleTypeCountDTO;
 import uz.pdp.water_delivery.entity.enums.CourierStatus;
-import uz.pdp.water_delivery.repo.BottleTypesRepository;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Entity

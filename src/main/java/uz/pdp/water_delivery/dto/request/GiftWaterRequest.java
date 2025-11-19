@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 @Data
 public class GiftWaterRequest {
-    private Long bottleTypeId;
+    private Long productId;
     private Integer saleAmount;
     private Integer saleDiscount;
     private Boolean saleActive;

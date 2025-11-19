@@ -25,7 +25,8 @@ public class OrderProduct {
     private Order order;
 
     @ManyToOne
-    private BottleTypes bottleTypes;
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     private Integer bottleCount;
 
@@ -41,8 +42,8 @@ public class OrderProduct {
     @PrePersist
     public void capturePricingDetails() {
         this.wasOnSale = isOnSale();
-        this.priceAtPurchase = bottleTypes.getPrice();
-        this.discountAtPurchase = isOnSale() ? bottleTypes.getSale_amount() : null;
+        this.priceAtPurchase = product.getPrice();
+        this.discountAtPurchase = isOnSale() ? product.getSale_amount() : null;
     }
 
     /**
@@ -51,9 +52,9 @@ public class OrderProduct {
      */
     public Integer getTotalPrice() {
         if (isOnSale()) {
-            return (amount - bottleTypes.getSale_amount()) * bottleTypes.getPrice();
+            return (amount - product.getSale_amount()) * product.getPrice();
         } else {
-            return amount * bottleTypes.getPrice();
+            return amount * product.getPrice();
         }
     }
 
@@ -62,11 +63,11 @@ public class OrderProduct {
      * @return true agar chegirma faollashtirilgan bo'lsa
      */
     public boolean isOnSale() {
-        return bottleTypes.getSale_active() &&
-                bottleTypes.getSale_startDate() != null &&
-                bottleTypes.getSale_endDate() != null &&
-                !LocalDate.now().isBefore(bottleTypes.getSale_startDate()) &&
-                !LocalDate.now().isAfter(bottleTypes.getSale_endDate());
+        return product.getSale_active() &&
+                product.getSale_startDate() != null &&
+                product.getSale_endDate() != null &&
+                !LocalDate.now().isBefore(product.getSale_startDate()) &&
+                !LocalDate.now().isAfter(product.getSale_endDate());
     }
 
     /**

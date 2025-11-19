@@ -2,10 +2,7 @@ package uz.pdp.water_delivery.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import uz.pdp.water_delivery.bot.TelegramUser;
-import uz.pdp.water_delivery.dto.BottleTypeCountDTO;
-import uz.pdp.water_delivery.entity.BottleTypes;
 import uz.pdp.water_delivery.entity.Courier;
 import uz.pdp.water_delivery.entity.DeliveryTime;
 import uz.pdp.water_delivery.entity.Order;
@@ -14,7 +11,6 @@ import uz.pdp.water_delivery.entity.enums.OrderStatus;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 

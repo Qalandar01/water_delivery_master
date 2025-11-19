@@ -2,18 +2,17 @@ package uz.pdp.water_delivery.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import uz.pdp.water_delivery.dto.BottleTypeCountDTO;
-import uz.pdp.water_delivery.entity.BottleTypes;
+import uz.pdp.water_delivery.entity.Product;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface BottleTypesRepository extends JpaRepository<BottleTypes, Long> {
-    List<BottleTypes> findAllByActiveTrue();
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    List<Product> findAllByActiveTrue();
 
-    Optional<BottleTypes> findByType(String type);
+    Optional<Product> findByType(String type);
 
     boolean existsByType(String type);
 

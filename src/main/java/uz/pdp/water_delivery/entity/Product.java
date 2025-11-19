@@ -13,7 +13,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 @Entity
-public class BottleTypes {
+@Table(name = "product")
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -57,7 +58,7 @@ public class BottleTypes {
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        BottleTypes that = (BottleTypes) o;
+        Product that = (Product) o;
         return getId() != null && Objects.equals(getId(), that.getId());
     }
 
@@ -68,7 +69,7 @@ public class BottleTypes {
 
     @Override
     public String toString() {
-        return "BottleTypes{" +
+        return "Product{" +
                 "id=" + id +
                 ", type='" + type + '\'' +
                 ", description='" + description + '\'' +
