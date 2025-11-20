@@ -5,23 +5,27 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uz.pdp.water_delivery.dto.BottleEditView;
-import uz.pdp.water_delivery.dto.BottleTypeDTO;
+import uz.pdp.water_delivery.dto.ProductDTO;
+import uz.pdp.water_delivery.dto.ProductEditView;
 import uz.pdp.water_delivery.dto.request.GiftWaterRequest;
 import uz.pdp.water_delivery.entity.Product;
+import uz.pdp.water_delivery.entity.ProductImage;
+import uz.pdp.water_delivery.entity.ProductImageContent;
 import uz.pdp.water_delivery.repo.OrderProductRepository;
+import uz.pdp.water_delivery.repo.ProductImageContentRepository;
 import uz.pdp.water_delivery.repo.ProductRepository;
 
-import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BottleService {
+public class ProductService {
 
     private final ProductRepository productRepository;
     private final OrderProductRepository orderProductRepository;
+    private final FileService fileService;
+    private final ProductImageContentRepository productImageContentRepository;
 
     public List<Product> getActiveProductsWithOrderCount() {
         List<Product> products = productRepository.findAllByActiveTrue();
@@ -76,26 +80,26 @@ public class BottleService {
 
     public void deleteDiscount(Long id) {
 
-        Product bottleType = productRepository.findById(id)
+        Product product = productRepository.findById(id)
                 .orElseThrow(() ->
                         new IllegalArgumentException("Bunday ID ga ega butilka topilmadi!")
                 );
 
-        clearDiscountFields(bottleType);
+        clearDiscountFields(product);
 
-        productRepository.save(bottleType);
+        productRepository.save(product);
     }
 
-    private void clearDiscountFields(Product bottleType) {
-        bottleType.setSale_amount(null);
-        bottleType.setSale_discount(null);
-        bottleType.setSale_active(false);
-        bottleType.setSale_startDate(null);
-        bottleType.setSale_endDate(null);
+    private void clearDiscountFields(Product product) {
+        product.setSale_amount(null);
+        product.setSale_discount(null);
+        product.setSale_active(false);
+        product.setSale_startDate(null);
+        product.setSale_endDate(null);
     }
 
     @Transactional
-    public void createBottle(BottleTypeDTO dto) throws IOException {
+    public void createProduct(ProductDTO dto) {
 
         String type = dto.getType().trim();
 
@@ -103,33 +107,36 @@ public class BottleService {
             throw new IllegalArgumentException("Bunday idish turi mavjud!");
         }
 
-        Product bottle = new Product();
-        bottle.setType(type);
-        bottle.setPrice(dto.getPrice());
-        bottle.setActive(dto.isActive());
-        bottle.setDescription(dto.getDescription());
-        bottle.setReturnable(dto.isReturnable());
+        Product product = new Product();
+        product.setType(type);
+        product.setPrice(dto.getPrice());
+        product.setActive(dto.isActive());
+        product.setDescription(dto.getDescription());
+        product.setReturnable(dto.isReturnable());
 
-        MultipartFile file = dto.getImage();
-        if (file != null && !file.isEmpty()) {
-            bottle.setImage(file.getBytes());
-        }
+        ProductImage  productImage = fileService.saveProductImage(dto.getImage());
+        product.setProductImage(productImage);
 
-        productRepository.save(bottle);
+        productRepository.save(product);
     }
 
-    public BottleEditView getBottleEditView(Long id) {
-        Product bottleType = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Bottle not found"));
+    public ProductEditView getProductEditView(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
-        BottleTypeDTO dto = mapToDTO(bottleType);
-        String base64Image = encodeBase64(bottleType.getImage());
+        ProductImage productImage = product.getProductImage();
 
-        return new BottleEditView(dto, base64Image);
+        ProductImageContent productImageContent = productImageContentRepository.findByProductImage_Id(productImage.getId()).get(0);
+
+        ProductDTO dto = mapToDTO(product);
+
+        String base64Image = encodeBase64(productImageContent.getContent());
+
+        return new ProductEditView(dto, base64Image);
     }
 
-    private BottleTypeDTO mapToDTO(Product entity) {
-        BottleTypeDTO dto = new BottleTypeDTO();
+    private ProductDTO mapToDTO(Product entity) {
+        ProductDTO dto = new ProductDTO();
         dto.setId(entity.getId());
         dto.setType(entity.getType());
         dto.setDescription(entity.getDescription());
@@ -144,36 +151,36 @@ public class BottleService {
     }
 
     @Transactional
-    public void updateBottle(BottleTypeDTO dto) throws IOException {
-        Product bottle = productRepository.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Bottle not found"));
+    public void updateProduct(ProductDTO dto) {
+        Product product = productRepository.findById(dto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
-        mapDtoToEntity(dto, bottle);
-        updateImageIfProvided(dto, bottle);
+        mapDtoToEntity(dto, product);
+        updateImageIfProvided(dto, product);
 
-        productRepository.save(bottle);
+        productRepository.save(product);
     }
 
-    private void mapDtoToEntity(BottleTypeDTO dto, Product bottle) {
-        bottle.setType(dto.getType().trim());
-        bottle.setDescription(dto.getDescription());
-        bottle.setPrice(dto.getPrice());
-        bottle.setActive(dto.isActive());
-        bottle.setReturnable(dto.isReturnable());
+    private void mapDtoToEntity(ProductDTO dto, Product product) {
+        product.setType(dto.getType().trim());
+        product.setDescription(dto.getDescription());
+        product.setPrice(dto.getPrice());
+        product.setActive(dto.isActive());
+        product.setReturnable(dto.isReturnable());
     }
 
-    private void updateImageIfProvided(BottleTypeDTO dto, Product bottle) throws IOException {
+    private void updateImageIfProvided(ProductDTO dto, Product product){
         MultipartFile image = dto.getImage();
         if (image != null && !image.isEmpty()) {
-            bottle.setImage(image.getBytes());
+            product.setProductImage(fileService.saveProductImage(image));
         }
     }
 
     @Transactional
-    public void deleteBottle(Long id) {
-        Product bottle = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Bottle not found."));
-        productRepository.delete(bottle);
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found."));
+        productRepository.delete(product);
     }
 
 }

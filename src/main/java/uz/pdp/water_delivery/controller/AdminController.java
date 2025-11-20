@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import uz.pdp.water_delivery.dto.BottleEditView;
-import uz.pdp.water_delivery.dto.BottleTypeDTO;
+import uz.pdp.water_delivery.dto.ProductDTO;
+import uz.pdp.water_delivery.dto.ProductEditView;
 import uz.pdp.water_delivery.dto.request.GiftWaterRequest;
 import uz.pdp.water_delivery.dto.request.UserRequestDTO;
 import uz.pdp.water_delivery.entity.User;
 import uz.pdp.water_delivery.entity.enums.RoleName;
 import uz.pdp.water_delivery.repo.*;
-import uz.pdp.water_delivery.services.service.BottleService;
+import uz.pdp.water_delivery.services.service.ProductService;
 import uz.pdp.water_delivery.services.service.UserService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
@@ -33,7 +33,7 @@ public class AdminController {
     private final LogErrorFile logErrorFile;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final BottleService bottleService;
+    private final ProductService productService;
 
     @GetMapping("/admin")
     public String admin(Model model) {
@@ -45,7 +45,7 @@ public class AdminController {
 
     @GetMapping("/admin/change-gift-water")
     public String changeGiftWater(Model model) {
-        model.addAttribute("bottleTypes", bottleService.getActiveProductsWithOrderCount());
+        model.addAttribute("bottleTypes", productService.getActiveProductsWithOrderCount());
         return "admin/chegirmalar";
     }
 
@@ -53,7 +53,7 @@ public class AdminController {
     public String changeGiftWater(GiftWaterRequest request, RedirectAttributes redirectAttributes) {
 
         try {
-            bottleService.updateGiftWater(request);
+            productService.updateGiftWater(request);
             redirectAttributes.addFlashAttribute("successMessage", "Chegirma muvaffaqiyatli saqlandi.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -73,7 +73,7 @@ public class AdminController {
     public String deleteDiscount(@PathVariable Long id, RedirectAttributes redirectAttributes) {
 
         try {
-            bottleService.deleteDiscount(id);
+            productService.deleteDiscount(id);
             redirectAttributes.addFlashAttribute("successMessage", "Chegirma muvaffaqiyatli o'chirildi.");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
@@ -86,18 +86,18 @@ public class AdminController {
 
 
     @GetMapping("/admin/add/bottle")
-    public String showAddBottleForm(Model model) {
-        model.addAttribute("bottleTypeDTO", new BottleTypeDTO());
+    public String showAddProductForm(Model model) {
+        model.addAttribute("bottleTypeDTO", new ProductDTO());
         return "admin/bottle/add-bottle-type";
     }
 
     @PostMapping("/admin/add/bottle")
-    public String addBottle(
-            @ModelAttribute BottleTypeDTO bottleTypeDTO,
+    public String addProduct(
+            @ModelAttribute ProductDTO productDto,
             RedirectAttributes redirectAttributes
     ) {
         try {
-            bottleService.createBottle(bottleTypeDTO);
+            productService.createProduct(productDto);
             redirectAttributes.addFlashAttribute("successMessage", "Idish turi qo'shildi!");
             return "redirect:/admin/bottle/menu";
 
@@ -114,26 +114,26 @@ public class AdminController {
     }
 
     @GetMapping("/admin/bottle/menu")
-    public String bottleMenu(Model model) {
-        model.addAttribute("bottleTypes", bottleService.getActiveProductsWithOrderCount());
+    public String productMenu(Model model) {
+        model.addAttribute("bottleTypes", productService.getActiveProductsWithOrderCount());
         return "admin/bottle/bottle-menu";
     }
 
     @GetMapping("/admin/bottle/edit/{id}")
     public String editBottle(@PathVariable Long id, Model model) {
-        BottleEditView view = bottleService.getBottleEditView(id);
+        ProductEditView view = productService.getProductEditView(id);
         model.addAttribute("bottleType", view.getDto());
         model.addAttribute("base64Image", view.getBase64Image());
         return "admin/bottle/bottle-edit";
     }
 
     @PostMapping("/admin/bottle/update")
-    public String updateBottle(@ModelAttribute BottleTypeDTO bottleTypeDTO) {
+    public String updateBottle(@ModelAttribute ProductDTO productDto) {
         try {
-            bottleService.updateBottle(bottleTypeDTO);
+            productService.updateProduct(productDto);
             return "redirect:/admin/bottle/menu";
         } catch (Exception e) {
-            logErrorFile.logError(e, "updateBottle", bottleTypeDTO.getId());
+            logErrorFile.logError(e, "updateBottle", productDto.getId());
             return "redirect:/admin/bottle/menu?error=true";
         }
     }
@@ -141,7 +141,7 @@ public class AdminController {
     @GetMapping("/admin/bottle/delete/{id}")
     public String deleteBottle(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            bottleService.deleteBottle(id);
+            productService.deleteProduct(id);
             redirectAttributes.addFlashAttribute("successMessage", "Bottle type deleted successfully.");
         } catch (EntityNotFoundException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());

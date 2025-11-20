@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class BottleEditView {
-    private BottleTypeDTO dto;
+public class ProductEditView {
+    private ProductDTO dto;
     private String base64Image;
 }

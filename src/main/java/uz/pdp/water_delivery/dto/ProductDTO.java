@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BottleTypeDTO {
+public class ProductDTO {
     private Long id;
     private String type;
     private boolean active;
