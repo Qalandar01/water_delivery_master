@@ -118,9 +118,21 @@
                         <p th:if="${bottleType.returnable == false}" style="color: red;">Qaytarilmaydi</p>
                     </th:block>
                     <th:block th:if="${bottleType.orderCount == 0}">
-                        <a th:href="@{/admin/bottle/delete/{id}(id=${bottleType.id})}" class="btn btn-danger">
-                            <i class="fa-solid fa-trash"></i> O'chirish
-                        </a>
+<!--                        <a th:href="@{/admin/bottle/delete/{id}(id=${bottleType.id})}" class="btn btn-danger">-->
+<!--                            <i class="fa-solid fa-trash"></i> O'chirish-->
+<!--                        </a>-->
+                        <form th:action="@{/admin/bottle/delete/{id}(id=${bottleType.id})}"
+                              method="post"
+                              style="display:inline;">
+                            <input type="hidden" name="_method" value="DELETE"/>
+
+                            <button type="submit"
+                                    class="btn btn-danger"
+                                    onclick="return confirm('Rostdan ham o‘chirilsinmi?');">
+                                <i class="fa-solid fa-trash"></i> O'chirish
+                            </button>
+                        </form>
+
                     </th:block>
                     <a th:href="@{/admin/bottle/edit/{id}(id=${bottleType.id})}" class="btn btn-info">
                         <i class="fa-solid fa-pen"></i> O'zgartirish

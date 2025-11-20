@@ -155,7 +155,11 @@
                 <span th:if="${bottleType.sale_active == false}" class="badge bg-danger">Faol emas</span>
             </td>
             <td>
-                <a th:href="@{'/admin/discount/delete/' + ${bottleType.id}}" class="btn btn-danger btn-sm">O'chirish</a>
+                <form th:action="@{'/admin/discount/' + ${bottleType.id}}" method="post" style="display:inline;">
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <button type="submit" class="btn btn-danger btn-sm">O'chirish</button>
+                </form>
+
             </td>
         </tr>
         </tbody>

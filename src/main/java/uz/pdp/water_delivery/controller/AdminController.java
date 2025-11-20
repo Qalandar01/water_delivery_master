@@ -7,10 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uz.pdp.water_delivery.dto.ProductDTO;
 import uz.pdp.water_delivery.dto.ProductEditView;
@@ -69,7 +66,7 @@ public class AdminController {
      * Chegirma o'chirish
      */
 
-    @GetMapping("/admin/discount/delete/{id}")
+    @DeleteMapping("/admin/discount/{id}")
     public String deleteDiscount(@PathVariable Long id, RedirectAttributes redirectAttributes) {
 
         try {
@@ -138,7 +135,7 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/admin/bottle/delete/{id}")
+    @DeleteMapping("/admin/bottle/delete/{id}")
     public String deleteBottle(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             productService.deleteProduct(id);
@@ -189,7 +186,7 @@ public class AdminController {
     }
 
 
-    @GetMapping("/admin/users/delete/{id}")
+    @DeleteMapping("/admin/users/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             userService.deleteOrUpdateUserRoles(id);

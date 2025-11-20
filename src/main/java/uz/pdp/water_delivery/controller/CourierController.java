@@ -6,10 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import uz.pdp.water_delivery.dto.UserDTO;
 import uz.pdp.water_delivery.entity.Courier;
 import uz.pdp.water_delivery.entity.District;
@@ -100,7 +97,7 @@ public class CourierController {
     }
 
     @Transactional
-    @GetMapping("/admin/couriers/delete/{id}")
+    @DeleteMapping("/admin/couriers/delete/{id}")
     public String deleteCourier(@PathVariable Long id, Model model) {
         try {
             courierService.deleteCourierById(id);

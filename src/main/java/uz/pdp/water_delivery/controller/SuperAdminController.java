@@ -8,10 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import uz.pdp.water_delivery.entity.Role;
 import uz.pdp.water_delivery.entity.User;
 import uz.pdp.water_delivery.entity.enums.RoleName;
@@ -69,7 +66,7 @@ public class SuperAdminController {
         return "redirect:/super-admin";
     }
 
-    @GetMapping("/super-admin/delete/user/{id}")
+    @DeleteMapping("/super-admin/delete/user/{id}")
     public String deleteUser(@PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
