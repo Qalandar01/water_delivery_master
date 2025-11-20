@@ -28,6 +28,7 @@ import uz.pdp.water_delivery.entity.enums.RoleName;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
 import uz.pdp.water_delivery.repo.*;
 import uz.pdp.water_delivery.services.service.DeleteMessageService;
+import uz.pdp.water_delivery.services.service.FileService;
 import uz.pdp.water_delivery.services.service.UserService;
 import uz.pdp.water_delivery.utils.PhoneRepairUtil;
 
@@ -55,6 +56,7 @@ public class BotService  {
     private BasketRepository basketRepository;
     private OrderProductRepository orderProductRepository;
     private PasswordEncoder passwordEncoder;
+    private FileService fileService;
 
     @Autowired
     public void setBotDelivery(BotDelivery botDelivery) {
@@ -346,7 +348,7 @@ public class BotService  {
     }
 
     private void sendProductMessage(TelegramUser telegramUser, Product product) {
-        SendPhoto sendMessage = new SendPhoto(telegramUser.getChatId(), product.getImage());
+        SendPhoto sendMessage = new SendPhoto(telegramUser.getChatId(), fileService.getProductImageContent(product));
         sendMessage.caption(generatedTextForProduct(product, telegramUser));
         sendMessage.replyMarkup(botUtils.generateProductNumberButtons(telegramUser));
 
@@ -1018,5 +1020,10 @@ public class BotService  {
 
     @Autowired
     public void setTelegramStateDispatcher(TelegramStateDispatcher telegramStateDispatcher) {
+    }
+
+    @Autowired
+    public void setFileService(FileService fileService) {
+        this.fileService = fileService;
     }
 }

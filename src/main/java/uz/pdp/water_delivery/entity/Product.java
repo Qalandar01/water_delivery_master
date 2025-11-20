@@ -29,9 +29,8 @@ public class Product {
 
     private boolean active;
 
-    private byte[] image;
-
-    private String imagePath;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ProductImage productImage;
 
     private Long orderCount;
 
@@ -75,7 +74,6 @@ public class Product {
                 ", description='" + description + '\'' +
                 ", price=" + price +
                 ", active=" + active +
-                ", imagePath='" + imagePath + '\'' +
                 ", orderCount=" + orderCount +
                 ", isReturnable=" + isReturnable +
                 ", sale_amount=" + sale_amount +
