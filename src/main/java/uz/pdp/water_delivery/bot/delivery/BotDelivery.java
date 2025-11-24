@@ -20,7 +20,7 @@ import uz.pdp.water_delivery.entity.*;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
 import uz.pdp.water_delivery.repo.*;
-import uz.pdp.water_delivery.services.service.DeleteMessageService;
+import uz.pdp.water_delivery.services.DeleteMessageService;
 import uz.pdp.water_delivery.utils.DistanceUtil;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 import uz.pdp.water_delivery.utils.RouteDetails;
@@ -183,7 +183,7 @@ public class BotDelivery {
                 .collect(Collectors.groupingBy(Order::getDay));
         dateOrderMap.forEach((date, dateOrders) -> {
             Map<String, Map<String, Long>> districtOrderMap = dateOrders.stream()
-                    .collect(Collectors.groupingBy(order -> order.getDistrict().getName(),
+                    .collect(Collectors.groupingBy(Order::getDistrict,
                             Collectors.groupingBy(order -> order.getDeliveryTime().toString(),
                                     Collectors.counting()
                             )
@@ -195,7 +195,7 @@ public class BotDelivery {
                 timeMap.forEach((timeRange, count) -> {
                     result.append("    🕙 ").append(timeRange);
                     String statusIcons = dateOrders.stream()
-                            .filter(order -> order.getDeliveryTime().toString().equals(timeRange) && order.getDistrict().getName().equals(district))
+                            .filter(order -> order.getDeliveryTime().toString().equals(timeRange) && order.getDistrict().equals(district))
                             .map(order -> order.getOrderStatus() == OrderStatus.ASSIGNED ? "  ✅" : "  📴")
                             .distinct()
                             .collect(Collectors.joining(" "));

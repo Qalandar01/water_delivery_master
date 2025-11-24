@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.water_delivery.entity.DeliveryTime;
-import uz.pdp.water_delivery.services.service.DeliveryTimeService;
+import uz.pdp.water_delivery.services.DeliveryTimeService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
 import java.time.format.DateTimeParseException;

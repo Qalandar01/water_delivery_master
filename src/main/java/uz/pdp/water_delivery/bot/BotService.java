@@ -27,9 +27,9 @@ import uz.pdp.water_delivery.entity.enums.OrderStatus;
 import uz.pdp.water_delivery.entity.enums.RoleName;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
 import uz.pdp.water_delivery.repo.*;
-import uz.pdp.water_delivery.services.service.DeleteMessageService;
-import uz.pdp.water_delivery.services.service.FileService;
-import uz.pdp.water_delivery.services.service.UserService;
+import uz.pdp.water_delivery.services.DeleteMessageService;
+import uz.pdp.water_delivery.services.FileService;
+import uz.pdp.water_delivery.services.UserService;
 import uz.pdp.water_delivery.utils.PhoneRepairUtil;
 
 import java.time.LocalDate;
@@ -38,14 +38,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class BotService  {
+public class BotService {
 
     private final TelegramBot telegramBot;
     private final TelegramUserRepository telegramUserRepository;
     private final UserRepository userRepository;
     private final BotUtils botUtils;
     private final UserService userService;
-    private final RegionRepository regionRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final ProductRepository productRepository;
     private final DeliveryTimeRepository deliveryTimeRepository;
@@ -108,12 +107,10 @@ public class BotService  {
     }
 
 
-
     public void saveContactSendMessage(Message message, TelegramUser telegramUser) {
         String contact = PhoneRepairUtil.repair(message.contact().phoneNumber());
         User user = userService.createdOrFindUser(contact);
-        Region region = regionRepository.findByName("Toshkent");
-        telegramUser.setRegion(region);
+        telegramUser.setRegion("Toshkent");
         deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), "Please share contact");
         if (user != null) {
             user.setFirstName(message.contact().firstName());
@@ -179,7 +176,6 @@ public class BotService  {
         telegramUser.setState(TelegramState.SHARE_REGION);
         telegramUserRepository.save(telegramUser);
     }*/
-
 
 
     public void saveLocationSendMessage(Message message, TelegramUser telegramUser) {
@@ -301,7 +297,6 @@ public class BotService  {
     }
 
 
-
     public void acceptBottleTypeShowSelectNumber(Message message, TelegramUser telegramUser) {
         String type = message.text();
         if (handlePredefinedActions(type, telegramUser)) return;
@@ -377,7 +372,6 @@ public class BotService  {
                 totalPrice
         );
     }
-
 
 
     public void changeProductNumber(CallbackQuery message, TelegramUser telegramUser) {
@@ -464,7 +458,6 @@ public class BotService  {
 //            return LocalDate.now().plusDays(1);
 //        }
 //    }
-
 
 
     public void acceptOrderTimeAndShowConfirmation(CallbackQuery callbackQuery, TelegramUser tgUser) {
@@ -628,7 +621,6 @@ public class BotService  {
     }
 
 
-
     public void sendCabinetConfirmCode(Message message, TelegramUser telegramUser) {
         if (message.text().equals(telegramUser.getUser().getPassword())) {
             telegramUser.setState(TelegramState.START_DELIVERY);
@@ -661,7 +653,6 @@ public class BotService  {
         }
         botDelivery.deliveryMenu(message, telegramUser);
     }
-
 
 
     public void sendUserDidNotAnswerPhone(TelegramUser tgUser) {
@@ -786,7 +777,6 @@ public class BotService  {
     }
 
 
-
     public void sendPleaseWaitingOperator(Message message, TelegramUser telegramUser) {
         deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), "Please waiting operator");
         sendMessage(telegramUser, BotConstant.PLEASE_WAITING_OPERATOR);
@@ -872,7 +862,6 @@ public class BotService  {
         Integer finalMessageId = finalResponse.message().messageId();
         deleteMessageService.archivedForDeletingMessages(telegramUser, finalMessageId, "Buyurtmani tasdiqlash tugmasi");
     }
-
 
 
     public void settingMenu(Message message, TelegramUser telegramUser) {

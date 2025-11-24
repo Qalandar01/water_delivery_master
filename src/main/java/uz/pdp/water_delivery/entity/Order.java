@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.dto.Location;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Table(name = "orders")
+@SQLRestriction("is_deleted=false")
 public class Order {
 
     @Id
@@ -43,15 +45,15 @@ public class Order {
 
     private String phone;
 
+    private Boolean isDeleted = false;
+
     private Double totalPrice;
 
     @ManyToOne
     private Courier courier;
 
-    @ManyToOne
-    private Region region;
+    private String region;
 
-    @ManyToOne
-    private District district;
+    private String district;
 
 }

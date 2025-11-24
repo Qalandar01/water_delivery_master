@@ -2,6 +2,7 @@ package uz.pdp.water_delivery.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import java.util.Objects;
 @Builder
 @Entity
 @Table(name = "product")
+@SQLRestriction("is_deleted=false")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +38,8 @@ public class Product {
 
     @Column(nullable = false)
     private boolean isReturnable = false;
+
+    private Boolean isDeleted = false;
 
     private Integer sale_amount;
 

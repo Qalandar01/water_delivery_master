@@ -4,6 +4,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.DeleteMessage;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 import uz.pdp.water_delivery.dto.Location;
 import uz.pdp.water_delivery.entity.*;
 import uz.pdp.water_delivery.entity.abs.AbsEntity;
@@ -19,6 +20,7 @@ import java.util.Locale;
 @NoArgsConstructor
 @Entity
 @Table(name = "telegram_user")
+@SQLRestriction("is_deleted=false")
 public class TelegramUser extends AbsEntity {
 
     private Long chatId;
@@ -34,13 +36,13 @@ public class TelegramUser extends AbsEntity {
     @Embedded
     private Location location;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Region region;
+    private String region;
 
-    @ManyToOne
-    private District district;
+    private String district;
 
-    private boolean isHome = false;
+    private Boolean isHome = false;
+
+    private Boolean isDeleted = false;
 
     private String xonadon;
 

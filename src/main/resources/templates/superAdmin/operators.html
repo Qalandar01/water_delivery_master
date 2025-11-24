@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Panel</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/super-admin.css">
+</head>
+<body>
+<nav class="navbar navbar-custom">
+    <a class="navbar-brand" th:href="@{/static}"> <i class="fas fa-home"></i> Super Admin Panel</a>
+    <!-- Logout tugmasi -->
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a class="nav-link text-white" href="/logout"><i class="fas fa-arrow-left"></i> Logout</a>
+        </li>
+    </ul>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="offset-10">
+            <a th:href="@{/admin/users/new}" class="btn btn-success mb-3">
+                <i class="fa-solid fa-plus"></i> Operator qo'shish
+            </a>
+        </div>
+    </div>
+
+    <table class="styled-table">
+        <thead>
+        <tr>
+            <th> <i class="fas fa-hashtag"></i> No</th>
+            <th> <i class="fas fa-user"></i> Ism</th>
+            <th> <i class="fas fa-phone"></i> Telefon</th>
+            <th> <i class="fas fa-check-circle"></i> Faol</th>
+            <th> <i class="fas fa-money-check"></i> To'lov statusi</th>
+            <th class="text-center"> <i class="fas fa-cog"></i> Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user, iterStat : ${users}">
+            <td th:text="${iterStat.index + 1}"></td>
+            <td th:text="${user.firstName}"></td>
+            <td th:text="${user.getDisplayPhone()}"></td>
+            <td>
+                <span th:class="${user.active ? 'text-success font-weight-bold' : 'text-danger font-weight-bold'}">
+                    <i th:class="${user.active ? 'fas fa-check-circle' : 'fas fa-times-circle'}"></i>
+                    <span th:text="${user.active ? 'Faol' : 'Faol emas'}"></span>
+                </span>
+            </td>
+            <th>
+                <span th:class="${user.paid ? 'text-success font-weight-bold' : 'text-danger font-weight-bold'}">
+                    <i th:class="${user.paid ? 'fas fa-check-circle' : 'fas fa-times-circle'}"></i>
+                    <span th:text="${user.paid ? 'To''landi' : 'To''lanmadi'}"></span>
+                </span>
+            </th>
+            <td class="text-center">
+                <a th:href="@{'/admin/users/edit/' + ${user.id}}" class="btn btn-info mr-2 col-5">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+
+                <form th:action="@{'/admin/users/delete/' + ${user.id}}"
+                      method="post"
+                      style="display:inline;">
+                    <input type="hidden" name="_method" value="DELETE"/>
+
+                    <button type="submit"
+                            class="btn btn-danger col-5"
+                            onclick="return confirm('Are you sure you want to delete this user?');">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </form>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

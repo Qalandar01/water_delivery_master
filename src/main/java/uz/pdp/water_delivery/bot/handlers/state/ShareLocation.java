@@ -7,7 +7,7 @@ import uz.pdp.water_delivery.bot.BotConstant;
 import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
-import uz.pdp.water_delivery.services.service.DeleteMessageService;
+import uz.pdp.water_delivery.services.DeleteMessageService;
 
 @HandlesState(TelegramState.HAS_ORDER)
 @Component
