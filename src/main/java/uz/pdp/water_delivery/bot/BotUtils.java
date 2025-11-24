@@ -9,7 +9,6 @@ import uz.pdp.water_delivery.entity.*;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
 import uz.pdp.water_delivery.repo.DeliveryTimeRepository;
 import uz.pdp.water_delivery.repo.ProductRepository;
-import uz.pdp.water_delivery.repo.RegionRepository;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BotUtils {
 
-    private final RegionRepository regionRepository;
     private final ProductRepository productRepository;
     private final DeliveryTimeRepository deliveryTimeRepository;
 
@@ -56,18 +54,18 @@ public class BotUtils {
     }
 
 
-    public InlineKeyboardMarkup getGeneratedRegionButtons() {
-        List<Region> regions = regionRepository.findAll();
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
-        for (Region region : regions) {
-            InlineKeyboardButton button = new InlineKeyboardButton("🏛️ " + region.getName())
-                    .callbackData(BotConstant.REGION + region.getId());
-            inlineKeyboardMarkup.addRow(button);
-        }
-
-        return inlineKeyboardMarkup;
-    }
+//    public InlineKeyboardMarkup getGeneratedRegionButtons() {
+//        List<Region> regions = regionRepository.findAll();
+//        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+//
+//        for (Region region : regions) {
+//            InlineKeyboardButton button = new InlineKeyboardButton("🏛️ " + region.getName())
+//                    .callbackData(BotConstant.REGION + region.getId());
+//            inlineKeyboardMarkup.addRow(button);
+//        }
+//
+//        return inlineKeyboardMarkup;
+//    }
 
 
     public InlineKeyboardMarkup generateBottleButton10L() {
@@ -169,7 +167,7 @@ public class BotUtils {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         for (Order order : orders) {
             keyboardMarkup.addRow(
-                    new InlineKeyboardButton(order.getDistrict().getName() + " " + getTimeRange(order))
+                    new InlineKeyboardButton(order.getDistrict() + " " + getTimeRange(order))
                             .callbackData(String.valueOf(order.getId()))
             );
         }

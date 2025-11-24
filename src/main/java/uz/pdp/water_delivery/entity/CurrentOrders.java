@@ -2,6 +2,7 @@ package uz.pdp.water_delivery.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Table(name = "current_orders")
+@SQLRestriction("is_deleted=false")
 public class CurrentOrders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +32,7 @@ public class CurrentOrders {
 
     private LocalDateTime waitingTime;
 
+    private Boolean isDeleted = false;
 
     public CurrentOrders(Order order, Integer orderCount) {
         this.order = order;

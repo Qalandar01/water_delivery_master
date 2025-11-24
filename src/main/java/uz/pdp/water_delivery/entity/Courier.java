@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import uz.pdp.water_delivery.dto.BottleTypeCountDTO;
 import uz.pdp.water_delivery.entity.enums.CourierStatus;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "courier")
+@SQLRestriction("is_deleted=false")
 public class Courier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,11 +35,12 @@ public class Courier {
 
     private Boolean isActive = true;
 
+    private Boolean isDeleted = false;
+
     @OneToOne
     private User user;
 
-    @ManyToMany
-    private List<District> districts;
+    private List<String> districts;
 
     @Transient
     private List<BottleTypeCountDTO> bottleCount;
@@ -45,7 +48,6 @@ public class Courier {
     @Override
     public String toString() {
         String districtNames = districts != null ? districts.stream()
-                .map(District::getName)
                 .reduce((name1, name2) -> name1 + ", " + name2)
                 .orElse("No districts") : "No districts";
 

@@ -14,7 +14,7 @@ public class VerifyUserDTO {
     private Long tgUserId;
     private Double longitude;
     private Double latitude;
-    private Long districtId;
+    private String district;
     private String addressLine;
     private String phone;
     private boolean isHome = false;

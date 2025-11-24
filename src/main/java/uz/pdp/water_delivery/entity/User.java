@@ -2,6 +2,7 @@ package uz.pdp.water_delivery.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "users")
+@SQLRestriction("is_deleted=false")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +37,8 @@ public class User implements UserDetails {
     private String password;
 
     private Boolean active = true;
+
+    private Boolean isDeleted = false;
 
     private Integer lastBottleCount;
 
@@ -85,5 +89,11 @@ public class User implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return true;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return active != null && active;
+    }
+
 
 }

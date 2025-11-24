@@ -156,10 +156,10 @@
                     <div th:each="district : ${districts}">
                         <div class="form-check dropdown-item">
                             <input class="form-check-input district-checkbox" type="checkbox"
-                                   th:id="${'district-' + district.id}"
-                                   th:field="*{districts}" th:value="${district.id}"
+                                   th:id="${'district-' + district}"
+                                   th:field="*{districts}" th:value="${district}"
                                    th:checked="${courier.districts.contains(district)}">
-                            <label class="form-check-label" th:for="${'district-' + district.id}" th:text="${district.name}"></label>
+                            <label class="form-check-label" th:for="${'district-' + district}" th:text="${district}"></label>
                         </div>
                     </div>
                 </div>

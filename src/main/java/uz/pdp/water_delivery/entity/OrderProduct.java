@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Builder
 @Entity
+@SQLRestriction("is_deleted=false")
 public class OrderProduct {
 
     @Id
@@ -23,6 +25,8 @@ public class OrderProduct {
 
     @ManyToOne
     private Order order;
+
+    private Boolean isDeleted = false;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
