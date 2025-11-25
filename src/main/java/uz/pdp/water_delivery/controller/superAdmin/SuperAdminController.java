@@ -3,77 +3,60 @@ package uz.pdp.water_delivery.controller.superAdmin;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import uz.pdp.water_delivery.entity.Role;
 import uz.pdp.water_delivery.entity.User;
-import uz.pdp.water_delivery.entity.enums.RoleName;
-import uz.pdp.water_delivery.repo.RoleRepository;
 import uz.pdp.water_delivery.repo.UserRepository;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
+import uz.pdp.water_delivery.services.UserService;
 
 @Controller
 @RequiredArgsConstructor
 public class SuperAdminController {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
 
     @GetMapping("/super-admin")
-    public String superAdmin(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) auth.getPrincipal();
-        List<User> users = userRepository.findAllByRolesRoleName(RoleName.ROLE_ADMIN)
-                .stream()
-                .filter(user -> !user.getId().equals(currentUser.getId()))
-                .collect(Collectors.toList());
-        model.addAttribute("users", users);
+    public String superAdmin(Model model, Authentication authentication) {
+        User currentUser = (User) authentication.getPrincipal();
+
+        model.addAttribute("users", userService.findAdminsExcluding(currentUser.getId()));
+
         return "superAdmin/super-admin";
     }
 
 
-    @GetMapping("/super-admin/add/user")
-    public String addUser(Model model) {
 
-        User user = new User();
-        model.addAttribute("user", user);
+    @GetMapping("/super-admin/add/user")
+    public String addUserForm(Model model) {
+        model.addAttribute("user", new User());
         return "superAdmin/add-user";
     }
 
     @PostMapping("/super-admin/add/user")
-    public String addUser(@Valid @ModelAttribute User user, BindingResult result, Model model) {
-        if (userRepository.existsByPhone(user.getPhone())) {
-            result.rejectValue("phone", "error.user", "This phone number is already in use.");
-        }
+    public String addUser(
+            @Valid @ModelAttribute("user") User user,
+            BindingResult result
+    ) {
+        userService.createAdmin(user, result);
 
         if (result.hasErrors()) {
-            model.addAttribute("user", user);
             return "superAdmin/add-user";
         }
-        Role roleOperator = roleRepository.findByRoleName(RoleName.ROLE_ADMIN);
-        user.setRoles(List.of(roleOperator));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+
         return "redirect:/super-admin";
     }
+
 
     @DeleteMapping("/super-admin/delete/user/{id}")
     public String deleteUser(@PathVariable Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
-        user.setIsDeleted(true);
-        userRepository.save(user);
+        userService.softDeleteUser(id);
         return "redirect:/super-admin";
     }
+
 
     @GetMapping("/super-admin/edit/user/{id}")
     public String editUser(@PathVariable Long id, Model model) {
@@ -84,32 +67,17 @@ public class SuperAdminController {
     }
 
     @PostMapping("/super-admin/edit/user/{id}")
-    public String updateUser(@PathVariable Long id, @ModelAttribute User user, BindingResult result) {
+    public String updateUser(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("user") User user,
+            BindingResult result
+    ) {
         if (result.hasErrors()) {
             return "superAdmin/edit-user";
         }
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + id));
 
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setPhone(user.getPhone());
-        existingUser.setActive(user.getActive());
-        existingUser.setPaid(user.getPaid());
-
-        if (user.getPaid()) { // Agar foydalanuvchi to'lov qilgan bo'lsa
-            existingUser.setPaidDate(LocalDate.now()); // To'lov sanasini yangilash
-            existingUser.setNextMonthDate(LocalDate.now().plusMonths(1)); // Keyingi to'lov sanasi
-        }
-
-        userRepository.save(existingUser);
+        userService.updateUser(id, user);
         return "redirect:/super-admin";
     }
-
-
-
-
-
-
 
 }
