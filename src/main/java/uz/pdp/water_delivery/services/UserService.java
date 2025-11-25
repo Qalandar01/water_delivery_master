@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import uz.pdp.water_delivery.dto.UserDTO;
 import uz.pdp.water_delivery.dto.request.UserRequestDTO;
 import uz.pdp.water_delivery.entity.Role;
@@ -110,5 +111,56 @@ public class UserService {
 
         userRepository.save(existingUser);
 
+    }
+
+    public List<User> findAdminsExcluding(Long userId) {
+        return userRepository.findAllByRolesRoleName(RoleName.ROLE_ADMIN)
+                .stream()
+                .filter(user -> !user.getId().equals(userId))
+                .toList();
+    }
+
+    public void createAdmin(User user, BindingResult result) {
+
+        if (userRepository.existsByPhone(user.getPhone())) {
+            result.rejectValue("phone", "duplicate", "This phone number is already in use.");
+            return;
+        }
+
+        Role adminRole = roleRepository.findByRoleName(RoleName.ROLE_ADMIN);
+
+        user.setRoles(List.of(adminRole));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void softDeleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+
+        user.setIsDeleted(true);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateUser(Long id, User updatedUser) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setLastName(updatedUser.getLastName());
+        existingUser.setPhone(updatedUser.getPhone());
+        existingUser.setActive(updatedUser.getActive());
+
+        boolean paidBefore = existingUser.getPaid();
+        existingUser.setPaid(updatedUser.getPaid());
+
+        // Payment logic improvement
+        if (!paidBefore && updatedUser.getPaid()) {
+            existingUser.setPaidDate(LocalDate.now());
+            existingUser.setNextMonthDate(LocalDate.now().plusMonths(1));
+        }
     }
 }
