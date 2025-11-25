@@ -47,7 +47,6 @@ public class BotService {
     private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
     private final ProductRepository productRepository;
-    private final DeliveryTimeRepository deliveryTimeRepository;
     private final OrderRepository orderRepository;
     private final RoleRepository roleRepository;
     private final DeleteMessageService deleteMessageService;
@@ -539,15 +538,6 @@ public class BotService {
     }
 
 
-    public String generateOrderTxt(TelegramUser tgUser) {
-        return BotConstant.ORDER_INFO.formatted(
-                tgUser.getProduct().getType(),
-                tgUser.getProductCount(),
-                tgUser.calcTotalAmountOfCurrentOrder(),
-                tgUser.getCurrentOrderDay(),
-                tgUser.getCurrentOrderDeliveryTime()
-        );
-    }
 
     @Transactional
     public void makeAnOrder(CallbackQuery callbackQuery, TelegramUser tgUser) {
@@ -565,7 +555,6 @@ public class BotService {
                     .telegramUser(tgUser)
                     .orderStatus(OrderStatus.CREATED)
                     .phone(tgUser.getUser().getPhone())
-                    .day(LocalDate.now())
                     .build();
             orderRepository.save(order);
             List<Basket> baskets = basketRepository.findAllByTelegramUser(tgUser);
@@ -596,10 +585,6 @@ public class BotService {
     }
 
 
-    private DeliveryTime extractDeliveryTimeFromCallbackQuery(CallbackQuery callbackQuery) {
-        Long deliveryTimeId = Long.parseLong(callbackQuery.data());
-        return deliveryTimeRepository.findById(deliveryTimeId).orElseThrow(() -> new RuntimeException("delivery time not found"));
-    }
 
     private LocalDate extractDayFromCallbackQuery(CallbackQuery callbackQuery) {
         int deliveryTimeId = Integer.parseInt(callbackQuery.data());

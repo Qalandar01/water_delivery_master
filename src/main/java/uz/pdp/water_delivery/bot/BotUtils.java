@@ -5,12 +5,13 @@ import com.pengrad.telegrambot.model.request.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.dto.Location;
-import uz.pdp.water_delivery.entity.*;
+import uz.pdp.water_delivery.entity.Basket;
+import uz.pdp.water_delivery.entity.CurrentOrders;
+import uz.pdp.water_delivery.entity.Order;
+import uz.pdp.water_delivery.entity.Product;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
-import uz.pdp.water_delivery.repo.DeliveryTimeRepository;
 import uz.pdp.water_delivery.repo.ProductRepository;
 
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,22 +22,20 @@ import java.util.List;
 public class BotUtils {
 
     private final ProductRepository productRepository;
-    private final DeliveryTimeRepository deliveryTimeRepository;
 
     public static Keyboard getGeneratedContactButton() {
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(
+        return new ReplyKeyboardMarkup(
                 new KeyboardButton(BotConstant.SHARE_CONTACT).requestContact(true)
         ).resizeKeyboard(true).oneTimeKeyboard(true);
-        return replyKeyboardMarkup;
     }
 
 
     public Keyboard getGeneratedLocationButton() {
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(
+        return new ReplyKeyboardMarkup(
                 new KeyboardButton(BotConstant.SHARE_LOCATION).requestLocation(true)
         ).resizeKeyboard(true).oneTimeKeyboard(true);
-        return replyKeyboardMarkup;
     }
+
     public Keyboard getChangeLocationButton() {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(
                 new KeyboardButton(BotConstant.SHARE_LOCATION).requestLocation(true)
@@ -105,49 +104,11 @@ public class BotUtils {
 
     private InlineKeyboardButton[] createActionButtons() {
         return new InlineKeyboardButton[]{
-                new InlineKeyboardButton(BotConstant.CANCEL_BTN).callbackData(BotConstant.CANCEL_BTN ),
+                new InlineKeyboardButton(BotConstant.CANCEL_BTN).callbackData(BotConstant.CANCEL_BTN),
                 new InlineKeyboardButton(BotConstant.ADD_TO_BASKET).callbackData(BotConstant.ADD_TO_BASKET)
         };
     }
 
-
-    public InlineKeyboardMarkup generateDeliveryTimeButtons() {
-        List<DeliveryTime> deliveryTimes = deliveryTimeRepository.findAllByOrderByIdAsc();
-        List<InlineKeyboardButton> todayButtons = new ArrayList<>();
-        List<InlineKeyboardButton> tomorrowButtons = new ArrayList<>();
-        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-        LocalTime now = LocalTime.now();
-
-        for (DeliveryTime time : deliveryTimes) {
-            LocalTime startTime = time.getStartTime();
-            if (time.getDay().equals("Bugun") && startTime.isAfter(now)) {
-                InlineKeyboardButton button = new InlineKeyboardButton(
-                        "🕘  " + time.getStartTime() + "-" + time.getEndTime()
-                ).callbackData(String.valueOf(time.getId()));
-                todayButtons.add(button);
-            } else if (time.getDay().equals("Ertaga")) {
-                InlineKeyboardButton button = new InlineKeyboardButton(
-                        "🕙  " + time.getStartTime() + "-" + time.getEndTime()
-                ).callbackData(String.valueOf(time.getId()));
-                tomorrowButtons.add(button);
-            }
-        }
-
-        if (!todayButtons.isEmpty()) {
-            InlineKeyboardButton todayButton1 = new InlineKeyboardButton("Bugun ▼").callbackData("ignore");
-            keyboardMarkup.addRow(todayButton1);
-        }
-        InlineKeyboardButton tomorrowButton2 = new InlineKeyboardButton("Ertaga ▼").callbackData("ignore");
-        for (InlineKeyboardButton todayButton : todayButtons) {
-            keyboardMarkup.addRow(todayButton);
-        }
-
-        keyboardMarkup.addRow(tomorrowButton2);
-        for (InlineKeyboardButton tomorrowButton : tomorrowButtons) {
-            keyboardMarkup.addRow(tomorrowButton);
-        }
-        return keyboardMarkup;
-    }
 
     public static InlineKeyboardMarkup getGeneratedStartDeliveryButtons() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
@@ -167,7 +128,7 @@ public class BotUtils {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         for (Order order : orders) {
             keyboardMarkup.addRow(
-                    new InlineKeyboardButton(order.getDistrict() + " " + getTimeRange(order))
+                    new InlineKeyboardButton(order.getDistrict())
                             .callbackData(String.valueOf(order.getId()))
             );
         }
@@ -177,14 +138,10 @@ public class BotUtils {
         return keyboardMarkup;
     }
 
-    public String getTimeRange(Order order) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        return order.getDeliveryTime().getStartTime().format(formatter) + " - " + order.getDeliveryTime().getEndTime().format(formatter);
-    }
 
     public String getTimeRange(CurrentOrders currentOrders) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        return currentOrders.getOrder().getDeliveryTime().getStartTime().format(formatter) + " - " + currentOrders.getOrder().getDeliveryTime().getEndTime().format(formatter);
+        return currentOrders.getOrder().getCreatedAt().format(formatter) + " - " + currentOrders.getOrder().getCreatedAt().format(formatter);
     }
 
     public InlineKeyboardMarkup generateStartDelivered() {
@@ -262,7 +219,6 @@ public class BotUtils {
         replyKeyboardMarkup.addRow(row.toArray(new KeyboardButton[0]));
         return replyKeyboardMarkup.resizeKeyboard(true);
     }
-
 
 
     public InlineKeyboardMarkup generateConfirmOrderButtons() {

@@ -29,7 +29,7 @@ public class Product {
 
     private Integer price;
 
-    private boolean active;
+    private Boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ProductImage productImage;
@@ -37,7 +37,7 @@ public class Product {
     private Long orderCount;
 
     @Column(nullable = false)
-    private boolean isReturnable = false;
+    private Boolean isReturnable = false;
 
     private Boolean isDeleted = false;
 

@@ -3,19 +3,10 @@ package uz.pdp.water_delivery.utils;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import uz.pdp.water_delivery.entity.DeliveryTime;
-import uz.pdp.water_delivery.entity.Order;
-import uz.pdp.water_delivery.entity.Role;
 import uz.pdp.water_delivery.entity.User;
-import uz.pdp.water_delivery.entity.enums.OrderStatus;
-import uz.pdp.water_delivery.entity.enums.RoleName;
-import uz.pdp.water_delivery.repo.DeliveryTimeRepository;
-import uz.pdp.water_delivery.repo.OrderRepository;
-import uz.pdp.water_delivery.repo.RoleRepository;
 import uz.pdp.water_delivery.repo.UserRepository;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service

@@ -145,14 +145,7 @@ public class BotDelivery {
 //        }
     }
 
-    private List<Order> findCourierOrders(TelegramUser telegramUser, DeliveryTime deliveryTime) {
-        Courier courier = courierRepository.findByUserId(telegramUser.getUser().getId());
-        return orderRepository.findAllByCourierIdAndOrderStatusInAndDeliveryTime(
-                courier.getId(),
-                List.of(OrderStatus.ASSIGNED),
-                deliveryTime
-        );
-    }
+
 
     private void processTomorrowOrders(TelegramUser telegramUser, List<Order> orders, CallbackQuery messageText) {
         SendMessage sendMessage = new SendMessage(telegramUser.getChatId(), sendOrders(orders));
@@ -178,13 +171,13 @@ public class BotDelivery {
 
     public String sendOrders(List<Order> orders) {
         StringBuilder result = new StringBuilder();
-        Map<LocalDate, List<Order>> dateOrderMap = orders.stream()
+        Map<LocalDateTime, List<Order>> dateOrderMap = orders.stream()
                 .filter(order -> order.getOrderStatus().equals(OrderStatus.ASSIGNED) || order.getOrderStatus().equals(OrderStatus.NEXT_ORDER))
-                .collect(Collectors.groupingBy(Order::getDay));
+                .collect(Collectors.groupingBy(Order::getCreatedAt));
         dateOrderMap.forEach((date, dateOrders) -> {
             Map<String, Map<String, Long>> districtOrderMap = dateOrders.stream()
                     .collect(Collectors.groupingBy(Order::getDistrict,
-                            Collectors.groupingBy(order -> order.getDeliveryTime().toString(),
+                            Collectors.groupingBy(order -> order.getCreatedAt().toString(),
                                     Collectors.counting()
                             )
                     ));
@@ -195,7 +188,7 @@ public class BotDelivery {
                 timeMap.forEach((timeRange, count) -> {
                     result.append("    🕙 ").append(timeRange);
                     String statusIcons = dateOrders.stream()
-                            .filter(order -> order.getDeliveryTime().toString().equals(timeRange) && order.getDistrict().equals(district))
+                            .filter(order -> order.getCreatedAt().toString().equals(timeRange) && order.getDistrict().equals(district))
                             .map(order -> order.getOrderStatus() == OrderStatus.ASSIGNED ? "  ✅" : "  📴")
                             .distinct()
                             .collect(Collectors.joining(" "));
@@ -320,7 +313,7 @@ public class BotDelivery {
             boolean isDiscounted = false;
 
             for (OrderProduct orderProduct : orderProducts) {
-                if (orderProduct.getProduct().isReturnable()) {
+                if (orderProduct.getProduct().getIsReturnable()) {
                     currentOrders.getOrder().getTelegramUser().getUser().setLastBottleCount(orderProduct.getAmount());
                 }
                 double productPrice = orderProduct.getProduct().getPrice();
@@ -480,8 +473,8 @@ public class BotDelivery {
 
             Courier courier = courierRepository.findByUserId(telegramUser.getUser().getId());
             if (courier != null) {
-                List<Order> orders = orderRepository.findAllByCourierIdAndOrderStatusAndDeliveryTime(
-                        courier.getId(), OrderStatus.ASSIGNED, telegramUser.getCurrentOrderDeliveryTime());
+                List<Order> orders = orderRepository.findAllByCourierIdAndOrderStatus(
+                        courier.getId(), OrderStatus.ASSIGNED);
 
                 if (orders.isEmpty()) {
                     sendTelegramMessage(telegramUser, "🚫 Bu vaqtda buyurtma yo'q.");

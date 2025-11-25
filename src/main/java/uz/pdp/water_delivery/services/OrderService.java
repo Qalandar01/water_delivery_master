@@ -14,15 +14,16 @@ import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.dto.OrderSummaryDTO;
 import uz.pdp.water_delivery.dto.PaymentOrdersDTO;
 import uz.pdp.water_delivery.dto.UpdateOrderPageDTO;
-import uz.pdp.water_delivery.entity.*;
+import uz.pdp.water_delivery.entity.Courier;
+import uz.pdp.water_delivery.entity.CurrentOrders;
+import uz.pdp.water_delivery.entity.Order;
+import uz.pdp.water_delivery.entity.OrderProduct;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
 import uz.pdp.water_delivery.entity.enums.TelegramState;
 import uz.pdp.water_delivery.exception.CourierNotFoundException;
-import uz.pdp.water_delivery.exception.DeliveryTimeNotFoundException;
 import uz.pdp.water_delivery.exception.OrderNotFoundException;
 import uz.pdp.water_delivery.repo.*;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,17 +35,15 @@ public class OrderService {
     private final CourierRepository courierRepository;
     private final CurrentOrdersRepository currentOrdersRepository;
     private final OrderProductRepository orderProductRepository;
-    private final DeliveryTimeRepository deliveryTimeRepository;
     private final TelegramBot telegramBot;
     private final DeleteMessageService deleteMessageService;
     private final BotService botService;
 
-    public OrderService(OrderRepository orderRepository, CourierRepository courierRepository, CurrentOrdersRepository currentOrdersRepository, OrderProductRepository orderProductRepository, DeliveryTimeRepository deliveryTimeRepository, TelegramBot telegramBot, DeleteMessageService deleteMessageService, BotService botService) {
+    public OrderService(OrderRepository orderRepository, CourierRepository courierRepository, CurrentOrdersRepository currentOrdersRepository, OrderProductRepository orderProductRepository, TelegramBot telegramBot, DeleteMessageService deleteMessageService, BotService botService) {
         this.orderRepository = orderRepository;
         this.courierRepository = courierRepository;
         this.currentOrdersRepository = currentOrdersRepository;
         this.orderProductRepository = orderProductRepository;
-        this.deliveryTimeRepository = deliveryTimeRepository;
         this.telegramBot = telegramBot;
         this.deleteMessageService = deleteMessageService;
         this.botService = botService;
@@ -106,31 +105,16 @@ public class OrderService {
 
         List<OrderProduct> orderProducts = orderProductRepository.findByOrderId(order.getId());
 
-        List<DeliveryTime> allTimes = deliveryTimeRepository.findAll();
-        DeliveryTime selectedTime = order.getDeliveryTime();
 
-        LocalTime currentTime = LocalTime.now().plusMinutes(15);
-        List<DeliveryTime> availableTimes = allTimes.stream()
-                .filter(time -> "Ertaga".equals(time.getDay()) ||
-                        ("Bugun".equals(time.getDay()) && time.getStartTime().isAfter(currentTime)))
-                .collect(Collectors.toList());
-
-        return new UpdateOrderPageDTO(order, orderProducts, availableTimes, selectedTime.getId());
+        return new UpdateOrderPageDTO(order, orderProducts);
     }
 
     @Transactional
-    public void updateOrderDelivery(Long orderId, Long deliveryTimeId) {
+    public void updateOrderDelivery(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found"));
 
-        DeliveryTime deliveryTime = deliveryTimeRepository.findById(deliveryTimeId)
-                .orElseThrow(() -> new DeliveryTimeNotFoundException("Delivery time not found"));
-
-        // Set order day based on delivery time
-        order.setDay("Bugun".equals(deliveryTime.getDay()) ? LocalDate.now() : LocalDate.now().plusDays(1));
-
-        order.setDeliveryTime(deliveryTime);
-        order.setCourier(null); // reset courier assignment
+         order.setCourier(null); // reset courier assignment
         order.setOrderStatus(OrderStatus.CREATED);
 
         orderRepository.save(order);
@@ -206,13 +190,6 @@ public class OrderService {
         return orderSummaryDTOs;
     }
 
-    public PaymentOrdersDTO getPaymentOrdersForToday() {
-        String todayStr = "Bugun"; // "Bugun" is your system’s string for today
-        List<DeliveryTime> deliveryTimes = deliveryTimeRepository.findAllByDayOrderByIdAsc(todayStr);
-        List<OrderSummaryDTO> orderSummary = getOrderSummary(); // existing method or move to service
-
-        return new PaymentOrdersDTO(deliveryTimes, orderSummary);
-    }
 
     @Transactional
     public void assignCouriersToOrders() {
