@@ -77,9 +77,6 @@ public class TelegramUser extends AbsEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
-    @ManyToOne
-    private DeliveryTime currentOrderDeliveryTime;
-
     private LocalDate currentOrderDay;
 
     private Long currentOrderId;

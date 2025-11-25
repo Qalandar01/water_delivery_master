@@ -159,9 +159,9 @@ public class OperatorController {
         try {
             UpdateOrderPageDTO dto = orderService.getUpdateOrderPageData(orderId);
             model.addAttribute("orderProducts", dto.getOrderProducts());
-            model.addAttribute("availableTimes", dto.getAvailableTimes());
+            model.addAttribute("availableTimes", null);
             model.addAttribute("order", dto.getOrder());
-            model.addAttribute("selectedTimeId", dto.getSelectedTimeId());
+            model.addAttribute("selectedTimeId", null);
 
             return "operator/updateOrder";
         } catch (OrderNotFoundException e) {
@@ -175,15 +175,12 @@ public class OperatorController {
 
     @PostMapping("/operator/update/order")
     public String updateOrder(@RequestParam Long orderId,
-                              @RequestParam Long deliveryTimeId,
-                              Model model) {
+                              @RequestParam Long deliveryTimeId) {
         try {
-            orderService.updateOrderDelivery(orderId, deliveryTimeId);
+            orderService.updateOrderDelivery(orderId);
             return "redirect:/operator/orders?success=orderUpdated";
         } catch (OrderNotFoundException e) {
             return "redirect:/operator/update/order/" + orderId + "?error=orderNotFound";
-        } catch (DeliveryTimeNotFoundException e) {
-            return "redirect:/operator/update/order/" + orderId + "?error=deliveryTimeNotFound";
         } catch (Exception e) {
             logErrorFile.logError(e, "updateOrder", orderId.hashCode(), null);
             return "redirect:/operator/orders?error=updateFailed";
@@ -272,17 +269,17 @@ public class OperatorController {
         return "operator/all-users-phone-off";
     }
 
-    @GetMapping("/operator/orders/payment")
-    public String showPaymentOrders(Model model) {
-        LocalDate today = LocalDate.now();
-        model.addAttribute("todayDate", today);
-
-        PaymentOrdersDTO paymentOrdersDTO = orderService.getPaymentOrdersForToday();
-        model.addAttribute("deliveryTimes", paymentOrdersDTO.deliveryTimes());
-        model.addAttribute("orderSummary", paymentOrdersDTO.orderSummary());
-
-        return "operator/orders-payment";
-    }
+//    @GetMapping("/operator/orders/payment")
+//    public String showPaymentOrders(Model model) {
+//        LocalDate today = LocalDate.now();
+//        model.addAttribute("todayDate", today);
+//
+//        PaymentOrdersDTO paymentOrdersDTO = orderService.getPaymentOrdersForToday();
+//        model.addAttribute("deliveryTimes", null);
+//        model.addAttribute("orderSummary", paymentOrdersDTO.orderSummary());
+//
+//        return "operator/orders-payment";
+//    }
 
 
     @GetMapping("/operator/update/courier/{courierId}")
@@ -303,7 +300,6 @@ public class OperatorController {
     }
 
 
-
     @GetMapping("/operator/orders/time-out")
     public String listTimeOutOrders(Model model) {
         List<Order> orders = orderService.getOrdersByStatus(OrderStatus.END_TIME);
@@ -318,7 +314,6 @@ public class OperatorController {
         model.addAttribute("users", users);
         return "operator/change-location-users";
     }
-
 
 
 }
