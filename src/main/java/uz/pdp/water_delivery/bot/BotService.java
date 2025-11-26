@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +44,6 @@ public class BotService {
     private final UserRepository userRepository;
     private final BotUtils botUtils;
     private final UserService userService;
-    private final SimpMessagingTemplate messagingTemplate;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final RoleRepository roleRepository;
@@ -184,7 +182,6 @@ public class BotService {
         sendDoneMessage(telegramUser, removeKeyboard);
         telegramUser.setState(TelegramState.WAITING_OPERATOR);
         telegramUserRepository.save(telegramUser);
-        messagingTemplate.convertAndSend("/topic/status", "Location updated for user: " + telegramUser.getChatId());
     }
 
     private void sendDoneMessage(TelegramUser telegramUser, ReplyKeyboardRemove removeKeyboard) {
@@ -579,8 +576,6 @@ public class BotService {
             tgUser.getUser().setNewUser(orders.isEmpty());
             tgUser.setState(TelegramState.HAS_ORDER);
             telegramUserRepository.save(tgUser);
-            messagingTemplate.convertAndSend("/topic/orders", "Order created for user: " + tgUser.getChatId());
-
         }
     }
 
@@ -702,7 +697,6 @@ public class BotService {
         telegramUser.setState(TelegramState.WAITING_OPERATOR_CHANGE_LOCATION);
         telegramUser.setChangeLocation(true);
         telegramUserRepository.save(telegramUser);
-        messagingTemplate.convertAndSend("/topic/status", "Order created for user: " + telegramUser.getChatId());
     }
 
 
