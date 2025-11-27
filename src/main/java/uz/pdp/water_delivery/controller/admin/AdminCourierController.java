@@ -73,7 +73,7 @@ public class AdminCourierController {
 
 
     @Transactional
-    @PostMapping("/admin/couriers/update/{id}")
+    @PutMapping("/admin/couriers/update/{id}")
     public String updateCourier(
             @PathVariable Long id,
             @ModelAttribute Courier courier,

@@ -74,7 +74,7 @@ public class UserController {
         return "admin/edit-user";
     }
 
-    @PostMapping("/admin/users/edit/{id}")
+    @PutMapping("/admin/users/edit/{id}")
     public String updateUser(
             @PathVariable Long id,
             @Valid @ModelAttribute("user") UserRequestDTO userRequestDTO,

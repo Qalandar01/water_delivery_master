@@ -128,7 +128,7 @@
       <div class="btn3_container" id="returnableSwitch">
         <span class="main" id="returnableSwitchIcon"></span>
       </div>
-      <input type="checkbox" class="d-none" id="returnable" th:field="*{returnable}" th:checked="${bottleTypeDTO.returnable}">
+      <input type="checkbox" class="d-none" id="returnable" th:field="*{returnable}" th:checked="${productDTO.returnable}">
     </div>
 
     <div class="form-group">
@@ -136,7 +136,7 @@
       <div class="btn3_container" id="activeSwitch">
         <span class="main" id="switchIcon"></span>
       </div>
-      <input type="checkbox" class="d-none" id="active" th:field="*{active}" th:checked="${bottleTypeDTO.isActive()}">
+      <input type="checkbox" class="d-none" id="active" th:field="*{active}" th:checked="${productDTO.isActive()}">
     </div>
 
     <div class="form-group">

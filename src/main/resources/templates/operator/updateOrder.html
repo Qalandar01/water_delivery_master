@@ -126,6 +126,8 @@
 
 
   <form th:action="@{/operator/update/order}" method="post">
+
+      <input type="hidden" name="_method" value="put"/>
     <input type="hidden" name="orderId" th:value="${order.id}"/>
 
     <label for="deliveryTime" class="mt-4 mb-2">Vaqtni tanlang:</label>

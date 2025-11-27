@@ -313,7 +313,7 @@ public class BotDelivery {
             boolean isDiscounted = false;
 
             for (OrderProduct orderProduct : orderProducts) {
-                if (orderProduct.getProduct().getIsReturnable()) {
+                if (orderProduct.getProduct().getReturnable()) {
                     currentOrders.getOrder().getTelegramUser().getUser().setLastBottleCount(orderProduct.getAmount());
                 }
                 double productPrice = orderProduct.getProduct().getPrice();

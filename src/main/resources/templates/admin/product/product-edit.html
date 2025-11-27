@@ -67,14 +67,16 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-custom">
-    <a class="navbar-brand" th:href="@{/templates/admin/product/menu}"><i class="fa-solid fa-home"></i> Bottle Menu</a>
+    <a class="navbar-brand" th:href="@{/admin/product/menu}"><i class="fa-solid fa-home"></i> Bottle Menu</a>
 </nav>
 
 <div class="container">
     <h3 class="text-center mb-4">Idishni O'zgartirish</h3>
 
-    <form th:action="@{/templates/admin/product/update}" th:object="${product}" method="post" enctype="multipart/form-data">
+    <form th:action="@{/admin/product/update}" th:object="${product}" method="post" enctype="multipart/form-data">
         <input type="hidden" th:field="*{id}" />
+
+        <input type="hidden" name="_method" value="put"/>
 
         <div class="form-group text-center">
             <img th:src="'data:image/jpeg;base64,' + ${base64Image}" class="bottle-img" id="previewImage" alt="Bottle Image">

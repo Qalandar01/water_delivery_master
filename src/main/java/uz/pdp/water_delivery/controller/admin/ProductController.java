@@ -61,7 +61,7 @@ public class ProductController {
         return "/admin/product/product-edit";
     }
 
-    @PostMapping("/admin/product/update")
+    @PutMapping("/admin/product/update")
     public String updateProduct(@ModelAttribute ProductDTO productDto) {
         try {
             productService.updateProduct(productDto);

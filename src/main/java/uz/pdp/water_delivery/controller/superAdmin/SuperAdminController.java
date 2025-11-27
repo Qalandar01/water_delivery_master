@@ -66,7 +66,7 @@ public class SuperAdminController {
         return "superAdmin/edit-user";
     }
 
-    @PostMapping("/super-admin/edit/user/{id}")
+    @PutMapping("/super-admin/edit/user/{id}")
     public String updateUser(
             @PathVariable Long id,
             @Valid @ModelAttribute("user") User user,

@@ -550,6 +550,7 @@ public class BotService {
                     .region(tgUser.getRegion())
                     .district(tgUser.getDistrict())
                     .telegramUser(tgUser)
+                    .isDeleted(false)
                     .orderStatus(OrderStatus.CREATED)
                     .phone(tgUser.getUser().getPhone())
                     .build();

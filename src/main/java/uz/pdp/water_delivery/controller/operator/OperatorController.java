@@ -9,13 +9,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.dto.OrdersPageData;
-import uz.pdp.water_delivery.dto.PaymentOrdersDTO;
 import uz.pdp.water_delivery.dto.UpdateOrderPageDTO;
 import uz.pdp.water_delivery.dto.VerifyUserDTO;
 import uz.pdp.water_delivery.entity.Courier;
 import uz.pdp.water_delivery.entity.Order;
 import uz.pdp.water_delivery.entity.enums.OrderStatus;
-import uz.pdp.water_delivery.exception.*;
+import uz.pdp.water_delivery.exception.CourierNotFoundException;
+import uz.pdp.water_delivery.exception.OrderNotFoundException;
+import uz.pdp.water_delivery.exception.TelegramUserNotFoundException;
+import uz.pdp.water_delivery.exception.UserDeletionException;
 import uz.pdp.water_delivery.projection.SimpleWaitingUser;
 import uz.pdp.water_delivery.repo.CourierRepository;
 import uz.pdp.water_delivery.repo.TelegramUserRepository;
@@ -24,7 +26,6 @@ import uz.pdp.water_delivery.services.OrderService;
 import uz.pdp.water_delivery.services.TelegramUserService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -173,7 +174,7 @@ public class OperatorController {
     }
 
 
-    @PostMapping("/operator/update/order")
+    @PutMapping("/operator/update/order")
     public String updateOrder(@RequestParam Long orderId,
                               @RequestParam Long deliveryTimeId) {
         try {
