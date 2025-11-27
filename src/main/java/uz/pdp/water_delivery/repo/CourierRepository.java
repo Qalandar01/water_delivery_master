@@ -12,7 +12,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CourierRepository extends JpaRepository<Courier, Long> {
+    @Query(value = "SELECT * FROM courier WHERE is_active = :isActive", nativeQuery = true)
     List<Courier> findAllByIsActive(boolean isActive);
+
     boolean existsByUserPhoneOrIdNot(String phone, Long id);
     Courier findByUserId(Long id);
 

@@ -37,7 +37,7 @@ public class Product {
     private Long orderCount;
 
     @Column(nullable = false)
-    private Boolean isReturnable = false;
+    private Boolean returnable = false;
 
     private Boolean isDeleted = false;
 
@@ -79,7 +79,7 @@ public class Product {
                 ", price=" + price +
                 ", active=" + active +
                 ", orderCount=" + orderCount +
-                ", isReturnable=" + isReturnable +
+                ", isReturnable=" + returnable +
                 ", sale_amount=" + sale_amount +
                 ", sale_discount=" + sale_discount +
                 ", sale_active=" + sale_active +

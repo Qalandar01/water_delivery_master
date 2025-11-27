@@ -112,7 +112,7 @@ public class ProductService {
         product.setPrice(dto.getPrice());
         product.setActive(dto.isActive());
         product.setDescription(dto.getDescription());
-        product.setIsReturnable(dto.isReturnable());
+        product.setReturnable(dto.isReturnable());
 
         ProductImage  productImage = fileService.saveProductImage(dto.getImage());
         product.setProductImage(productImage);
@@ -142,7 +142,7 @@ public class ProductService {
         dto.setDescription(entity.getDescription());
         dto.setPrice(entity.getPrice());
         dto.setActive(entity.getActive());
-        dto.setReturnable(entity.getIsReturnable());
+        dto.setReturnable(entity.getReturnable());
         return dto;
     }
 
@@ -166,7 +166,7 @@ public class ProductService {
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
         product.setActive(dto.isActive());
-        product.setIsReturnable(dto.isReturnable());
+        product.setReturnable(dto.isReturnable());
     }
 
     private void updateImageIfProvided(ProductDTO dto, Product product){
