@@ -6,15 +6,15 @@ import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uz.pdp.water_delivery.model.dto.response.CourierDTO;
-import uz.pdp.water_delivery.model.dto.request.UserDTO;
+import uz.pdp.water_delivery.model.dto.request.courier.CourierRequestDTO;
+import uz.pdp.water_delivery.model.records.courier.CourierResponseDTO;
 import uz.pdp.water_delivery.model.entity.Role;
 import uz.pdp.water_delivery.model.entity.User;
 import uz.pdp.water_delivery.model.entity.Courier;
 import uz.pdp.water_delivery.model.enums.CourierStatus;
 import uz.pdp.water_delivery.model.enums.OrderStatus;
 import uz.pdp.water_delivery.model.enums.RoleName;
-import uz.pdp.water_delivery.repo.*;
+import uz.pdp.water_delivery.model.repo.*;
 import uz.pdp.water_delivery.utils.PhoneRepairUtil;
 
 import java.util.List;
@@ -31,9 +31,9 @@ public class CourierService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
-    public List<CourierDTO> getAllCouriersWithOrderStatus() {
+    public List<CourierResponseDTO> getAllCouriersWithOrderStatus() {
         return courierRepository.findAll().stream()
-                .map(courier -> new CourierDTO(
+                .map(courier -> new CourierResponseDTO(
                         courier,
                         courier.getDistricts(),
                         orderRepository.existsByCourier(courier)
@@ -42,7 +42,7 @@ public class CourierService {
     }
 
     @Transactional
-    public void saveCourier(UserDTO dto) {
+    public void saveCourier(CourierRequestDTO dto) {
 
         String phone = PhoneRepairUtil.repair(dto.getPhone());
 
@@ -68,7 +68,7 @@ public class CourierService {
         notifyCourierAccepted(user);
     }
 
-    private User prepareUser(User user, String phone, UserDTO dto) {
+    private User prepareUser(User user, String phone, CourierRequestDTO dto) {
         if (user == null) {
             user = new User();
             user.setPhone(phone);
@@ -90,7 +90,7 @@ public class CourierService {
         }
     }
 
-    private Courier buildCourier(UserDTO dto, User user) {
+    private Courier buildCourier(CourierRequestDTO dto, User user) {
         return Courier.builder()
                 .courierStatus(CourierStatus.WAITING)
                 .carNumber(dto.getCarNumber())
@@ -127,7 +127,7 @@ public class CourierService {
     }
 
     @Transactional
-    public void updateCourier(Long id, UserDTO updatedCourier) {
+    public void updateCourier(Long id, CourierRequestDTO updatedCourier) {
         Courier existingCourier = courierRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Noto'g'ri kuryer ID: " + id));
 

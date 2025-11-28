@@ -91,7 +91,7 @@
                 <a th:href="@{'/admin/operators/edit/' + ${user.id}}" class="btn btn-info mr-2">
                     <i class="fas fa-edit"></i> Edit
                 </a>
-                <form th:action="@{/admin/delete/user/{id}(id=${user.id})}"
+                <form th:action="@{/admin/operator/delete/{id}(id=${user.id})}"
                       method="post"
                       style="display:inline;">
                     <input type="hidden" name="_method" value="DELETE"/>

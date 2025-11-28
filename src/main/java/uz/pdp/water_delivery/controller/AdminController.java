@@ -2,7 +2,7 @@ package uz.pdp.water_delivery.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import uz.pdp.water_delivery.repo.*;
+import uz.pdp.water_delivery.model.repo.UserRepository;
 import uz.pdp.water_delivery.services.ProductService;
 import uz.pdp.water_delivery.services.UserService;
 import uz.pdp.water_delivery.utils.LogErrorFile;

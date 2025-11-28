@@ -25,7 +25,7 @@ import uz.pdp.water_delivery.model.entity.*;
 import uz.pdp.water_delivery.model.enums.OrderStatus;
 import uz.pdp.water_delivery.model.enums.RoleName;
 import uz.pdp.water_delivery.model.enums.TelegramState;
-import uz.pdp.water_delivery.repo.*;
+import uz.pdp.water_delivery.model.repo.*;
 import uz.pdp.water_delivery.services.DeleteMessageService;
 import uz.pdp.water_delivery.services.FileService;
 import uz.pdp.water_delivery.services.UserService;

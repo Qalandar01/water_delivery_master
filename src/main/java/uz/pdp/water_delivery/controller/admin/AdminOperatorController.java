@@ -8,11 +8,11 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import uz.pdp.water_delivery.model.dto.OperatorDTO;
-import uz.pdp.water_delivery.model.dto.request.OperatorRequestDTO;
-import uz.pdp.water_delivery.model.dto.request.UpdateOperatorRequestDTO;
+import uz.pdp.water_delivery.model.records.operator.OperatorResponseDTO;
+import uz.pdp.water_delivery.model.dto.request.operator.OperatorRequestDTO;
+import uz.pdp.water_delivery.model.dto.request.operator.UpdateOperatorRequestDTO;
 import uz.pdp.water_delivery.model.entity.User;
-import uz.pdp.water_delivery.repo.UserRepository;
+import uz.pdp.water_delivery.model.repo.UserRepository;
 import uz.pdp.water_delivery.services.UserService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
@@ -28,7 +28,7 @@ public class AdminOperatorController {
 
     @GetMapping("/admin/operator")
     public String operators(Model model) {
-        List<OperatorDTO> operators = userService.getOperatorsDto();
+        List<OperatorResponseDTO> operators = userService.getOperatorsDto();
         model.addAttribute("operators", operators);
         return "/admin/operator/operators";
     }
@@ -65,8 +65,8 @@ public class AdminOperatorController {
 
     @GetMapping("/admin/operators/edit/{id}")
     public String showEditOperatorForm(@PathVariable Long id, Model model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
+        UpdateOperatorRequestDTO updateOperatorRequestDTO = userService.getUserById(id);
+        model.addAttribute("user", updateOperatorRequestDTO);
         return "admin/operator/operator-edit";
     }
 
@@ -91,6 +91,20 @@ public class AdminOperatorController {
             redirectAttributes.addFlashAttribute("errorMessage", "Unexpected error occurred while updating the user.");
         }
 
+        return "redirect:/admin/operator";
+    }
+
+    @DeleteMapping("/admin/operator/delete/{id}")
+    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.deleteOrUpdateUserRoles(id);
+            redirectAttributes.addFlashAttribute("successMessage", "User updated or deleted successfully.");
+        } catch (EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            logErrorFile.logError(e, "deleteUser", id);
+            redirectAttributes.addFlashAttribute("errorMessage", "Error occurred while updating user roles.");
+        }
         return "redirect:/admin/operator";
     }
 }

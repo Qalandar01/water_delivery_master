@@ -9,7 +9,7 @@ import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.bot.delivery.BotDelivery;
 import uz.pdp.water_delivery.model.enums.TelegramState;
-import uz.pdp.water_delivery.repo.TelegramUserRepository;
+import uz.pdp.water_delivery.model.repo.TelegramUserRepository;
 
 @Service
 public class CallbackHandler implements UpdateHandler {

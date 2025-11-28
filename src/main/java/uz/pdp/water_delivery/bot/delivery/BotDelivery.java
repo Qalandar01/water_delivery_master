@@ -19,7 +19,7 @@ import uz.pdp.water_delivery.model.dto.Location;
 import uz.pdp.water_delivery.model.entity.*;
 import uz.pdp.water_delivery.model.enums.OrderStatus;
 import uz.pdp.water_delivery.model.enums.TelegramState;
-import uz.pdp.water_delivery.repo.*;
+import uz.pdp.water_delivery.model.repo.*;
 import uz.pdp.water_delivery.services.DeleteMessageService;
 import uz.pdp.water_delivery.utils.DistanceUtil;
 import uz.pdp.water_delivery.utils.LogErrorFile;

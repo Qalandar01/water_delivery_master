@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import uz.pdp.water_delivery.model.entity.Product;
-import uz.pdp.water_delivery.repo.ProductRepository;
+import uz.pdp.water_delivery.model.repo.ProductRepository;
 import uz.pdp.water_delivery.services.FileService;
 
 import java.io.IOException;

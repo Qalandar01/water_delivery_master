@@ -5,7 +5,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import uz.pdp.water_delivery.model.entity.*;
 import uz.pdp.water_delivery.model.enums.RoleName;
-import uz.pdp.water_delivery.repo.*;
+import uz.pdp.water_delivery.model.repo.CourierRepository;
+import uz.pdp.water_delivery.model.repo.RoleRepository;
+import uz.pdp.water_delivery.model.repo.UserRepository;
 
 import java.util.List;
 

@@ -21,7 +21,10 @@ import uz.pdp.water_delivery.model.enums.OrderStatus;
 import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.exception.CourierNotFoundException;
 import uz.pdp.water_delivery.exception.OrderNotFoundException;
-import uz.pdp.water_delivery.repo.*;
+import uz.pdp.water_delivery.model.repo.CourierRepository;
+import uz.pdp.water_delivery.model.repo.CurrentOrdersRepository;
+import uz.pdp.water_delivery.model.repo.OrderProductRepository;
+import uz.pdp.water_delivery.model.repo.OrderRepository;
 
 import java.util.*;
 

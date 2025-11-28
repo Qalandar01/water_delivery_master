@@ -11,7 +11,7 @@ import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.exception.TelegramUserNotFoundException;
 import uz.pdp.water_delivery.exception.UserDeletionException;
 import uz.pdp.water_delivery.projection.SimpleWaitingUser;
-import uz.pdp.water_delivery.repo.TelegramUserRepository;
+import uz.pdp.water_delivery.model.repo.TelegramUserRepository;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
 import java.util.List;

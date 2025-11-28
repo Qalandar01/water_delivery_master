@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.model.entity.User;
-import uz.pdp.water_delivery.repo.UserRepository;
+import uz.pdp.water_delivery.model.repo.UserRepository;
 
 import java.util.Optional;
 

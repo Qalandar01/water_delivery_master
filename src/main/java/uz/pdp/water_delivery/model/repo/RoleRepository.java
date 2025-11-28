@@ -1,4 +1,4 @@
-package uz.pdp.water_delivery.repo;
+package uz.pdp.water_delivery.model.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import uz.pdp.water_delivery.model.entity.Role;

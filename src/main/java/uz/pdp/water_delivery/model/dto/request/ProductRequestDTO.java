@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductDTO {
+public class ProductRequestDTO {
 
     private Long id;
 

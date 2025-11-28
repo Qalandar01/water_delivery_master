@@ -1,16 +1,14 @@
-package uz.pdp.water_delivery.model.dto.request;
+package uz.pdp.water_delivery.model.dto.request.courier;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class CourierRequestDTO {
 
     private Long id;
 

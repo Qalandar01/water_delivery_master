@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.entity.deletMessage.DeleteMessageForTelegramUser;
-import uz.pdp.water_delivery.repo.DeleteMessageForTelegramUserRepository;
+import uz.pdp.water_delivery.model.repo.DeleteMessageForTelegramUserRepository;
 
 import java.util.List;
 

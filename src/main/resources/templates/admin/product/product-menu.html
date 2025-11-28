@@ -106,22 +106,22 @@
             </a>
         </div>
 
-        <div class="col-md-4" th:each="bottleType : ${products}">
+        <div class="col-md-4" th:each="product : ${products}">
             <div class="card card-custom">
-                <img th:src="@{/admin/product/image/{id}(id=${bottleType.id})}" alt="Bottle Image">
+                <img th:src="@{/admin/product/image/{id}(id=${product.id})}" alt="Bottle Image">
                 <div class="card-body card-body-custom">
-                    <h5 class="card-title"><i class="fa-solid fa-wine-bottle"></i> <span th:text="${bottleType.type}">Idish Turi</span></h5>
-                    <p class="card-text"><i class="fa-solid fa-align-left"></i> <span th:text="${bottleType.description}">Tavsif</span></p>
-                    <p class="price"><i class="fa-solid fa-coins"></i> <span th:text="'Narx: ' + ${bottleType.price} + ' so\'m'"></span></p>
-                    <th:block th:if="${bottleType.returnable != null}">
-                        <p th:if="${bottleType.returnable == true}" style="color: green;">Qaytariladi</p>
-                        <p th:if="${bottleType.returnable == false}" style="color: red;">Qaytarilmaydi</p>
+                    <h5 class="card-title"><i class="fa-solid fa-wine-bottle"></i> <span th:text="${product.type}">Idish Turi</span></h5>
+                    <p class="card-text"><i class="fa-solid fa-align-left"></i> <span th:text="${product.description}">Tavsif</span></p>
+                    <p class="price"><i class="fa-solid fa-coins"></i> <span th:text="'Narx: ' + ${product.price} + ' so\'m'"></span></p>
+                    <th:block th:if="${product.returnable != null}">
+                        <p th:if="${product.returnable == true}" style="color: green;">Qaytariladi</p>
+                        <p th:if="${product.returnable == false}" style="color: red;">Qaytarilmaydi</p>
                     </th:block>
-                    <th:block th:if="${bottleType.orderCount == 0}">
-<!--                        <a th:href="@{/admin/bottle/delete/{id}(id=${bottleType.id})}" class="btn btn-danger">-->
+                    <th:block th:if="${product.orderCount == 0}">
+<!--                        <a th:href="@{/admin/bottle/delete/{id}(id=${product.id})}" class="btn btn-danger">-->
 <!--                            <i class="fa-solid fa-trash"></i> O'chirish-->
 <!--                        </a>-->
-                        <form th:action="@{/templates/admin/product/delete/{id}(id=${bottleType.id})}"
+                        <form th:action="@{/templates/admin/product/delete/{id}(id=${product.id})}"
                               method="post"
                               style="display:inline;">
                             <input type="hidden" name="_method" value="DELETE"/>
@@ -134,7 +134,7 @@
                         </form>
 
                     </th:block>
-                    <a th:href="@{/admin/product/edit/{id}(id=${bottleType.id})}" class="btn btn-info">
+                    <a th:href="@{/admin/product/edit/{id}(id=${product.id})}" class="btn btn-info">
                         <i class="fa-solid fa-pen"></i> O'zgartirish
                     </a>
                 </div>

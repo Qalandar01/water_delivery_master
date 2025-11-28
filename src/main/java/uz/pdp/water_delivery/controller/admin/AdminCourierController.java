@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import uz.pdp.water_delivery.model.dto.request.UserDTO;
+import uz.pdp.water_delivery.model.dto.request.courier.CourierRequestDTO;
 import uz.pdp.water_delivery.model.entity.Courier;
 import uz.pdp.water_delivery.services.CourierService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
@@ -30,14 +30,14 @@ public class AdminCourierController {
 
     @GetMapping("/admin/couriers/new")
     public String showCreateCourierForm(Model model) {
-        model.addAttribute("userDTO", new UserDTO());
+        model.addAttribute("courierDTO", new CourierRequestDTO());
         return "admin/courier/courier-form";
     }
 
     @Transactional
     @PostMapping("/admin/couriers/save")
     public String saveCourier(
-            @Valid @ModelAttribute("userDTO") UserDTO userDTO,
+            @Valid @ModelAttribute("courierDTO") CourierRequestDTO courierRequestDTO,
             BindingResult result,
             Model model
     ) {
@@ -47,7 +47,7 @@ public class AdminCourierController {
         }
 
         try {
-            courierService.saveCourier(userDTO);
+            courierService.saveCourier(courierRequestDTO);
             return "redirect:/admin/couriers";
         } catch (IllegalStateException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
@@ -76,7 +76,7 @@ public class AdminCourierController {
     @PutMapping("/admin/couriers/update/{id}")
     public String updateCourier(
             @PathVariable Long id,
-            @ModelAttribute UserDTO courier,
+            @ModelAttribute CourierRequestDTO courier,
             Model model
     ) {
         try {
