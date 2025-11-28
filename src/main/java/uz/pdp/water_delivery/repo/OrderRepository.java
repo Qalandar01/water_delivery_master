@@ -3,9 +3,9 @@ package uz.pdp.water_delivery.repo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import uz.pdp.water_delivery.bot.TelegramUser;
-import uz.pdp.water_delivery.entity.Courier;
-import uz.pdp.water_delivery.entity.Order;
-import uz.pdp.water_delivery.entity.enums.OrderStatus;
+import uz.pdp.water_delivery.model.entity.Courier;
+import uz.pdp.water_delivery.model.entity.Order;
+import uz.pdp.water_delivery.model.enums.OrderStatus;
 
 import java.util.List;
 

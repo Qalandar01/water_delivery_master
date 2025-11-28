@@ -2,7 +2,7 @@ package uz.pdp.water_delivery.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uz.pdp.water_delivery.entity.BotConstant;
+import uz.pdp.water_delivery.model.entity.BotConstant;
 import uz.pdp.water_delivery.repo.BotConstantRepository;
 
 import java.util.HashMap;

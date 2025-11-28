@@ -1,9 +1,8 @@
 package uz.pdp.water_delivery.repo;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
-import uz.pdp.water_delivery.entity.Role;
-import uz.pdp.water_delivery.entity.enums.RoleName;
+import uz.pdp.water_delivery.model.entity.Role;
+import uz.pdp.water_delivery.model.enums.RoleName;
 
 import java.util.List;
 

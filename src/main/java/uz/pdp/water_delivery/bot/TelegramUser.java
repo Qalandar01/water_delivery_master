@@ -5,10 +5,10 @@ import com.pengrad.telegrambot.request.DeleteMessage;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
-import uz.pdp.water_delivery.dto.Location;
-import uz.pdp.water_delivery.entity.*;
+import uz.pdp.water_delivery.model.dto.Location;
+import uz.pdp.water_delivery.model.entity.*;
 import uz.pdp.water_delivery.entity.abs.AbsEntity;
-import uz.pdp.water_delivery.entity.enums.TelegramState;
+import uz.pdp.water_delivery.model.enums.TelegramState;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;

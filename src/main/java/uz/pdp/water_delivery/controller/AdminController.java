@@ -1,26 +1,11 @@
 package uz.pdp.water_delivery.controller;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import uz.pdp.water_delivery.dto.ProductDTO;
-import uz.pdp.water_delivery.dto.ProductEditView;
-import uz.pdp.water_delivery.dto.request.GiftWaterRequest;
-import uz.pdp.water_delivery.dto.request.UserRequestDTO;
-import uz.pdp.water_delivery.entity.User;
-import uz.pdp.water_delivery.entity.enums.RoleName;
 import uz.pdp.water_delivery.repo.*;
 import uz.pdp.water_delivery.services.ProductService;
 import uz.pdp.water_delivery.services.UserService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
-
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor

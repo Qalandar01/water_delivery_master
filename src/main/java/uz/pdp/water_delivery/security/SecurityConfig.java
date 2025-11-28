@@ -19,33 +19,6 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
-    //    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http.userDetailsService(userDetailsService);
-//        http.authorizeHttpRequests(authorize -> authorize
-//                        .requestMatchers("/api/webhook").permitAll()
-//                        .requestMatchers("/login","/change-password", "/forgot-password", "/change-password-phone", "/css/**", "/static/**", "/js/**", "/registration", "/topic").permitAll()
-//                        .requestMatchers("/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/user/**").hasRole("USER")
-//                        .requestMatchers("/operator/**").hasRole("OPERATOR")
-//                        .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
-//                        .anyRequest().authenticated()
-//                )
-//                .formLogin(formLogin -> formLogin
-//                        .loginPage("/login")
-//                        .loginProcessingUrl("/login")       // POST handled by Spring
-//                        .defaultSuccessUrl("/", true)
-//                        .failureHandler(customAuthenticationFailureHandler())
-//                        .permitAll()
-//                )
-//                .logout(logout -> logout
-//                        .logoutUrl("/logout")
-//                        .logoutSuccessUrl("/login")
-//                        .permitAll()
-//                )
-//                .csrf(AbstractHttpConfigurer::disable);
-//        return http.build();
-//    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

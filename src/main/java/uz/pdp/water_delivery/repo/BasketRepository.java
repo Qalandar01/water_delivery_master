@@ -3,8 +3,8 @@ package uz.pdp.water_delivery.repo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import uz.pdp.water_delivery.bot.TelegramUser;
-import uz.pdp.water_delivery.entity.Basket;
-import uz.pdp.water_delivery.entity.Product;
+import uz.pdp.water_delivery.model.entity.Basket;
+import uz.pdp.water_delivery.model.entity.Product;
 
 import java.util.List;
 

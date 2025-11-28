@@ -11,22 +11,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
-import uz.pdp.water_delivery.dto.OrderSummaryDTO;
-import uz.pdp.water_delivery.dto.PaymentOrdersDTO;
-import uz.pdp.water_delivery.dto.UpdateOrderPageDTO;
-import uz.pdp.water_delivery.entity.Courier;
-import uz.pdp.water_delivery.entity.CurrentOrders;
-import uz.pdp.water_delivery.entity.Order;
-import uz.pdp.water_delivery.entity.OrderProduct;
-import uz.pdp.water_delivery.entity.enums.OrderStatus;
-import uz.pdp.water_delivery.entity.enums.TelegramState;
+import uz.pdp.water_delivery.model.dto.OrderSummaryDTO;
+import uz.pdp.water_delivery.model.dto.UpdateOrderPageDTO;
+import uz.pdp.water_delivery.model.entity.Courier;
+import uz.pdp.water_delivery.model.entity.CurrentOrders;
+import uz.pdp.water_delivery.model.entity.Order;
+import uz.pdp.water_delivery.model.entity.OrderProduct;
+import uz.pdp.water_delivery.model.enums.OrderStatus;
+import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.exception.CourierNotFoundException;
 import uz.pdp.water_delivery.exception.OrderNotFoundException;
 import uz.pdp.water_delivery.repo.*;
 
-import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class OrderService {

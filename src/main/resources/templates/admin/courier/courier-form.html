@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yangi Kuryer Qo'shish</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .navbar-custom {
+            background-color: #042d56;
+            border-bottom: 2px solid #04AA6D;
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: #fff;
+            font-size: 1.2em;
+        }
+
+        .navbar-custom .navbar-brand {
+            font-weight: bold;
+        }
+
+        .navbar-custom .nav-link {
+            font-size: 1.1em;
+            margin-left: auto;
+            text-transform: uppercase;
+        }
+
+        .form-container {
+            padding: 40px;
+            border: none;
+            border-radius: 12px;
+            background-color: #ffffff;
+            margin: 30px auto;
+            max-width: 550px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #343a40;
+        }
+
+        .form-group i {
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            font-size: 1.3em;
+            color: #007bff;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            padding-left: 45px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1.1em;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            background-color: #007bff;
+            border: none;
+            padding: 12px;
+            color: white;
+            font-size: 1.2em;
+            border-radius: 6px;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        button[type="submit"] i {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .alert {
+            border-radius: 6px;
+            font-size: 1.1em;
+        }
+
+        .alert.alert-success {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .alert.alert-danger {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .alert i {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 500px) {
+            .form-container {
+                padding: 30px;
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-custom">
+    <a class="nav-link" href="javascript:void(0);" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</a>
+</nav>
+
+<div class="form-container">
+    <h2 class="text-center">Yangi Kuryer Qo'shish</h2>
+    <div th:if="${successMessage}" class="alert alert-success">
+        <i class="fas fa-check-circle"></i> <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger">
+        <i class="fas fa-exclamation-circle"></i> <span th:text="${errorMessage}"></span>
+    </div>
+
+    <form th:action="@{/admin/couriers/save}" th:object="${userDTO}" method="post">
+        <div class="form-group">
+            <i class="fas fa-user"></i>
+            <label for="firstName">Ismi</label>
+            <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+        </div>
+        <div class="form-group">
+            <i class="fas fa-user"></i>
+            <label for="lastName">Familiyasi</label>
+            <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+        </div>
+        <div class="form-group">
+            <i class="fas fa-phone"></i>
+            <label for="phone">Telefon</label>
+            <input type="text" class="form-control" id="phone" th:field="*{phone}" required>
+        </div>
+        <div class="form-group">
+            <i class="fas fa-car"></i>
+            <label for="carType">Mashina Turi</label>
+            <input type="text" class="form-control" id="carType" th:field="*{carType}">
+        </div>
+        <div class="form-group">
+            <i class="fas fa-id-card"></i>
+            <label for="carNumber">Mashina Raqami</label>
+            <input type="text" class="form-control" id="carNumber" th:field="*{carNumber}">
+        </div>
+        <div class="form-group">
+            <i class="fas fa-user-tag"></i>
+            <label for="courierStatus">Kuryer Statusi</label>
+            <select class="form-control" id="courierStatus" th:field="*{isActive}">
+                <option value="ACTIVE" >Faol</option>
+                <option value="INACTIVE">Faol emas</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Saqlash</button>
+    </form>
+</div>
+
+<script>
+    function goBack() {
+        window.location.href = "/admin/couriers";
+    }
+</script>
+</body>
+</html>

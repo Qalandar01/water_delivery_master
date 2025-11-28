@@ -6,9 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uz.pdp.water_delivery.dto.Location;
+import uz.pdp.water_delivery.model.dto.Location;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j

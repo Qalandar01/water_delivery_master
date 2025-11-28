@@ -10,9 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import uz.pdp.water_delivery.entity.Role;
-import uz.pdp.water_delivery.entity.User;
-import uz.pdp.water_delivery.entity.enums.RoleName;
+import uz.pdp.water_delivery.model.entity.Role;
+import uz.pdp.water_delivery.model.entity.User;
+import uz.pdp.water_delivery.model.enums.RoleName;
 import uz.pdp.water_delivery.repo.UserRepository;
 
 import java.util.List;
@@ -171,7 +171,7 @@ public class LoginController {
     private String redirectToRolePage(RoleName roleName) {
         String page = switch (roleName) {
             case ROLE_SUPER_ADMIN -> "/super-admin";
-            case ROLE_ADMIN -> "/admin";
+            case ROLE_ADMIN -> "/admin/operator";
             case ROLE_OPERATOR -> "/operator";
             default -> "/logout";
         };

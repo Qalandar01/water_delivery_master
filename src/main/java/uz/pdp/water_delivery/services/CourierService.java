@@ -6,14 +6,14 @@ import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uz.pdp.water_delivery.dto.CourierDTO;
-import uz.pdp.water_delivery.dto.UserDTO;
-import uz.pdp.water_delivery.entity.Courier;
-import uz.pdp.water_delivery.entity.Role;
-import uz.pdp.water_delivery.entity.User;
-import uz.pdp.water_delivery.entity.enums.CourierStatus;
-import uz.pdp.water_delivery.entity.enums.OrderStatus;
-import uz.pdp.water_delivery.entity.enums.RoleName;
+import uz.pdp.water_delivery.model.dto.response.CourierDTO;
+import uz.pdp.water_delivery.model.dto.request.UserDTO;
+import uz.pdp.water_delivery.model.entity.Role;
+import uz.pdp.water_delivery.model.entity.User;
+import uz.pdp.water_delivery.model.entity.Courier;
+import uz.pdp.water_delivery.model.enums.CourierStatus;
+import uz.pdp.water_delivery.model.enums.OrderStatus;
+import uz.pdp.water_delivery.model.enums.RoleName;
 import uz.pdp.water_delivery.repo.*;
 import uz.pdp.water_delivery.utils.PhoneRepairUtil;
 
@@ -95,8 +95,9 @@ public class CourierService {
                 .courierStatus(CourierStatus.WAITING)
                 .carNumber(dto.getCarNumber())
                 .carType(dto.getCarType())
-                .districts(dto.getDistricts())
-                .isActive("ACTIVE".equalsIgnoreCase(dto.getCourierStatus()))
+                .districts(null)
+                .isDeleted(false)
+                .isActive(dto.isActive())
                 .user(user)
                 .build();
     }
@@ -119,17 +120,18 @@ public class CourierService {
             );
         });
     }
+
     public Courier findByIdOrThrow(Long id) {
         return courierRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid courier id: " + id));
     }
 
     @Transactional
-    public void updateCourier(Long id, Courier updatedCourier) {
+    public void updateCourier(Long id, UserDTO updatedCourier) {
         Courier existingCourier = courierRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Noto'g'ri kuryer ID: " + id));
 
-        String repairedPhone = PhoneRepairUtil.repair(updatedCourier.getUser().getPhone());
+        String repairedPhone = PhoneRepairUtil.repair(updatedCourier.getPhone());
 
         // Check if phone is already used by another courier
         boolean phoneExistsForAnother = courierRepository.existsByUserPhoneAndIdNot(repairedPhone, id);
@@ -139,25 +141,26 @@ public class CourierService {
 
         // Check if courier has active assigned orders before deactivating
         boolean hasAssignedOrders = orderRepository.existsByCourierAndOrderStatus(existingCourier, OrderStatus.ASSIGNED);
-        if (hasAssignedOrders && !existingCourier.getIsActive().equals(updatedCourier.getIsActive())) {
+        if (hasAssignedOrders) {
             throw new IllegalStateException(
                     "Kuryer faol buyurtmalarni boshqarayotganligi sababli faoliyat holatini o'zgartirib bo'lmaydi."
             );
         }
 
         // Update user info
-        existingCourier.getUser().setFirstName(updatedCourier.getUser().getFirstName());
-        existingCourier.getUser().setLastName(updatedCourier.getUser().getLastName());
+        existingCourier.getUser().setFirstName(updatedCourier.getFirstName());
+        existingCourier.getUser().setLastName(updatedCourier.getLastName());
         existingCourier.getUser().setPhone(repairedPhone);
 
         // Update courier info
         existingCourier.setCarType(updatedCourier.getCarType());
         existingCourier.setCarNumber(updatedCourier.getCarNumber());
-        existingCourier.setIsActive(updatedCourier.getIsActive());
-        existingCourier.setDistricts(updatedCourier.getDistricts());
+        existingCourier.setIsActive(updatedCourier.isActive());
+        existingCourier.setDistricts(null);
 
         courierRepository.save(existingCourier);
     }
+
     @Transactional
     public void deleteCourierById(Long id) {
 

@@ -3,13 +3,11 @@ package uz.pdp.water_delivery.repo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import uz.pdp.water_delivery.entity.CurrentOrders;
-import uz.pdp.water_delivery.entity.enums.OrderStatus;
+import uz.pdp.water_delivery.model.entity.CurrentOrders;
+import uz.pdp.water_delivery.model.enums.OrderStatus;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface CurrentOrdersRepository extends JpaRepository<CurrentOrders, Long> {
 

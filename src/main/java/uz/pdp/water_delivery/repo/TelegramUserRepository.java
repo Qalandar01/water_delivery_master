@@ -4,13 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import uz.pdp.water_delivery.bot.TelegramUser;
-import uz.pdp.water_delivery.entity.User;
-import uz.pdp.water_delivery.entity.enums.TelegramState;
+import uz.pdp.water_delivery.model.entity.User;
+import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.projection.SimpleWaitingUser;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface TelegramUserRepository extends JpaRepository<TelegramUser, Long> {
 

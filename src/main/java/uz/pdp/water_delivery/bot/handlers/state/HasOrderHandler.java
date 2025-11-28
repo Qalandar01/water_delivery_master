@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.pdp.water_delivery.bot.BotConstant;
 import uz.pdp.water_delivery.bot.TelegramUser;
-import uz.pdp.water_delivery.entity.enums.TelegramState;
+import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.repo.TelegramUserRepository;
 import uz.pdp.water_delivery.services.DeleteMessageService;
 
