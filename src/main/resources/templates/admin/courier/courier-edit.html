@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuryerni Tahrirlash</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .navbar-custom {
+            background-color: #042d56;
+            border-bottom: 2px solid #04AA6D;
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: #fff;
+            font-size: 1.2em;
+        }
+
+        .navbar-custom .navbar-brand {
+            font-weight: bold;
+        }
+
+        .navbar-custom .nav-link {
+            font-size: 1.1em;
+            margin-left: auto;
+            text-transform: uppercase;
+        }
+
+        .form-container {
+            padding: 40px;
+            border: none;
+            border-radius: 12px;
+            background-color: #ffffff;
+            margin: 10px auto;
+            max-width: 550px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h2 {
+            font-size: 1.8em;
+            color: #343a40;
+        }
+
+        .form-group i {
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            font-size: 1.3em;
+            color: #007bff;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-control {
+            padding-left: 45px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1.1em;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            background-color: #007bff;
+            border: none;
+            padding: 12px;
+            color: white;
+            font-size: 1.2em;
+            border-radius: 6px;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        button[type="submit"] i {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .dropdown-menu {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 30px;
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-custom">
+    <a class="nav-link" th:href="@{/admin/couriers}"><i class="fas fa-arrow-left"></i> Ortga qaytish</a>
+</nav>
+
+<div class="form-container">
+    <h2 class="text-center">Kuryerni Tahrirlash</h2>
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
+    <form th:action="@{'/admin/couriers/update/' + ${courier.id}}"
+          th:object="${courier}"
+          method="post">
+
+        <!-- Convert POST → PUT -->
+        <input type="hidden" name="_method" value="put"/>
+
+        <div class="form-group">
+            <i class="fas fa-user"></i>
+            <label for="firstName">Ismi</label>
+            <input type="text" class="form-control" id="firstName"
+                   name="user.firstName" th:value="*{user.firstName}" required>
+        </div>
+
+        <div class="form-group">
+            <i class="fas fa-user"></i>
+            <label for="lastName">Familiyasi</label>
+            <input type="text" class="form-control" id="lastName"
+                   name="user.lastName" th:value="*{user.lastName}" required>
+        </div>
+
+        <div class="form-group">
+            <i class="fas fa-phone"></i>
+            <label for="phone">Telefon</label>
+            <input type="text" class="form-control" id="phone"
+                   name="user.phone" th:value="*{user.phone}" required>
+        </div>
+
+        <div class="form-group">
+            <i class="fas fa-car"></i>
+            <label for="carType">Mashina Turi</label>
+            <input type="text" class="form-control" id="carType"
+                   name="carType" th:value="*{carType}">
+        </div>
+
+        <div class="form-group">
+            <i class="fas fa-id-card"></i>
+            <label for="carNumber">Mashina Raqami</label>
+            <input type="text" class="form-control" id="carNumber"
+                   name="carNumber" th:value="*{carNumber}">
+        </div>
+
+<!--        <div class="form-group">-->
+<!--            <i class="fas fa-map-marker-alt"></i>-->
+<!--            <label for="districtDropdown">Tumanlar</label>-->
+
+<!--            <div class="dropdown">-->
+<!--                <button class="btn btn-success dropdown-toggle w-100"-->
+<!--                        type="button"-->
+<!--                        id="districtDropdown"-->
+<!--                        data-toggle="dropdown">-->
+<!--                    Tumanni tanlang-->
+<!--                </button>-->
+
+<!--                <div class="dropdown-menu w-100">-->
+<!--                    <div th:each="district : ${districts}">-->
+<!--                        <div class="form-check dropdown-item">-->
+<!--                            <input class="form-check-input district-checkbox"-->
+<!--                                   type="checkbox"-->
+<!--                                   th:id="${'district-' + district}"-->
+<!--                                   th:field="*{districts}"-->
+<!--                                   th:value="${district}"-->
+<!--                                   th:checked="${courier.districts.contains(district)}">-->
+<!--                            <label class="form-check-label"-->
+<!--                                   th:for="${'district-' + district}"-->
+<!--                                   th:text="${district}">-->
+<!--                            </label>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <div class="form-group">
+            <i class="fas fa-user-tag"></i>
+            <label for="courierStatus">Kuryer Statusi</label>
+            <select class="form-control" id="courierStatus"
+                    name="isActive" th:value="*{isActive}">
+                <option value="true"  th:selected="*{isActive == true}">Faol</option>
+                <option value="false" th:selected="*{isActive == false}">Faol emas</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Yangilash
+        </button>
+    </form>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

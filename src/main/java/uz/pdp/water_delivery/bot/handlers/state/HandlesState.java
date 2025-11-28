@@ -1,6 +1,6 @@
 package uz.pdp.water_delivery.bot.handlers.state;
 
-import uz.pdp.water_delivery.entity.enums.TelegramState;
+import uz.pdp.water_delivery.model.enums.TelegramState;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

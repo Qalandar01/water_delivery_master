@@ -5,12 +5,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uz.pdp.water_delivery.dto.ProductDTO;
-import uz.pdp.water_delivery.dto.ProductEditView;
-import uz.pdp.water_delivery.dto.request.GiftWaterRequest;
-import uz.pdp.water_delivery.entity.Product;
-import uz.pdp.water_delivery.entity.ProductImage;
-import uz.pdp.water_delivery.entity.ProductImageContent;
+import uz.pdp.water_delivery.model.dto.request.ProductDTO;
+import uz.pdp.water_delivery.model.dto.request.ProductEditView;
+import uz.pdp.water_delivery.model.dto.request.GiftWaterRequest;
+import uz.pdp.water_delivery.model.entity.Product;
+import uz.pdp.water_delivery.model.entity.ProductImage;
+import uz.pdp.water_delivery.model.entity.ProductImageContent;
 import uz.pdp.water_delivery.repo.OrderProductRepository;
 import uz.pdp.water_delivery.repo.ProductImageContentRepository;
 import uz.pdp.water_delivery.repo.ProductRepository;
@@ -137,7 +137,6 @@ public class ProductService {
 
     private ProductDTO mapToDTO(Product entity) {
         ProductDTO dto = new ProductDTO();
-        dto.setId(entity.getId());
         dto.setType(entity.getType());
         dto.setDescription(entity.getDescription());
         dto.setPrice(entity.getPrice());

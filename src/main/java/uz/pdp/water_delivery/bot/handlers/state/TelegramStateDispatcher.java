@@ -3,7 +3,7 @@ package uz.pdp.water_delivery.bot.handlers.state;
 import com.pengrad.telegrambot.model.Message;
 import org.springframework.stereotype.Component;
 import uz.pdp.water_delivery.bot.TelegramUser;
-import uz.pdp.water_delivery.entity.enums.TelegramState;
+import uz.pdp.water_delivery.model.enums.TelegramState;
 
 import java.util.EnumMap;
 import java.util.List;

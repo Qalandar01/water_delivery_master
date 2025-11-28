@@ -7,8 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import uz.pdp.water_delivery.dto.ProductDTO;
-import uz.pdp.water_delivery.dto.ProductEditView;
+import uz.pdp.water_delivery.model.dto.request.ProductDTO;
+import uz.pdp.water_delivery.model.dto.request.ProductEditView;
 import uz.pdp.water_delivery.services.ProductService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 

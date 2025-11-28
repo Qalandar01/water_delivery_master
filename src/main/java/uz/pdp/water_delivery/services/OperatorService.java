@@ -2,12 +2,12 @@ package uz.pdp.water_delivery.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uz.pdp.water_delivery.dto.CompanyDTO;
-import uz.pdp.water_delivery.dto.CurrentOrdersDTO;
-import uz.pdp.water_delivery.dto.OrdersPageData;
-import uz.pdp.water_delivery.entity.Courier;
-import uz.pdp.water_delivery.entity.enums.OrderStatus;
-import uz.pdp.water_delivery.entity.enums.TelegramState;
+import uz.pdp.water_delivery.model.dto.CompanyDTO;
+import uz.pdp.water_delivery.model.dto.CurrentOrdersDTO;
+import uz.pdp.water_delivery.model.dto.OrdersPageData;
+import uz.pdp.water_delivery.model.entity.Courier;
+import uz.pdp.water_delivery.model.enums.OrderStatus;
+import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.projection.SimpleWaitingUser;
 import uz.pdp.water_delivery.repo.CourierRepository;
 import uz.pdp.water_delivery.repo.CurrentOrdersRepository;

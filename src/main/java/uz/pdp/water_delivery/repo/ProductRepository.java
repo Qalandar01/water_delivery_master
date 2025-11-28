@@ -2,7 +2,7 @@ package uz.pdp.water_delivery.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import uz.pdp.water_delivery.entity.Product;
+import uz.pdp.water_delivery.model.entity.Product;
 
 import java.time.LocalDate;
 import java.util.List;

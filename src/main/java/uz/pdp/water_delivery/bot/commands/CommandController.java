@@ -1,7 +1,6 @@
 package uz.pdp.water_delivery.bot.commands;
 
 import org.springframework.stereotype.Component;
-import uz.pdp.water_delivery.bot.BotConstant;
 
 import java.util.HashMap;
 import java.util.List;

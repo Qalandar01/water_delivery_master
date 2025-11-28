@@ -7,11 +7,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
-import uz.pdp.water_delivery.dto.UserDTO;
-import uz.pdp.water_delivery.dto.request.UserRequestDTO;
-import uz.pdp.water_delivery.entity.Role;
-import uz.pdp.water_delivery.entity.User;
-import uz.pdp.water_delivery.entity.enums.RoleName;
+import uz.pdp.water_delivery.model.dto.OperatorDTO;
+import uz.pdp.water_delivery.model.dto.request.UserDTO;
+import uz.pdp.water_delivery.model.dto.request.OperatorRequestDTO;
+import uz.pdp.water_delivery.model.dto.request.UpdateOperatorRequestDTO;
+import uz.pdp.water_delivery.model.entity.Role;
+import uz.pdp.water_delivery.model.entity.User;
+import uz.pdp.water_delivery.model.enums.RoleName;
 import uz.pdp.water_delivery.exception.DuplicatePhoneNumberException;
 import uz.pdp.water_delivery.repo.RoleRepository;
 import uz.pdp.water_delivery.repo.UserRepository;
@@ -62,10 +64,18 @@ public class UserService {
     }
 
     @Transactional
-    public void createOperatorUser(User user) {
+    public void createOperatorUser(OperatorRequestDTO operatorRequest) {
         Role roleOperator = roleRepository.findByRoleName(RoleName.ROLE_OPERATOR);
-        user.setRoles(List.of(roleOperator));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = User.builder()
+                .firstName(operatorRequest.getFirstname())
+                .lastName(operatorRequest.getLastname())
+                .password(passwordEncoder.encode(operatorRequest.getPassword()))
+                .roles(List.of(roleOperator))
+                .active(true)
+                .isDeleted(false)
+                .Paid(false)
+                .phone(operatorRequest.getPhone())
+                .build();
         userRepository.save(user);
     }
 
@@ -94,17 +104,17 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Long id, @Valid UserRequestDTO userRequestDTO) {
+    public void updateUser(Long id, @Valid UpdateOperatorRequestDTO updateOperatorRequestDTO) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
 
-        existingUser.setFirstName(userRequestDTO.getFirstName());
-        existingUser.setLastName(userRequestDTO.getLastName());
-        existingUser.setPhone(userRequestDTO.getPhone());
-        existingUser.setActive(userRequestDTO.isActive());
-        existingUser.setPaid(userRequestDTO.isPaid());
+        existingUser.setFirstName(updateOperatorRequestDTO.getFirstName());
+        existingUser.setLastName(updateOperatorRequestDTO.getLastName());
+        existingUser.setPhone(updateOperatorRequestDTO.getPhone());
+        existingUser.setActive(updateOperatorRequestDTO.isActive());
+        existingUser.setPaid(updateOperatorRequestDTO.isPaid());
 
-        if (userRequestDTO.isPaid()) {
+        if (updateOperatorRequestDTO.isPaid()) {
             existingUser.setPaidDate(LocalDate.now());
             existingUser.setNextMonthDate(LocalDate.now().plusMonths(1));
         }
@@ -163,4 +173,18 @@ public class UserService {
             existingUser.setNextMonthDate(LocalDate.now().plusMonths(1));
         }
     }
+
+    public List<OperatorDTO> getOperatorsDto() {
+        List<User> users = getUsersByRole(RoleName.ROLE_OPERATOR);
+
+        return users.stream()
+                .map(user -> OperatorDTO.builder()
+                        .id(user.getId())
+                        .firstName(user.getFirstName())
+                        .displayPhone(user.getDisplayPhone())
+                        .active(user.getActive())
+                        .build())
+                .toList();
+    }
+
 }

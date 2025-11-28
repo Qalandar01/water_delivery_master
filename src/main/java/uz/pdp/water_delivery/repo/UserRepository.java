@@ -3,14 +3,11 @@ package uz.pdp.water_delivery.repo;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import uz.pdp.water_delivery.entity.Role;
-import uz.pdp.water_delivery.entity.User;
-import uz.pdp.water_delivery.entity.enums.RoleName;
+import uz.pdp.water_delivery.model.entity.User;
+import uz.pdp.water_delivery.model.enums.RoleName;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByPhone(String phone);

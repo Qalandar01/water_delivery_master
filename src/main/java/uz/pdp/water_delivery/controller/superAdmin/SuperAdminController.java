@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import uz.pdp.water_delivery.entity.User;
+import uz.pdp.water_delivery.model.entity.User;
 import uz.pdp.water_delivery.repo.UserRepository;
 import uz.pdp.water_delivery.services.UserService;
 

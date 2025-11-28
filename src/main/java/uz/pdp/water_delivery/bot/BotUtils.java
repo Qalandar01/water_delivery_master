@@ -4,12 +4,12 @@ package uz.pdp.water_delivery.bot;
 import com.pengrad.telegrambot.model.request.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uz.pdp.water_delivery.dto.Location;
-import uz.pdp.water_delivery.entity.Basket;
-import uz.pdp.water_delivery.entity.CurrentOrders;
-import uz.pdp.water_delivery.entity.Order;
-import uz.pdp.water_delivery.entity.Product;
-import uz.pdp.water_delivery.entity.enums.OrderStatus;
+import uz.pdp.water_delivery.model.dto.Location;
+import uz.pdp.water_delivery.model.entity.Basket;
+import uz.pdp.water_delivery.model.entity.CurrentOrders;
+import uz.pdp.water_delivery.model.entity.Order;
+import uz.pdp.water_delivery.model.entity.Product;
+import uz.pdp.water_delivery.model.enums.OrderStatus;
 import uz.pdp.water_delivery.repo.ProductRepository;
 
 import java.time.format.DateTimeFormatter;

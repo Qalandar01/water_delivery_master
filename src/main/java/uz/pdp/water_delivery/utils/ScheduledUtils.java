@@ -3,7 +3,7 @@ package uz.pdp.water_delivery.utils;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import uz.pdp.water_delivery.entity.User;
+import uz.pdp.water_delivery.model.entity.User;
 import uz.pdp.water_delivery.repo.UserRepository;
 
 import java.time.LocalDate;

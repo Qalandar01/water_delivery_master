@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import uz.pdp.water_delivery.entity.Product;
-import uz.pdp.water_delivery.entity.ProductImage;
-import uz.pdp.water_delivery.entity.ProductImageContent;
+import uz.pdp.water_delivery.model.entity.Product;
+import uz.pdp.water_delivery.model.entity.ProductImage;
+import uz.pdp.water_delivery.model.entity.ProductImageContent;
 import uz.pdp.water_delivery.repo.ProductImageContentRepository;
 import uz.pdp.water_delivery.repo.ProductImageRepository;
 

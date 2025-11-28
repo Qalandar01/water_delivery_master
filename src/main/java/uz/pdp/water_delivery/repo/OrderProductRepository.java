@@ -1,9 +1,9 @@
 package uz.pdp.water_delivery.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import uz.pdp.water_delivery.entity.Order;
-import uz.pdp.water_delivery.entity.OrderProduct;
-import uz.pdp.water_delivery.entity.Product;
+import uz.pdp.water_delivery.model.entity.Order;
+import uz.pdp.water_delivery.model.entity.OrderProduct;
+import uz.pdp.water_delivery.model.entity.Product;
 
 import java.util.List;
 
