@@ -140,19 +140,19 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="courierDTO : ${couriers}">
-                    <td th:text="${courierDTO.courier.user.firstName}"></td>
-                    <td th:text="${courierDTO.courier.carType}"></td>
-                    <td th:text="${courierDTO.courier.carNumber}"></td>
-                    <td th:text="${courierDTO.courier.user.phone}"></td>
-                    <td th:text="${courierDTO.courier.isActive}"></td>
+                <tr th:each="courierRequestDTO : ${couriers}">
+                    <td th:text="${courierRequestDTO.courier.user.firstName}"></td>
+                    <td th:text="${courierRequestDTO.courier.carType}"></td>
+                    <td th:text="${courierRequestDTO.courier.carNumber}"></td>
+                    <td th:text="${courierRequestDTO.courier.user.phone}"></td>
+                    <td th:text="${courierRequestDTO.courier.isActive}"></td>
                     <td>
-                        <a th:href="@{'/admin/couriers/edit/' + ${courierDTO.courier.id}}"
+                        <a th:href="@{'/admin/couriers/edit/' + ${courierRequestDTO.courier.id}}"
                            class="btn btn-info">
                             <i class="fa-solid fa-edit"></i> Edit
                         </a>
-                        <span th:if="${!courierDTO.hasOrders}">
-              <form th:action="@{/admin/couriers/delete/{id}(id=${courierDTO.courier.id})}"
+                        <span th:if="${!courierRequestDTO.hasOrders}">
+              <form th:action="@{/admin/couriers/delete/{id}(id=${courierRequestDTO.courier.id})}"
                     method="post"
                     style="display:inline;">
     <input type="hidden" name="_method" value="DELETE"/>

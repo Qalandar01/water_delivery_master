@@ -1,13 +1,7 @@
 package uz.pdp.water_delivery.entity.deletMessage;
 
-import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.persistence.*;
 import lombok.*;
-import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.TelegramUser;
-import uz.pdp.water_delivery.repo.DeleteMessageForTelegramUserRepository;
-
-import java.util.UUID;
 
 @Getter
 @Data

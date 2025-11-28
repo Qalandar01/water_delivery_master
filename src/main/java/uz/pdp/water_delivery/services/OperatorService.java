@@ -9,9 +9,9 @@ import uz.pdp.water_delivery.model.entity.Courier;
 import uz.pdp.water_delivery.model.enums.OrderStatus;
 import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.projection.SimpleWaitingUser;
-import uz.pdp.water_delivery.repo.CourierRepository;
-import uz.pdp.water_delivery.repo.CurrentOrdersRepository;
-import uz.pdp.water_delivery.repo.TelegramUserRepository;
+import uz.pdp.water_delivery.model.repo.CourierRepository;
+import uz.pdp.water_delivery.model.repo.CurrentOrdersRepository;
+import uz.pdp.water_delivery.model.repo.TelegramUserRepository;
 
 import java.util.List;
 

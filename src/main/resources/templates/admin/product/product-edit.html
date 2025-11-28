@@ -79,7 +79,7 @@
         <input type="hidden" name="_method" value="put"/>
 
         <div class="form-group text-center">
-            <img th:src="'data:image/jpeg;base64,' + ${base64Image}" class="bottle-img" id="previewImage" alt="Bottle Image">
+            <img th:src="'/admin/product/image/' + ${product.id}" class="bottle-img" id="previewImage" alt="Bottle Image">
         </div>
 
         <div class="form-group">

@@ -1,4 +1,4 @@
-package uz.pdp.water_delivery.model.dto.request;
+package uz.pdp.water_delivery.model.dto.request.operator;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

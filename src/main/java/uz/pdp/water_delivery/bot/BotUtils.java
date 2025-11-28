@@ -10,7 +10,7 @@ import uz.pdp.water_delivery.model.entity.CurrentOrders;
 import uz.pdp.water_delivery.model.entity.Order;
 import uz.pdp.water_delivery.model.entity.Product;
 import uz.pdp.water_delivery.model.enums.OrderStatus;
-import uz.pdp.water_delivery.repo.ProductRepository;
+import uz.pdp.water_delivery.model.repo.ProductRepository;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;

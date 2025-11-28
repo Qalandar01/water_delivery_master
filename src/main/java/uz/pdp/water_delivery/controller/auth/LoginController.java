@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import uz.pdp.water_delivery.model.entity.Role;
 import uz.pdp.water_delivery.model.entity.User;
 import uz.pdp.water_delivery.model.enums.RoleName;
-import uz.pdp.water_delivery.repo.UserRepository;
+import uz.pdp.water_delivery.model.repo.UserRepository;
 
 import java.util.List;
 import java.util.Optional;

@@ -7,8 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 import uz.pdp.water_delivery.model.entity.Product;
 import uz.pdp.water_delivery.model.entity.ProductImage;
 import uz.pdp.water_delivery.model.entity.ProductImageContent;
-import uz.pdp.water_delivery.repo.ProductImageContentRepository;
-import uz.pdp.water_delivery.repo.ProductImageRepository;
+import uz.pdp.water_delivery.model.repo.ProductImageContentRepository;
+import uz.pdp.water_delivery.model.repo.ProductImageRepository;
 
 import java.io.IOException;
 

@@ -5,18 +5,21 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import uz.pdp.water_delivery.model.dto.request.ProductDTO;
-import uz.pdp.water_delivery.model.dto.request.ProductEditView;
+import uz.pdp.water_delivery.model.dto.request.ProductRequestDTO;
 import uz.pdp.water_delivery.model.dto.request.GiftWaterRequest;
 import uz.pdp.water_delivery.model.entity.Product;
 import uz.pdp.water_delivery.model.entity.ProductImage;
 import uz.pdp.water_delivery.model.entity.ProductImageContent;
-import uz.pdp.water_delivery.repo.OrderProductRepository;
-import uz.pdp.water_delivery.repo.ProductImageContentRepository;
-import uz.pdp.water_delivery.repo.ProductRepository;
+import uz.pdp.water_delivery.model.mapper.ProductMapper;
+import uz.pdp.water_delivery.model.records.admin.ProductResponseDTO;
+import uz.pdp.water_delivery.model.repo.OrderProductRepository;
+import uz.pdp.water_delivery.model.repo.ProductImageContentRepository;
+import uz.pdp.water_delivery.model.repo.ProductRepository;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,16 +30,28 @@ public class ProductService {
     private final FileService fileService;
     private final ProductImageContentRepository productImageContentRepository;
 
-    public List<Product> getActiveProductsWithOrderCount() {
+    public List<ProductResponseDTO> getActiveProductsWithOrderCount() {
+
         List<Product> products = productRepository.findAllByActiveTrue();
 
-        for (Product product : products) {
-            long orderCount = orderProductRepository.countByProduct(product);
-            product.setOrderCount(orderCount);
-        }
+        List<Object[]> counts = orderProductRepository.findOrderCountGroupedByProductNative();
 
-        return products;
+        Map<Long, Long> countMap = counts.stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+
+        products.forEach(product ->
+                product.setOrderCount(countMap.getOrDefault(product.getId(), 0L))
+        );
+
+        return products.stream()
+                .map(ProductMapper::mapToResponse)
+                .toList();
     }
+
+
 
     public void updateGiftWater(GiftWaterRequest req) {
 
@@ -99,7 +114,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void createProduct(ProductDTO dto) {
+    public void createProduct(ProductRequestDTO dto) {
 
         String type = dto.getType().trim();
 
@@ -120,37 +135,21 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public ProductEditView getProductEditView(Long id) {
+    public ProductRequestDTO getProductEditView(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
-        ProductImage productImage = product.getProductImage();
-
-        ProductImageContent productImageContent = productImageContentRepository.findByProductImage_Id(productImage.getId()).get(0);
-
-        ProductDTO dto = mapToDTO(product);
-
-        String base64Image = encodeBase64(productImageContent.getContent());
-
-        return new ProductEditView(dto, base64Image);
+        return ProductMapper.mapToRequest(product);
     }
 
-    private ProductDTO mapToDTO(Product entity) {
-        ProductDTO dto = new ProductDTO();
-        dto.setType(entity.getType());
-        dto.setDescription(entity.getDescription());
-        dto.setPrice(entity.getPrice());
-        dto.setActive(entity.getActive());
-        dto.setReturnable(entity.getReturnable());
-        return dto;
-    }
+
 
     private String encodeBase64(byte[] image) {
         return Base64.getEncoder().encodeToString(image);
     }
 
     @Transactional
-    public void updateProduct(ProductDTO dto) {
+    public void updateProduct(ProductRequestDTO dto) {
         Product product = productRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Product not found"));
 
@@ -160,7 +159,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    private void mapDtoToEntity(ProductDTO dto, Product product) {
+    private void mapDtoToEntity(ProductRequestDTO dto, Product product) {
         product.setType(dto.getType().trim());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
@@ -168,7 +167,7 @@ public class ProductService {
         product.setReturnable(dto.isReturnable());
     }
 
-    private void updateImageIfProvided(ProductDTO dto, Product product){
+    private void updateImageIfProvided(ProductRequestDTO dto, Product product){
         MultipartFile image = dto.getImage();
         if (image != null && !image.isEmpty()) {
             product.setProductImage(fileService.saveProductImage(image));

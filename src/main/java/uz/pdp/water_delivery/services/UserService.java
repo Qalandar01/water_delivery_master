@@ -7,16 +7,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
-import uz.pdp.water_delivery.model.dto.OperatorDTO;
-import uz.pdp.water_delivery.model.dto.request.UserDTO;
-import uz.pdp.water_delivery.model.dto.request.OperatorRequestDTO;
-import uz.pdp.water_delivery.model.dto.request.UpdateOperatorRequestDTO;
+import uz.pdp.water_delivery.model.records.operator.OperatorResponseDTO;
+import uz.pdp.water_delivery.model.dto.request.courier.CourierRequestDTO;
+import uz.pdp.water_delivery.model.dto.request.operator.OperatorRequestDTO;
+import uz.pdp.water_delivery.model.dto.request.operator.UpdateOperatorRequestDTO;
 import uz.pdp.water_delivery.model.entity.Role;
 import uz.pdp.water_delivery.model.entity.User;
 import uz.pdp.water_delivery.model.enums.RoleName;
 import uz.pdp.water_delivery.exception.DuplicatePhoneNumberException;
-import uz.pdp.water_delivery.repo.RoleRepository;
-import uz.pdp.water_delivery.repo.UserRepository;
+import uz.pdp.water_delivery.model.repo.RoleRepository;
+import uz.pdp.water_delivery.model.repo.UserRepository;
 import uz.pdp.water_delivery.utils.PhoneRepairUtil;
 
 import java.time.LocalDate;
@@ -40,12 +40,12 @@ public class UserService {
         return users.orElseGet(() -> userRepository.save(user));
     }
 
-    public User createOrUpdateUser(UserDTO userDTO) throws DuplicatePhoneNumberException {
-        String repairedPhone = PhoneRepairUtil.repair(userDTO.getPhone());
+    public User createOrUpdateUser(CourierRequestDTO courierRequestDTO) throws DuplicatePhoneNumberException {
+        String repairedPhone = PhoneRepairUtil.repair(courierRequestDTO.getPhone());
         Optional<User> existingUser = userRepository.findByPhone(repairedPhone);
         User user = existingUser.orElse(User.builder().build());
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
+        user.setFirstName(courierRequestDTO.getFirstName());
+        user.setLastName(courierRequestDTO.getLastName());
         user.setPhone(repairedPhone);
         Role role = roleRepository.findByRoleName(RoleName.ROLE_DELIVERY);
         if (role != null) {
@@ -98,9 +98,16 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
+    public UpdateOperatorRequestDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+        return UpdateOperatorRequestDTO.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
+                .active(user.getActive())
+                .paid(user.getPaid())
+                .build();
     }
 
     @Transactional
@@ -174,17 +181,17 @@ public class UserService {
         }
     }
 
-    public List<OperatorDTO> getOperatorsDto() {
+    public List<OperatorResponseDTO> getOperatorsDto() {
         List<User> users = getUsersByRole(RoleName.ROLE_OPERATOR);
 
         return users.stream()
-                .map(user -> OperatorDTO.builder()
-                        .id(user.getId())
-                        .firstName(user.getFirstName())
-                        .displayPhone(user.getDisplayPhone())
-                        .active(user.getActive())
-                        .build())
-                .toList();
+                .map(user -> new OperatorResponseDTO(
+                        user.getId(),
+                        user.getLastName(),
+                        user.getDisplayPhone(),
+                        user.getActive()
+                )).toList();
+
     }
 
 }
