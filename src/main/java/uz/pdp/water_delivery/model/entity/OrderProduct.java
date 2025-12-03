@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -32,9 +33,9 @@ public class OrderProduct {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private Integer bottleCount;
+    private Integer productCount;
 
-    private Integer priceAtPurchase; // Sotib olingan paytdagi narx
+    private Long priceAtPurchase; // Sotib olingan paytdagi narx
 
     private Integer discountAtPurchase; // Sotib olingan paytdagi chegirma
 
@@ -54,9 +55,9 @@ public class OrderProduct {
      * Mahsulotning umumiy narxini hisoblaydi
      * @return total price (so'mda)
      */
-    public Integer getTotalPrice() {
+    public Long getTotalPrice() {
         if (isOnSale()) {
-            return (amount - product.getSale_amount()) * product.getPrice();
+           return (amount - product.getSale_amount()) * product.getPrice();
         } else {
             return amount * product.getPrice();
         }

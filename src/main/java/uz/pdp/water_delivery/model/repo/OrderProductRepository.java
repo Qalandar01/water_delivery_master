@@ -6,6 +6,7 @@ import uz.pdp.water_delivery.model.entity.Order;
 import uz.pdp.water_delivery.model.entity.OrderProduct;
 import uz.pdp.water_delivery.model.entity.Product;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface OrderProductRepository extends JpaRepository<OrderProduct, Long> {
@@ -24,4 +25,6 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Long
             """, nativeQuery = true)
     List<Object[]> findOrderCountGroupedByProductNative();
 
+
+    List<OrderProduct> findAllByOrderId(Long orderId);
 }

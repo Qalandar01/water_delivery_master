@@ -35,6 +35,7 @@ public class Courier {
 
     private Boolean isActive = true;
 
+    @Builder.Default
     private Boolean isDeleted = false;
 
     @OneToOne
@@ -57,7 +58,7 @@ public class Courier {
     public String getFullName() {
         return String.format(
                 "🚗 Avto turi: %s<br>" +
-                        "🚘 Raqami: %s<br>" +
+                        "🚘 Raqami: %s</br>" +
                         "✅ Sig'imi: %s",
                 carType != null ? carType : "N/A",
                 carNumber != null ? carNumber : "N/A",

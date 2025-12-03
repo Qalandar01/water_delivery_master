@@ -23,7 +23,6 @@ public class BotController {
     private final BotService botService;
     private final TelegramBot telegramBot;
 
-    @Async
     public void handleUpdate(Update update) {
         try {
             updateHandlers.stream()

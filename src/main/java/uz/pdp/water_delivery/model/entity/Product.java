@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -27,7 +28,7 @@ public class Product {
     @Column(length = 512)
     private String description;
 
-    private Integer price;
+    private Long price;
 
     private Boolean active;
 

@@ -3,11 +3,15 @@ package uz.pdp.water_delivery.bot;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.DeleteMessage;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
-import uz.pdp.water_delivery.model.dto.Location;
-import uz.pdp.water_delivery.model.entity.*;
 import uz.pdp.water_delivery.entity.abs.AbsEntity;
+import uz.pdp.water_delivery.model.dto.Location;
+import uz.pdp.water_delivery.model.entity.Product;
+import uz.pdp.water_delivery.model.entity.User;
 import uz.pdp.water_delivery.model.enums.TelegramState;
 
 import java.text.NumberFormat;

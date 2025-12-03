@@ -738,7 +738,7 @@ public class BotService {
                         .append("🔢 Soni: <b>").append(orderProduct.getAmount()).append(" ta</b>\n");
 
                 if (orderProduct.isOnSale()) {
-                    int discountPrice = orderProduct.getProduct().getPrice() * orderProduct.getProduct().getSale_amount();
+                    Long discountPrice = orderProduct.getProduct().getPrice() * orderProduct.getProduct().getSale_amount();
                     messageBuilder.append("🔒 Chegirma: <b>").append(orderProduct.getProduct().getSale_amount()).append(" ta</b>\n");
                     messageBuilder.append("💰 Chegirma narxi: <b>").append(discountPrice).append(" so'm</b>\n");
                 } else {
@@ -788,7 +788,7 @@ public class BotService {
         for (Basket basket : baskets) {
             StringBuilder messageBuilder = new StringBuilder();
             int remainingAmount = basket.getAmount();
-            int finalTotalPrice = basket.getProduct().getPrice() * basket.getAmount();
+            Long finalTotalPrice = basket.getProduct().getPrice() * basket.getAmount();
 
             messageBuilder.append("🛒 Mahsulot: ")
                     .append("<b>").append(basket.getProduct().getType()).append("</b>\n")
@@ -801,7 +801,7 @@ public class BotService {
 
             if (basket.getProduct().getSale_active() && basket.getAmount() >= basket.getProduct().getSale_discount()) {
                 int giftAmount = basket.getProduct().getSale_amount();
-                int giftPrice = giftAmount * basket.getProduct().getPrice();
+                Long giftPrice = giftAmount * basket.getProduct().getPrice();
 
                 finalTotalPrice -= giftPrice;
 

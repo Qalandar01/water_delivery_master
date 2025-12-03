@@ -6,7 +6,7 @@ public record ProductResponseDTO(
         Long id,
         String type,
         String description,
-        Integer price,
+        Long price,
         Boolean active,
         Long orderCount,
         Boolean returnable,

@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import uz.pdp.water_delivery.model.dto.request.courier.CourierRequestDTO;
 import uz.pdp.water_delivery.model.entity.Courier;
+import uz.pdp.water_delivery.model.records.courier.CourierResponseDTO;
 import uz.pdp.water_delivery.services.CourierService;
 import uz.pdp.water_delivery.utils.LogErrorFile;
 
@@ -23,7 +24,8 @@ public class AdminCourierController {
 
     @GetMapping("/admin/couriers")
     public String couriers(Model model) {
-        model.addAttribute("couriers", courierService.getAllCouriersWithOrderStatus());
+        List<CourierResponseDTO> allCouriersWithOrderStatus = courierService.getAllCouriersWithOrderStatus();
+        model.addAttribute("couriers", allCouriersWithOrderStatus);
         return "admin/courier/couriers";
     }
 
