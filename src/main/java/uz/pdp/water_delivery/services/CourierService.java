@@ -17,6 +17,8 @@ import uz.pdp.water_delivery.model.enums.RoleName;
 import uz.pdp.water_delivery.model.repo.*;
 import uz.pdp.water_delivery.utils.PhoneRepairUtil;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -73,6 +75,7 @@ public class CourierService {
             user = new User();
             user.setPhone(phone);
             user.setPassword(null); // no password for courier
+            user.setRoles(new ArrayList<>());
         }
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());

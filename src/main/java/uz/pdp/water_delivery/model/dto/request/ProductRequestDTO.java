@@ -34,7 +34,7 @@ public class ProductRequestDTO {
 
     @NotNull(message = "Price must not be null")
     @Positive(message = "Price must be a positive number")
-    private Integer price;
+    private Long price;
 
     private boolean isReturnable;
 }

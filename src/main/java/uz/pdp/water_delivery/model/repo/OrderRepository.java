@@ -57,6 +57,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     boolean existsByTelegramUser(TelegramUser telegramUser);
 
 
-
-
+    List<Order> findAllByOrderStatusIn(List<OrderStatus> created);
 }

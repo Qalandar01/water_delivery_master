@@ -3,118 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Order Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        #map {
-            width: 100%;
-            height: 850px;
-        }
-
-        .row {
-            display: flex;
-        }
-
-        .col-3 {
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        #map { width:100%; height:850px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .my-row { display:flex; }
+        .col-left {
             flex: 0 0 15%;
             max-width: 25%;
             padding: 10px;
             border-right: 1px solid #ccc;
+            overflow-y: auto;
+            max-height: 900px;
+            background-color: white;
         }
-
-        .col-9 {
-            flex: 0 0 84%;
-            max-width: 85%;
-            padding: 20px;
-        }
-
-        .text-muted {
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-        }
-
+        .col-right { flex: 0 0 84%; max-width: 85%; padding: 20px; }
+        .text-muted { font-size:18px; font-weight:bold; text-align:center; color: #333; }
         .courier-card {
-            transition: background-color 0.3s ease;
-            margin-bottom: 5px;
+            transition: all .3s ease;
+            margin-bottom:5px;
+            cursor: pointer;
+            border-radius: 8px;
         }
-
-        .courier-card.show {
-            background-color: #d4edda; /* Success background */
+        .courier-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-
-        .courier-card.hide {
-            background-color: #f8d7da; /* Danger background */
+        .courier-card.selected {
+            border: 2px solid #198754;
+            background-color:#e6f7ec;
+            box-shadow: 0 4px 12px rgba(25,135,84,0.3);
         }
-
-        .toggle-visibility {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .courier-card a { text-decoration: none; color: inherit; }
+        .hide { display:none; }
+        .legend-item {
+            margin-bottom: 8px;
+            padding: 5px 10px;
+            background: white;
+            border-radius: 4px;
             font-size: 14px;
         }
-
-        .toggle-visibility i {
-            margin-right: 8px;
+        .route-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
+        .route-info h5 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
         #alert-message {
             position: fixed;
-            bottom: 20px;
+            top: 80px;
             right: 20px;
             z-index: 1000;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-        }
-
-        .courier-card.selected {
-            border: 2px solid #198754; /* green border */
-            background-color: #e6f7ec; /* light green background */
+            min-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
     </style>
 </head>
-
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" th:href="@{/}"><i class="fa-solid fa-home"></i> Home</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
 </nav>
 
-<div class="row">
-    <div class="col-3">
+<div class="my-row">
+    <div class="col-left">
         <h2 class="text-muted">Couriers</h2>
         <div th:each="courier : ${couriers}" class="mb-3">
-            <a th:href="|?courier=${courier.id}|">
-                <div th:class="|card courier-card ${courier.id.equals(currentCourier.id)? 'selected':''}|">
+            <a th:href="|?courier=${courier.id}|" style="text-decoration: none;">
+                <div th:class="|card courier-card ${courier.id.equals(currentCourier.id) ? 'selected':''}|">
                     <div class="card-body">
-                        <button class="btn btn-success"
-                                type="button">
+                        <button class="btn btn-success btn-sm" type="button">
                             <i class="bi bi-person"></i>
-                            <span th:text="${courier.user.firstName}"></span>
+                            <span th:text="${courier.fullName}">Name</span>
                         </button>
-                        <div class="courier-info m-2">
-                            <p th:utext="${courier.getFullName()}"></p>
+                        <div class="courier-info mt-2">
+                            <small th:text="${courier.fullName}">Full Name</small>
                         </div>
                     </div>
                 </div>
@@ -122,27 +92,40 @@
         </div>
     </div>
 
-    <div class="col-9">
-        <div class="row">
-            <div class="col-2">
-                <div class="">🟢 Bugun</div>
-                <div class="">🟠 Kecha</div>
-                <div class="">🔴 2 kun oldin</div>
+    <div class="col-right">
+        <div class="route-info">
+            <h5>📍 Current Route Plan</h5>
+            <div id="routeSummary">
+                <span class="text-muted">Click orders on map to build route...</span>
             </div>
-            <div class="col-3">
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-4">
+                <strong>Order Status Legend:</strong>
+                <div class="legend-item">🟢 Today's Orders</div>
+                <div class="legend-item">🟠 Yesterday's Orders</div>
+                <div class="legend-item">🔴 2+ Days Old</div>
+                <div class="legend-item">🟣 Selected for Route</div>
+                <div class="legend-item">⚫ Assigned to Other Courier</div>
+            </div>
+            <div class="col-4">
                 <label>
-                    <input checked type="checkbox" onchange="onChangeAll(this)"> show all
+                    <input id="showAllCheckbox" checked type="checkbox" onchange="onChangeAll(this)"> Show All Orders
                 </label>
-                <input type="text" placeholder="search..." onkeyup="handleSearchOrders(this)">
+                <input class="form-control mt-2" type="text" placeholder="Search by phone..." onkeyup="handleSearchOrders(this)">
             </div>
-            <div class="col-2 offset-5">
-                <form method="post" action="/operator/orders/assign" id="myForm">
+            <div class="col-2 offset-2">
+                <form method="post" action="/operator/orders/assign" id="assignForm">
                     <input type="hidden" name="orders" id="ordersInput">
                     <input type="hidden" name="courierId" th:value="${currentCourier.id}">
-                    <button class="btn btn-success"> Assign</button>
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i class="bi bi-check-circle"></i> Assign Orders
+                    </button>
                 </form>
             </div>
         </div>
+
         <div class="row">
             <div class="col-12">
                 <div id="map"></div>
@@ -151,417 +134,681 @@
     </div>
 </div>
 
-<div id="alert-message" class="alert alert-warning hide">
+<div id="alert-message" class="alert alert-warning alert-dismissible fade show hide" role="alert">
     <span id="alert-text"></span>
+    <button type="button" class="close" onclick="hideAlert()">
+        <span>&times;</span>
+    </button>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://api-maps.yandex.ru/2.1/?apikey=fadc504f-5c7e-4ec3-8862-cf391038453b&lang=en_US"></script>
+<script th:src="@{https://api-maps.yandex.ru/2.1/?apikey=${yandexMapsApiKey}&lang=en_US}"></script>
 
-<script th:inline="javascript">/*<![CDATA[*/
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Parse server data
+    var orders = JSON.parse(/*[[${ordersJson}]]*/ "[]");
+    var currentOrders = JSON.parse(/*[[${currentOrdersJson}]]*/ "[]");
+    var couriers = JSON.parse(/*[[${couriersJson}]]*/ "[]");
+    var company = JSON.parse(/*[[${companyJson}]]*/ "{}");
+    var currentCourier = JSON.parse(/*[[${currentCourierJson}]]*/ "{}");
 
-let orders = [
+    // Global variables
+    var map;
+    var placemarks = [];
+    var companyCoords = [company.latitude, company.longitude];
 
-]
-let currentOrders = /*[[${currentOrders}]]*/ [];
-let couriers = /*[[${couriers}]]*/ [];
-let company = /*[[${company}]]*/ [];
-let placemarks = [];
-const companyCoords = [company.latitude, company.longitude];
+    // In-memory storage (no localStorage)
+    var selectedIdsPerCourier = {};
+    var selectedPointsPerCourier = {};
 
-let currentCourier = /*[[${currentCourier}]]*/ [];
-let selectedIdsPerCourier = loadIdsFromLocalStorage();
-// let selectedIdsPerCourier = {}
-let selectedPointsPerCourier = loadPointsFromLocalStorage();
-// let selectedPointsPerCourier = {}
+    // Initialize data structures
+    function initializeData() {
+        // Initialize for all couriers
+        couriers.forEach(function(courier) {
+            var courierId = String(courier.id);
 
-// <-- Minimal change: only set defaults if not already present (don't overwrite saved data)
-if (!selectedIdsPerCourier[currentCourier.id] || selectedIdsPerCourier[currentCourier.id].length === 0) {
-    selectedIdsPerCourier[currentCourier.id] = ['company'];
-}
-if (!selectedPointsPerCourier[currentCourier.id] || selectedPointsPerCourier[currentCourier.id].length === 0) {
-    if (currentOrders.filter(item => item.courierId === currentCourier.id).length !== 0) {
-        let lastLocation = [currentOrders[currentOrders.length - 1].location.latitude, currentOrders[currentOrders.length - 1].location.longitude];
-        selectedPointsPerCourier[currentCourier.id] = [lastLocation];
-    } else {
-        selectedPointsPerCourier[currentCourier.id] = [companyCoords];
-    }
-}
-
-let map;
-ymaps.ready(initMap);
-
-
-function initMap() {
-    // Use [latitude, longitude]
-    map = new ymaps.Map('map', {
-        center: companyCoords,
-        zoom: 15,
-        type: "yandex#map"
-    });
-
-    const companyPlacemark = new ymaps.Placemark(
-        companyCoords,
-        {hintContent: 'Company'},
-        {
-            preset: 'islands#blueHomeIcon',
-            iconColor: "blue",
-            cursor: 'pointer'
-        }
-    );
-
-    let polyline = null;
-
-    // === Clicking company: reset everything ===
-    companyPlacemark.events.add('click', function () {
-        if (currentOrders.filter(item => item.courierId === currentCourier.id).length > 0) return;
-        if (polyline) {
-            map.geoObjects.remove(polyline);
-            polyline = null;
-        }
-
-        // optional UX niceties:
-        map.setCenter(companyCoords);
-        if (map.balloon) map.balloon.close();
-    });
-
-    orders.forEach(order => {
-        const lat = order[0];
-        const lon = order[1]
-        if (lat == null || lon == null) return;
-
-        // keep these for later use if you want
-        order.latitude = lat;
-        order.longitude = lon;
-
-        const color = getOrderColor(order);
-        const placemark = new ymaps.Placemark(
-            [lat, lon],
-            {
-                hintContent: buildHint(order) + (order.status==="ASSIGNED" ?`
-            <form action="/operator/orders/unassign" method="post" id="unassign_form">
-                <input type="hidden" value="${order.id}" name="orderId">
-                 <button class="btn btn-danger" >
-                    🚚 Release
-                 </button>
-            </form>
-            `:'')
-            },
-            {
-                preset: 'islands#icon',
-                iconColor: color,
-                cursor: 'pointer'
-            }
-        );
-
-        placemark.events.add('click', function () {
-            if (order.status === "ASSIGNED") {
-                let co = currentOrders.filter(item => item.courierId === currentCourier.id);
-                if (co.length > 0) {
-                    let last = co[co.length - 1];
-                    if (last.orderId === order.id) {
-                        selectedIdsPerCourier[currentCourier.id] = ['company'];
-                        let currentLocation = [last.location.latitude, last.location.longitude];
-                        selectedPointsPerCourier[currentCourier.id] = [currentLocation];
-                        polyline.geometry.setCoordinates(selectedPointsPerCourier[currentCourier.id]);
-                        saveData();
-                    }
-                }
-                return;
-            }
-            const point = [lat, lon];
-            const id = order.id;
-            const existingIndex = selectedIdsPerCourier[currentCourier.id].indexOf(id);
-
-            if (existingIndex !== -1) {
-                // rollback (but never remove the first company point)
-                selectedPointsPerCourier[currentCourier.id] =
-                    selectedPointsPerCourier[currentCourier.id].slice(0, existingIndex + 1);
-                selectedIdsPerCourier[currentCourier.id] =
-                    selectedIdsPerCourier[currentCourier.id].slice(0, existingIndex + 1);
-                saveData()
-            } else {
-                if (Object.values(selectedIdsPerCourier).flat().filter(item => item === order.id).length > 0) {
-                    return;
-                }
-                // add new point after last
-                selectedPointsPerCourier[currentCourier.id].push(point);
-                selectedIdsPerCourier[currentCourier.id].push(id);
+            if (!selectedIdsPerCourier[courierId]) {
+                selectedIdsPerCourier[courierId] = ['company'];
             }
 
-            // draw or update polyline, or remove if only 1 point left
-            if (selectedPointsPerCourier[currentCourier.id].length >= 2) {
-                if (polyline) {
-                    polyline.geometry.setCoordinates(selectedPointsPerCourier[currentCourier.id]);
+            if (!selectedPointsPerCourier[courierId]) {
+                var assignedOrders = currentOrders.filter(function(item) {
+                    return item.courierId === courier.id;
+                });
+
+                if (assignedOrders.length > 0) {
+                    var lastOrder = assignedOrders[assignedOrders.length - 1];
+                    selectedPointsPerCourier[courierId] = [
+                        [lastOrder.location.latitude, lastOrder.location.longitude]
+                    ];
                 } else {
-                    polyline = new ymaps.Polyline(
-                        selectedPointsPerCourier[currentCourier.id],
-                        {},
-                        {
-                            strokeColor: "#0000FF",
-                            strokeWidth: 7,
-                            strokeOpacity: 0.8
-                        }
-                    );
-                    map.geoObjects.add(polyline);
-                }
-            } else {
-                if (polyline) {
-                    map.geoObjects.remove(polyline);
-                    polyline = null;
+                    selectedPointsPerCourier[courierId] = [companyCoords];
                 }
             }
+        });
+    }
 
-            saveData()
+    // Initialize map
+    ymaps.ready(function() {
+        initializeData();
+        initMap();
+    });
+
+    function initMap() {
+        map = new ymaps.Map('map', {
+            center: companyCoords,
+            zoom: 13,
+            controls: ['zoomControl', 'fullscreenControl']
         });
 
-        placemarks.push({placemark, orderId: order.id});
-        map.geoObjects.add(placemark);
-    });
+        var companyPlacemark = new ymaps.Placemark(companyCoords, {
+            hintContent: 'Company Location - Click to reset route'
+        }, {
+            preset: 'islands#blueHomeIcon',
+            iconColor: 'blue',
+            cursor: 'pointer'
+        });
 
-    map.geoObjects.add(companyPlacemark);
-    companyPlacemark.events.add('click', function () {
-        selectedIdsPerCourier[currentCourier.id] = ['company'];
-        if (currentOrders.filter(item => item.courierId === currentCourier.id).length === 0)
-            selectedPointsPerCourier[currentCourier.id] = [companyCoords];
-        saveData();
-    })
+        map.geoObjects.add(companyPlacemark);
 
-    // === draw saved polyline on refresh ===
-
-
-    for (let courier of couriers) {
-        if (courier.id !== currentCourier.id) {
-            debugger;
-            let locations = [companyCoords];
-            currentOrders.filter(item => item.courierId === courier.id).forEach(item => {
-                locations.push([item.location.latitude, item.location.longitude])
+        // ✅ COMPANY CLICK: Reset/Undraw entire route
+        companyPlacemark.events.add('click', function() {
+            var assignedForCurrent = currentOrders.filter(function(item) {
+                return item.courierId === currentCourier.id;
             });
-            let p;
-            let arr = [...locations];
-            if (selectedPointsPerCourier[courier.id]) {
-                arr = [...arr, ...selectedPointsPerCourier[courier.id]];
+
+            var key = String(currentCourier.id);
+
+            // If courier has assigned orders, reset to last assigned position
+            if (assignedForCurrent.length > 0) {
+                var lastOrder = assignedForCurrent[assignedForCurrent.length - 1];
+                selectedIdsPerCourier[key] = ['company'];
+                selectedPointsPerCourier[key] = [
+                    [lastOrder.location.latitude, lastOrder.location.longitude]
+                ];
+                showAlert('🔄 Route reset to last assigned order');
+            } else {
+                // No assigned orders, reset to company
+                selectedIdsPerCourier[key] = ['company'];
+                selectedPointsPerCourier[key] = [companyCoords];
+                showAlert('🔄 Route completely reset');
             }
-            if (
-                arr.length >= 2
-            ) {
-                p = new ymaps.Polyline(
-                    arr,
-                    {},
-                    {
-                        strokeColor: "rgba(0,0,0,0.35)",
-                        strokeWidth: 7,
-                        strokeOpacity: 0.8
-                    }
-                );
-                p.events.add("click", function (e) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set("courier", courier.id); // replace courier param
-                    window.location.href = url.toString();
-                });
-                map.geoObjects.add(p);
-            }
-        }
+
+            reRenderMap();
+        });
+
+        renderOrders();
+        renderOtherCouriersPolylines();
+        renderCurrentCourierPolyline();
+        renderAssignedOrdersLine();
     }
 
-    if (selectedPointsPerCourier[currentCourier.id]
-        && selectedPointsPerCourier[currentCourier.id].length >= 2) {
-        polyline = new ymaps.Polyline(
-            selectedPointsPerCourier[currentCourier.id],
-            {},
-            {
-                strokeColor: "#0000FF",
+    function renderOrders() {
+        // Remove existing order placemarks
+        placemarks.forEach(function(p) {
+            try {
+                map.geoObjects.remove(p.placemark);
+            } catch(e) {
+                console.error('Error removing placemark:', e);
+            }
+        });
+        placemarks = [];
+
+        orders.forEach(function(order) {
+            var lat = order.location && order.location.latitude;
+            var lon = order.location && order.location.longitude;
+
+            if (!lat || !lon) {
+                console.warn('Order missing location:', order.id);
+                return;
+            }
+
+            var color = getOrderColor(order);
+            var hint = buildHint(order);
+
+            if (order.status === 'ASSIGNED') {
+                hint += buildUnassignButton(order.id);
+            }
+
+            // ✅ Check if order is in current courier's planned route
+            var key = String(currentCourier.id);
+            var isInCurrentRoute = selectedIdsPerCourier[key] &&
+                selectedIdsPerCourier[key].indexOf(order.id) !== -1;
+
+            // ✅ Visual styling based on order state
+            var iconPreset = 'islands#icon';
+            var strokeWidth = 2;
+            var strokeColor = '#FFFFFF';
+
+            if (order.status === 'ASSIGNED') {
+                // Assigned orders - show with border
+                iconPreset = 'islands#circleDotIcon';
+                strokeWidth = 3;
+                strokeColor = '#333333';
+            } else if (isInCurrentRoute) {
+                // Orders in current route - highlighted
+                iconPreset = 'islands#circleIcon';
+                strokeWidth = 3;
+                strokeColor = '#0066FF';
+            }
+
+            var placemark = new ymaps.Placemark([lat, lon], {
+                hintContent: hint
+            }, {
+                preset: iconPreset,
+                iconColor: color,
+                cursor: 'pointer',
+                strokeWidth: strokeWidth,
+                strokeColor: strokeColor
+            });
+
+            placemark.events.add('click', function() {
+                handlePlacemarkClick(order, lat, lon);
+            });
+
+            placemarks.push({
+                placemark: placemark,
+                orderId: order.id
+            });
+
+            map.geoObjects.add(placemark);
+        });
+    }
+
+    function handlePlacemarkClick(order, lat, lon) {
+        var key = String(currentCourier.id);
+        var orderId = order.id;
+        var point = [lat, lon];
+
+        // Handle ASSIGNED orders (already saved to database)
+        if (order.status === 'ASSIGNED') {
+            var assignedOrders = currentOrders.filter(function(item) {
+                return item.courierId === currentCourier.id;
+            });
+
+            if (assignedOrders.length > 0) {
+                var lastOrder = assignedOrders[assignedOrders.length - 1];
+                if (lastOrder.orderId === order.id) {
+                    selectedIdsPerCourier[key] = ['company'];
+                    selectedPointsPerCourier[key] = [
+                        [lastOrder.location.latitude, lastOrder.location.longitude]
+                    ];
+                    reRenderMap();
+                    showAlert('Start planning route from the last assigned order');
+                } else {
+                    showAlert('Can only modify route from the last assigned order');
+                }
+            }
+            return;
+        }
+
+        // Check if order already assigned to another courier (in planning)
+        var assignedToOther = false;
+        for (var courierId in selectedIdsPerCourier) {
+            if (courierId !== key && selectedIdsPerCourier[courierId].indexOf(orderId) !== -1) {
+                assignedToOther = true;
+                break;
+            }
+        }
+
+        if (assignedToOther) {
+            showAlert('This order is already assigned to another courier');
+            return;
+        }
+
+        // Check if order is already in current courier's route
+        var existingIndex = selectedIdsPerCourier[key].indexOf(orderId);
+
+        if (existingIndex !== -1) {
+            // ✅ UNDRAW: Clicking an already selected order removes it and all after it
+            console.log('🔙 Undrawing from order #' + orderId + ' (index: ' + existingIndex + ')');
+
+            // Keep only points up to (and including) the clicked order
+            selectedPointsPerCourier[key] = selectedPointsPerCourier[key].slice(0, existingIndex + 1);
+            selectedIdsPerCourier[key] = selectedIdsPerCourier[key].slice(0, existingIndex + 1);
+
+            showAlert('Route trimmed to Order #' + orderId);
+        } else {
+            // ✅ DRAW: Add new order to route
+            console.log('➕ Adding order #' + orderId + ' to route');
+            selectedPointsPerCourier[key].push(point);
+            selectedIdsPerCourier[key].push(orderId);
+
+            var routeLength = selectedIdsPerCourier[key].length - 1; // -1 for 'company'
+            showAlert('Added Order #' + orderId + ' (Total: ' + routeLength + ' orders)');
+        }
+
+        reRenderMap();
+    }
+
+    function renderOtherCouriersPolylines() {
+        couriers.forEach(function(courier) {
+            if (courier.id === currentCourier.id) return;
+
+            var locations = [companyCoords];
+            var courierId = String(courier.id);
+
+            // Add assigned orders
+            currentOrders.filter(function(item) {
+                return item.courierId === courier.id;
+            }).forEach(function(item) {
+                locations.push([item.location.latitude, item.location.longitude]);
+            });
+
+            // Add selected points
+            if (selectedPointsPerCourier[courierId]) {
+                locations = locations.concat(selectedPointsPerCourier[courierId]);
+            }
+
+            if (locations.length >= 2) {
+                var polyline = new ymaps.Polyline(locations, {
+                    hintContent: 'Route for ' + courier.firstName
+                }, {
+                    strokeColor: 'rgba(128,128,128,0.5)',
+                    strokeWidth: 5,
+                    strokeOpacity: 0.7
+                });
+
+                polyline.events.add('click', function() {
+                    window.location.href = '?courier=' + courier.id;
+                });
+
+                map.geoObjects.add(polyline);
+            }
+        });
+    }
+
+    function renderCurrentCourierPolyline() {
+        var key = String(currentCourier.id);
+        var points = selectedPointsPerCourier[key];
+
+        if (points && points.length >= 2) {
+            var polyline = new ymaps.Polyline(points, {
+                hintContent: 'Planned route for ' + currentCourier.firstName
+            }, {
+                strokeColor: '#0000FF',
                 strokeWidth: 7,
                 strokeOpacity: 0.8
+            });
+            map.geoObjects.add(polyline);
+        }
+    }
+
+    function renderAssignedOrdersLine() {
+        var locations = [companyCoords];
+
+        var assignedOrders = currentOrders.filter(function(item) {
+            return item.courierId === currentCourier.id;
+        });
+
+        assignedOrders.forEach(function(order) {
+            locations.push([order.location.latitude, order.location.longitude]);
+        });
+
+        if (locations.length >= 2) {
+            var polyline = new ymaps.Polyline(locations, {
+                hintContent: 'Assigned orders for ' + currentCourier.firstName
+            }, {
+                strokeColor: '#00FF00',
+                strokeWidth: 7,
+                strokeOpacity: 0.8
+            });
+            map.geoObjects.add(polyline);
+        }
+    }
+
+    function reRenderMap() {
+        map.geoObjects.removeAll();
+
+        // Re-add company marker with click handler
+        var companyPlacemark = new ymaps.Placemark(companyCoords, {
+            hintContent: 'Company Location - Click to reset route'
+        }, {
+            preset: 'islands#blueHomeIcon',
+            iconColor: 'blue',
+            cursor: 'pointer'
+        });
+
+        companyPlacemark.events.add('click', function() {
+            var assignedForCurrent = currentOrders.filter(function(item) {
+                return item.courierId === currentCourier.id;
+            });
+
+            var key = String(currentCourier.id);
+
+            if (assignedForCurrent.length > 0) {
+                var lastOrder = assignedForCurrent[assignedForCurrent.length - 1];
+                selectedIdsPerCourier[key] = ['company'];
+                selectedPointsPerCourier[key] = [
+                    [lastOrder.location.latitude, lastOrder.location.longitude]
+                ];
+                showAlert('🔄 Route reset to last assigned order');
+            } else {
+                selectedIdsPerCourier[key] = ['company'];
+                selectedPointsPerCourier[key] = [companyCoords];
+                showAlert('🔄 Route completely reset');
             }
-        );
-        map.geoObjects.add(polyline);
+
+            reRenderMap();
+        });
+
+        map.geoObjects.add(companyPlacemark);
+
+        renderOrders();
+        renderOtherCouriersPolylines();
+        renderCurrentCourierPolyline();
+        renderAssignedOrdersLine();
+
+        // ✅ Show route sequence numbers
+        renderRouteNumbers();
     }
 
-    let locationsOfAssignedOrders = [companyCoords]
-    let arr = currentOrders.filter(item => item.courierId === currentCourier.id);
-    for (let currentOrder of arr) {
-        locationsOfAssignedOrders.push([currentOrder.location.latitude, currentOrder.location.longitude])
-    }
-    let assignedOrderLines = new ymaps.Polyline(
-        locationsOfAssignedOrders,
-        {},
-        {
-            strokeColor: "#11ff00",
-            strokeWidth: 7,
-            strokeOpacity: 0.8
-        }
-    );
-    map.geoObjects.add(assignedOrderLines);
+    /**
+     * ✅ NEW: Show numbers on orders in the planned route
+     */
+    function renderRouteNumbers() {
+        var key = String(currentCourier.id);
+        var routeIds = selectedIdsPerCourier[key] || [];
 
-}
+        routeIds.forEach(function(orderId, index) {
+            if (orderId === 'company') return; // Skip company
 
+            var order = orders.find(function(o) { return o.id === orderId; });
+            if (!order || !order.location) return;
 
-function getOrderColor(order) {
-    if (selectedIdsPerCourier[currentCourier.id].filter(item => item === order.id).length === 0
-        &&
-        Object.values(selectedIdsPerCourier).flat().filter(item => item === order.id).length > 0)
-        return "gray";
-    let orderDate = order.day;
-    const today = new Date().toISOString().split('T')[0];
-    const yesterday = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0];
+            var sequenceNumber = index; // 0-based, but company is 0, so first order is 1
 
-    if (orderDate === today) return 'green';
-    if (orderDate === yesterday) return 'orange';
-    return 'red';
-}
-
-
-function saveData() {
-    localStorage.setItem("ids", JSON.stringify(selectedIdsPerCourier));
-    localStorage.setItem("points", JSON.stringify(selectedPointsPerCourier));
-}
-
-function loadPointsFromLocalStorage() {
-    let data = localStorage.getItem("points");
-    if (data) {
-        return JSON.parse(data);
-    } else {
-        let obj = {};
-        // company is the first fixed point
-        let co = currentOrders.filter(item => item.courierId === currentCourier.id);
-        if (co.length > 0) {
-            let last = co[co.length - 1];
-            let lastL = [last.location.latitude, last.location.longitude];
-            obj[currentCourier.id] = [lastL];
-        } else {
-            obj[currentCourier.id] = [companyCoords];
-        }
-        return obj;
-    }
-}
-
-function loadIdsFromLocalStorage() {
-    let data = localStorage.getItem("ids");
-    if (data) {
-        return JSON.parse(data);
-    } else {
-        let obj = {};
-        // keep 'company' as a symbolic id for first point
-        obj[currentCourier.id] = ['company'];
-        return obj;
-    }
-}
-
-function onChangeAll(element) {
-    let checked = element.checked;
-    placemarks.forEach(pm => map.geoObjects.remove(pm.placemark));
-    if (checked) {
-        placemarks.forEach(pm => map.geoObjects.add(pm.placemark));
-    } else {
-        for (let p of placemarks) {
-            let placemark = p.placemark;
-            let order = orders.filter(item => item.id === p.orderId)[0];
-            let allOrderIdsGivenToCourier = Object.values(selectedIdsPerCourier).flat();
-            if (
-                selectedIdsPerCourier[currentCourier.id].filter(item => item === order.id).length > 0
-                ||
-                allOrderIdsGivenToCourier.filter(item => item === order.id).length === 0
-
-            ) {
-                if (order.status === 'ASSIGNED' && currentOrders.filter(item => item.orderId === order.id && item.courierId !== currentCourier.id).length > 0) {
-                    continue;
+            var numberPlacemark = new ymaps.Placemark(
+                [order.location.latitude, order.location.longitude],
+                {
+                    iconContent: String(sequenceNumber)
+                },
+                {
+                    preset: 'islands#blueStretchyIcon',
+                    cursor: 'pointer'
                 }
-                map.geoObjects.add(placemark);
+            );
+
+            numberPlacemark.events.add('click', function() {
+                handlePlacemarkClick(order, order.location.latitude, order.location.longitude);
+            });
+
+            map.geoObjects.add(numberPlacemark);
+        });
+
+        // Update route summary panel
+        updateRouteSummary();
+    }
+
+    /**
+     * ✅ NEW: Update the route summary panel
+     */
+    function updateRouteSummary() {
+        var key = String(currentCourier.id);
+        var routeIds = selectedIdsPerCourier[key] || [];
+        var summaryDiv = document.getElementById('routeSummary');
+
+        if (!summaryDiv) return;
+
+        // Filter out 'company' from route
+        var orderIds = routeIds.filter(function(id) { return id !== 'company'; });
+
+        if (orderIds.length === 0) {
+            summaryDiv.innerHTML = '<span class="text-muted">Click orders on map to build route...</span>';
+            return;
+        }
+
+        var summaryHtml = '<strong>Route: </strong>';
+        summaryHtml += '<span class="badge badge-info">Company</span> → ';
+
+        orderIds.forEach(function(orderId, index) {
+            var order = orders.find(function(o) { return o.id === orderId; });
+            if (order) {
+                summaryHtml += '<span class="badge badge-primary" style="cursor:pointer;" onclick="highlightOrder(' + orderId + ')">';
+                summaryHtml += (index + 1) + '. Order #' + orderId + '</span>';
+                if (index < orderIds.length - 1) {
+                    summaryHtml += ' → ';
+                }
             }
+        });
+
+        summaryHtml += '<br><small class="text-muted mt-2 d-block">Total: ' + orderIds.length + ' order(s) • Click order numbers to remove</small>';
+
+        summaryDiv.innerHTML = summaryHtml;
+    }
+
+    /**
+     * ✅ NEW: Highlight an order on the map
+     */
+    function highlightOrder(orderId) {
+        var pm = placemarks.find(function(p) { return p.orderId === orderId; });
+        if (pm && pm.placemark) {
+            map.setCenter(pm.placemark.geometry.getCoordinates(), 16);
+            pm.placemark.balloon.open();
         }
     }
 
-}
+    function getOrderColor(order) {
+        var key = String(currentCourier.id);
+        var orderId = order.id;
 
-function buildHint(order) {
-    const productsHtml = order.products
-        .map(
-            (p) => `
-        <li>
-            <span class="product-name">${p.name}</span>
-            <span class="product-amount">x${p.amount}</span>
-        </li>`
-        )
-        .join("");
+        // ✅ GRAY: Check if assigned to another courier (database assigned)
+        if (order.status === 'ASSIGNED' && order.courierId !== currentCourier.id) {
+            var assignedToCurrentCourier = currentOrders.some(function(co) {
+                return co.orderId === orderId && co.courierId === currentCourier.id;
+            });
+            if (!assignedToCurrentCourier) {
+                return 'gray';
+            }
+        }
 
-    return `
-    <div style="
-      font-family: Arial, sans-serif;
-      font-size: 12px;
-      line-height: 1.4;
-      padding: 6px 8px;
-      max-width: 220px;
-    ">
-      <div style="
-        font-weight: bold;
-        font-size: 13px;
-        margin-bottom: 4px;
-        color: #2c3e50;
-      ">
-        🆔 Order #${order.id}
-      </div>
+        // ✅ GRAY: Check if assigned to another courier (in planning)
+        var assignedToOther = false;
+        for (var courierId in selectedIdsPerCourier) {
+            if (courierId !== key && selectedIdsPerCourier[courierId].indexOf(orderId) !== -1) {
+                assignedToOther = true;
+                break;
+            }
+        }
 
-      <div style="color: #555; margin-bottom: 2px;">
-        📅 ${order.date}
-      </div>
-      <div style="color: #555; margin-bottom: 6px;">
-        📞 ${order.phone}
-      </div>
+        if (assignedToOther) {
+            return 'gray';
+        }
 
-      <ul style="
-        margin: 0 0 8px 0;
-        padding-left: 16px;
-        color: #333;
-      ">
-        ${productsHtml}
-      </ul>
-    </div>
-  `;
-}
+        // ✅ PURPLE: In current courier's planned route (not yet saved)
+        if (selectedIdsPerCourier[key] && selectedIdsPerCourier[key].indexOf(orderId) !== -1) {
+            return 'violet';
+        }
 
+        // ✅ Date-based colors for available orders
+        var orderDate = order.day;
+        var today = new Date().toISOString().split('T')[0];
+        var yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        yesterday = yesterday.toISOString().split('T')[0];
 
-function handleSearchOrders(element) {
-    let val = element.value;
-    resetPlaceMarkStyles();
-    if (!val) {
-        return;
+        if (orderDate === today) return 'green';
+        if (orderDate === yesterday) return 'orange';
+        return 'red';
     }
-    let filteredOrders = orders.filter(item => item.phone.includes(val));
-    let orderId = null;
-    if (filteredOrders.length > 0) {
-        orderId = filteredOrders[0].id
-        let placemark = placemarks.filter(item => item.orderId === orderId)[0].placemark;
-        map.setCenter(placemark.geometry.getCoordinates(), 15);
-        placemark.options.set({preset: 'islands#redCircleDotIcon'});
+
+    function buildHint(order) {
+        var productsHtml = '';
+        if (order.products && order.products.length > 0) {
+            productsHtml = order.products.map(function(p) {
+                return '<li><span>' + p.name + '</span> x' + p.amount + '</li>';
+            }).join('');
+        }
+
+        return '<div style="font-family:Arial;font-size:12px;padding:8px;max-width:250px;">' +
+            '<div style="font-weight:bold;margin-bottom:4px;">🆔 Order #' + order.id + '</div>' +
+            '<div style="margin-bottom:2px;">📅 ' + formatDate(order.date) + '</div>' +
+            '<div style="margin-bottom:6px;">📞 ' + order.phone + '</div>' +
+            '<ul style="margin:0;padding-left:20px;">' + productsHtml + '</ul>' +
+            '</div>';
     }
-}
 
-function resetPlaceMarkStyles() {
-    for (let placemark of placemarks) {
-        let p = placemark.placemark;
-        p.options.set({preset: 'islands#icon'});
+    function buildUnassignButton(orderId) {
+        return '<form action="/operator/orders/unassign" method="post" class="unassign-form" style="margin-top:8px;">' +
+            '<input type="hidden" name="orderId" value="' + orderId + '">' +
+            '<button type="submit" class="btn btn-danger btn-sm">🚚 Release Order</button>' +
+            '</form>';
     }
-}
 
+    function formatDate(dateStr) {
+        if (!dateStr) return 'N/A';
+        var d = new Date(dateStr);
+        return d.toLocaleString();
+    }
 
-document.getElementById("myForm").addEventListener("submit", function () {
-    let sendingOrdersToAssign = selectedIdsPerCourier[currentCourier.id];
-    document.getElementById("ordersInput").value = JSON.stringify(sendingOrdersToAssign.slice(1));
-    localStorage.removeItem("ids");
-    localStorage.removeItem("points");
-});
+    function onChangeAll(checkbox) {
+        var showAll = checkbox.checked;
 
+        placemarks.forEach(function(pm) {
+            try {
+                map.geoObjects.remove(pm.placemark);
+            } catch(e) {}
+        });
 
-document.getElementById("unassign_form").addEventListener("submit", function () {
-    localStorage.removeItem("ids");
-    localStorage.removeItem("points");
-});
+        if (showAll) {
+            placemarks.forEach(function(pm) {
+                map.geoObjects.add(pm.placemark);
+            });
+        } else {
+            var key = String(currentCourier.id);
 
+            placemarks.forEach(function(pm) {
+                var order = orders.find(function(o) {
+                    return o.id === pm.orderId;
+                });
 
+                if (!order) return;
+
+                var selectedByCurrent = selectedIdsPerCourier[key].indexOf(order.id) !== -1;
+                var notAssignedToAnyone = true;
+
+                for (var courierId in selectedIdsPerCourier) {
+                    if (selectedIdsPerCourier[courierId].indexOf(order.id) !== -1) {
+                        notAssignedToAnyone = false;
+                        break;
+                    }
+                }
+
+                if (selectedByCurrent || notAssignedToAnyone) {
+                    if (order.status === 'ASSIGNED') {
+                        var assignedToOther = currentOrders.some(function(co) {
+                            return co.orderId === order.id && co.courierId !== currentCourier.id;
+                        });
+                        if (assignedToOther) return;
+                    }
+                    map.geoObjects.add(pm.placemark);
+                }
+            });
+        }
+    }
+
+    function handleSearchOrders(input) {
+        var searchValue = input.value.trim();
+        resetPlacemarkStyles();
+
+        if (!searchValue) return;
+
+        var foundOrders = orders.filter(function(order) {
+            return order.phone && order.phone.includes(searchValue);
+        });
+
+        if (foundOrders.length > 0) {
+            var orderId = foundOrders[0].id;
+            var pm = placemarks.find(function(p) {
+                return p.orderId === orderId;
+            });
+
+            if (pm && pm.placemark) {
+                var coords = pm.placemark.geometry.getCoordinates();
+                map.setCenter(coords, 16);
+                pm.placemark.options.set({preset: 'islands#redCircleDotIcon'});
+            }
+        } else {
+            showAlert('No orders found with phone: ' + searchValue);
+        }
+    }
+
+    function resetPlacemarkStyles() {
+        placemarks.forEach(function(pm) {
+            pm.placemark.options.set({preset: 'islands#icon'});
+        });
+    }
+
+    function showAlert(message) {
+        var alertDiv = document.getElementById('alert-message');
+        var alertText = document.getElementById('alert-text');
+        alertText.textContent = message;
+        alertDiv.classList.remove('hide');
+
+        setTimeout(function() {
+            hideAlert();
+        }, 5000);
+    }
+
+    function hideAlert() {
+        document.getElementById('alert-message').classList.add('hide');
+    }
+
+    // Form submission handler
+    document.getElementById('assignForm').addEventListener('submit', function(e) {
+        var key = String(currentCourier.id);
+        var orderIds = selectedIdsPerCourier[key].slice(1); // Remove 'company'
+
+        if (orderIds.length === 0) {
+            e.preventDefault();
+            showAlert('Please select at least one order to assign');
+            return false;
+        }
+
+        document.getElementById('ordersInput').value = JSON.stringify(orderIds);
+        return true;
+    });
+
+    // Handle unassign form submissions (delegated)
+    document.addEventListener('submit', function(e) {
+        if (e.target && e.target.classList.contains('unassign-form')) {
+            // Reset data on unassign
+            initializeData();
+        }
+    });
+
+    // Debug logging
+    console.log('=== MAP INITIALIZATION DEBUG ===');
+    console.log('Total orders loaded:', orders.length);
+    console.log('Total couriers:', couriers.length);
+    console.log('Current courier:', currentCourier.firstName, '(ID:', currentCourier.id + ')');
+    console.log('Currently assigned orders:', currentOrders.length);
+
+    // Log order statuses
+    var statusCount = {};
+    orders.forEach(function(order) {
+        statusCount[order.status] = (statusCount[order.status] || 0) + 1;
+    });
+    console.log('Orders by status:', statusCount);
+
+    // Log orders with missing locations
+    var noLocation = orders.filter(function(o) {
+        return !o.location || !o.location.latitude || !o.location.longitude;
+    });
+    if (noLocation.length > 0) {
+        console.warn('⚠️ Orders missing location data:', noLocation.length);
+        noLocation.forEach(function(o) {
+            console.warn('  - Order #' + o.id + ' has no location');
+        });
+    }
+
+    // Log placemarks added to map
+    console.log('Placemarks added to map:', placemarks.length);
+    console.log('================================');
+    /*]]>*/
 </script>
-
 </body>
 </html>

@@ -142,7 +142,7 @@
         <i class="fas fa-exclamation-circle"></i> <span th:text="${errorMessage}"></span>
     </div>
 
-    <form th:action="@{/admin/couriers/save}" th:object="${courierRequestDTO}" method="post">
+    <form th:action="@{/admin/couriers/save}" th:object="${courierDTO}" method="post">
         <div class="form-group">
             <i class="fas fa-user"></i>
             <label for="firstName">Ismi</label>
@@ -171,9 +171,9 @@
         <div class="form-group">
             <i class="fas fa-user-tag"></i>
             <label for="courierStatus">Kuryer Statusi</label>
-            <select class="form-control" id="courierStatus" th:field="*{isActive}">
-                <option value="ACTIVE" >Faol</option>
-                <option value="INACTIVE">Faol emas</option>
+            <select class="form-control" id="courierStatus" th:field="*{active}">
+                <option value="true" >Faol</option>
+                <option value="false">Faol emas</option>
             </select>
         </div>
         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Saqlash</button>

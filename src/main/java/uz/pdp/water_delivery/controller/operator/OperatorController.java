@@ -1,5 +1,9 @@
 package uz.pdp.water_delivery.controller.operator;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -8,19 +12,19 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
+import uz.pdp.water_delivery.exception.CourierNotFoundException;
+import uz.pdp.water_delivery.exception.OrderNotFoundException;
+import uz.pdp.water_delivery.exception.TelegramUserNotFoundException;
+import uz.pdp.water_delivery.exception.UserDeletionException;
 import uz.pdp.water_delivery.model.dto.OrdersPageData;
 import uz.pdp.water_delivery.model.dto.UpdateOrderPageDTO;
 import uz.pdp.water_delivery.model.dto.VerifyUserDTO;
 import uz.pdp.water_delivery.model.entity.Courier;
 import uz.pdp.water_delivery.model.entity.Order;
 import uz.pdp.water_delivery.model.enums.OrderStatus;
-import uz.pdp.water_delivery.exception.CourierNotFoundException;
-import uz.pdp.water_delivery.exception.OrderNotFoundException;
-import uz.pdp.water_delivery.exception.TelegramUserNotFoundException;
-import uz.pdp.water_delivery.exception.UserDeletionException;
-import uz.pdp.water_delivery.projection.SimpleWaitingUser;
 import uz.pdp.water_delivery.model.repo.CourierRepository;
 import uz.pdp.water_delivery.model.repo.TelegramUserRepository;
+import uz.pdp.water_delivery.projection.SimpleWaitingUser;
 import uz.pdp.water_delivery.services.OperatorService;
 import uz.pdp.water_delivery.services.OrderService;
 import uz.pdp.water_delivery.services.TelegramUserService;
@@ -40,6 +44,7 @@ public class OperatorController {
     private final OperatorService operatorService;
     private final TelegramUserService telegramUserService;
     private final OrderService orderService;
+    private final ObjectMapper jacksonObjectMapper;
 
     public String ApiKey = "23c60e9b-0d03-4854-b8cc-b1ef6ae33d78";
 
@@ -53,19 +58,54 @@ public class OperatorController {
 
     @GetMapping("/operator/orders")
     public String orders(
-            @RequestParam(required = false) Long courier,
+            @RequestParam(required = false) Long courierId,
             Model model
-    ) {
-        OrdersPageData data = operatorService.getOrdersPageData(courier);
+    ) throws JsonProcessingException {
+        try {
+            OrdersPageData data = operatorService.getOrdersPageData(courierId);
 
-        model.addAttribute("yandexMapsApiKey", ApiKey);
-        model.addAttribute("couriers", data.getCouriers());
-        model.addAttribute("currentCourier", data.getCurrentCourier());
-        model.addAttribute("currentOrders", data.getOrders());
-        model.addAttribute("company", data.getCompany());
-        model.addAttribute("orders", data.getOrders());   // Future use
+            if (data == null) {
+                throw new IllegalStateException("Failed to retrieve orders page data");
+            }
 
-        return "operator/orderMenu";
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+            String ordersJson = objectMapper.writeValueAsString(data.getOrders());
+            String currentOrdersJson = objectMapper.writeValueAsString(data.getCurrentOrders());
+            String couriersJson = objectMapper.writeValueAsString(data.getCouriers());
+            String companyJson = objectMapper.writeValueAsString(data.getCompany());
+            String currentCourierJson = objectMapper.writeValueAsString(data.getCurrentCourier());
+
+            model.addAttribute("ordersJson", ordersJson);
+            model.addAttribute("currentOrdersJson", currentOrdersJson);
+            model.addAttribute("couriersJson", couriersJson);
+            model.addAttribute("companyJson", companyJson);
+            model.addAttribute("currentCourierJson", currentCourierJson);
+            model.addAttribute("yandexMapsApiKey", ApiKey);
+
+            model.addAttribute("couriers", data.getCouriers());
+            model.addAttribute("currentCourier", data.getCurrentCourier());
+            model.addAttribute("currentOrders", data.getCurrentOrders());
+            model.addAttribute("company", data.getCompany());
+            model.addAttribute("orders", data.getOrders());
+
+            System.out.println("Orders loaded: " + data.getOrders().size());
+            System.out.println("Current courier: " + data.getCurrentCourier().getFullName());
+
+            return "operator/orderMenu";
+        } catch (JsonProcessingException e) {
+            System.err.println("JSON serialization error: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Failed to load orders data");
+            return "error/500";
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "An unexpected error occurred");
+            return "error/500";
+        }
     }
 
     @GetMapping("/operator/currentUser/{userId}")

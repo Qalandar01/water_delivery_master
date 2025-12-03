@@ -31,10 +31,6 @@ public class CourierRequestDTO {
     private String carType;
 
     @NotBlank(message = "Car number is required")
-    @Pattern(
-            regexp = "^[A-Z0-9-]{5,10}$",
-            message = "Car number format is invalid"
-    )
     private String carNumber;
 
     private boolean isActive;

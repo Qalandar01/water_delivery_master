@@ -11,7 +11,13 @@ spring:
     allow-circular-references: true
 
   jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: true
+    deserialization:
+      fail-on-unknown-properties: false
     time-zone: Asia/Tashkent
+    date-format: "yyyy-MM-dd'T'HH:mm:ss"
 
   datasource:
     driver-class-name: org.postgresql.Driver
