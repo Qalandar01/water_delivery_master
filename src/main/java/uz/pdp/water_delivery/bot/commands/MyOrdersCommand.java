@@ -4,21 +4,21 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
+import uz.pdp.water_delivery.bot.service.OrderBotService;
 import uz.pdp.water_delivery.model.enums.TelegramState;
 
 @Service
 public class MyOrdersCommand implements BotCommand {
 
     private final String command;
-    private final BotService botService;
     private final TelegramBot telegramBot;
+    private final OrderBotService orderBotService;
 
-    public MyOrdersCommand(BotService botService, TelegramBot telegramBot) {
+    public MyOrdersCommand(TelegramBot telegramBot, OrderBotService orderBotService) {
         this.command = BotConstant.MY_ORDERS;
-        this.botService = botService;
         this.telegramBot = telegramBot;
+        this.orderBotService = orderBotService;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class MyOrdersCommand implements BotCommand {
     @Override
     public void execute(Message message, TelegramUser telegramUser) {
         if (telegramUser.getState().equals(TelegramState.SETTING)) {
-            botService.sendMyOrders(message, telegramUser);
+            orderBotService.sendMyOrders(message, telegramUser);
         } else {
             telegramUser.deleteMessage(telegramBot, message.messageId());
         }

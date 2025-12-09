@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotService;
+import uz.pdp.water_delivery.bot.service.BotNavigationService;
+import uz.pdp.water_delivery.bot.service.BotService;
 import uz.pdp.water_delivery.bot.BotUtils;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.model.dto.Location;
@@ -50,6 +51,8 @@ public class BotDelivery {
 
     @Autowired
     private OrderProductRepository orderProductRepository;
+    @Autowired
+    private BotNavigationService botNavigationService;
 
     @Autowired
     public void setBotService(BotService botService) {
@@ -374,7 +377,7 @@ public class BotDelivery {
             currentOrders.getOrder().getTelegramUser().setState(TelegramState.CABINET);
             telegramUserRepository.save(currentOrders.getOrder().getTelegramUser());
             orderRepository.save(currentOrders.getOrder());
-            botService.sendCabinet(currentOrders.getOrder().getTelegramUser());
+            botNavigationService.sendCabinet(currentOrders.getOrder().getTelegramUser());
             saveLocationDeliverySendMessage(message.message(), telegramUser);
         } catch (Exception e) {
             logErrorFile.logError(e, "completedOrder", message.message().messageId(), telegramUser.getChatId());

@@ -8,9 +8,9 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.AnswerCallbackQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.handlers.UpdateHandler;
+import uz.pdp.water_delivery.bot.service.BotService;
 
 import java.util.List;
 

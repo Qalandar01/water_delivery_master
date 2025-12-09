@@ -5,9 +5,12 @@ import com.pengrad.telegrambot.model.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotService;
+import uz.pdp.water_delivery.bot.service.BasketBotService;
+import uz.pdp.water_delivery.bot.service.BotNavigationService;
+import uz.pdp.water_delivery.bot.service.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.bot.delivery.BotDelivery;
+import uz.pdp.water_delivery.bot.service.OrderBotService;
 import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.model.repo.TelegramUserRepository;
 
@@ -16,11 +19,17 @@ public class CallbackHandler implements UpdateHandler {
     private final BotService botService;
     private final TelegramUserRepository telegramUserRepository;
     private final BotDelivery botDelivery;
+    private final BasketBotService basketBotService;
+    private final BotNavigationService botNavigationService;
+    private final OrderBotService orderBotService;
 
-    public CallbackHandler(BotService botService, TelegramUserRepository telegramUserRepository, BotDelivery botDelivery) {
+    public CallbackHandler(BotService botService, TelegramUserRepository telegramUserRepository, BotDelivery botDelivery, BasketBotService basketBotService, BotNavigationService botNavigationService, OrderBotService orderBotService) {
         this.botService = botService;
         this.telegramUserRepository = telegramUserRepository;
         this.botDelivery = botDelivery;
+        this.basketBotService = basketBotService;
+        this.botNavigationService = botNavigationService;
+        this.orderBotService = orderBotService;
     }
 
     @Override
@@ -39,11 +48,11 @@ public class CallbackHandler implements UpdateHandler {
 
     private void handleUserCallbackQuery(CallbackQuery message, TelegramUser telegramUser, String data) {
         switch (telegramUser.getState()) {
-            case SELECT_BOTTLE_NUMBER -> botService.changeProductNumber(message, telegramUser);
+            case SELECT_BOTTLE_NUMBER -> basketBotService.changeProductNumber(message, telegramUser);
 
             case CONFIRM_ORDER -> botService.acceptOrderTimeAndShowConfirmation(message, telegramUser);
 
-            case CREATE_ORDER -> botService.makeAnOrder(message, telegramUser);
+            case CREATE_ORDER -> orderBotService.makeAnOrder(message, telegramUser);
 
             case MY_BASKET -> {
                 if (data.equals(BotConstant.CONFIRM_ORDER)) {
@@ -53,9 +62,9 @@ public class CallbackHandler implements UpdateHandler {
                 } else if (data.equals(BotConstant.CABINET)) {
                     telegramUser.setState(TelegramState.CABINET);
                     telegramUserRepository.save(telegramUser);
-                    botService.sendCabinet(telegramUser);
+                    botNavigationService.sendCabinet(telegramUser);
                 }else if(data.startsWith(BotConstant.DELETE)){
-                    botService.removeBasketProduct(telegramUser, data);
+                    basketBotService.removeBasketProduct(telegramUser, data);
                 }
 
             }

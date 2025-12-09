@@ -3,18 +3,18 @@ package uz.pdp.water_delivery.bot.commands;
 import com.pengrad.telegrambot.model.Message;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
+import uz.pdp.water_delivery.bot.service.BasketBotService;
 
 @Service
 public class BasketCommand implements BotCommand {
 
     private final String command;
-    private final BotService botService;
+    private final BasketBotService basketBotService;
 
-    public BasketCommand(BotService botService) {
+    public BasketCommand( BasketBotService basketBotService) {
         this.command = BotConstant.BASKET;
-        this.botService = botService;
+        this.basketBotService = basketBotService;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class BasketCommand implements BotCommand {
 
     @Override
     public void execute(Message message, TelegramUser telegramUser) {
-        botService.showBasket(message, telegramUser);
+        basketBotService.showBasket(message, telegramUser);
 
     }
 }

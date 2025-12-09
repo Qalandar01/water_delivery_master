@@ -4,8 +4,8 @@ import com.pengrad.telegrambot.model.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
+import uz.pdp.water_delivery.bot.service.UserBotService;
 import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.services.DeleteMessageService;
 
@@ -14,11 +14,11 @@ import uz.pdp.water_delivery.services.DeleteMessageService;
 @RequiredArgsConstructor
 public class WaitingOperatorHandler implements StateHandler {
     private final DeleteMessageService deleteMessageService;
-    private final BotService botService;
+    private final UserBotService userBotService;
 
     @Override
     public void handle(Message message, TelegramUser telegramUser) {
         deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), BotConstant.PLEASE_SHARE_CONTACT);
-        botService.sendDoneMessage(telegramUser);
+        userBotService.sendDoneMessage(telegramUser);
     }
 }

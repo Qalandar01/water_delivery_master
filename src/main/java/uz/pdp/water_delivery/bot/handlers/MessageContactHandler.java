@@ -5,8 +5,9 @@ import com.pengrad.telegrambot.model.Update;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
+import uz.pdp.water_delivery.bot.service.BotService;
+import uz.pdp.water_delivery.bot.service.UserBotService;
 import uz.pdp.water_delivery.model.enums.TelegramState;
 
 @Service
@@ -14,6 +15,7 @@ import uz.pdp.water_delivery.model.enums.TelegramState;
 public class MessageContactHandler implements UpdateHandler {
 
     private final BotService botService;
+    private final UserBotService userBotService;
 
     @Override
     public boolean canHandle(Update update) {
@@ -26,7 +28,7 @@ public class MessageContactHandler implements UpdateHandler {
         Message message = update.message();
         TelegramUser telegramUser = botService.getTelegramUserOrCreate(message.chat().id());
         if (telegramUser.getState().equals(TelegramState.SHARE_CONTACT)) {
-            botService.saveContactSendMessage(message, telegramUser);
+            userBotService.saveContactSendMessage(message, telegramUser);
         }
     }
 }

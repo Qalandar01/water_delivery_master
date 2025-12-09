@@ -3,5 +3,6 @@
   <component name="DataSourcePerFileMappings">
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/99b3a9bb-6871-42c4-9f7d-e83afdae661b/console.sql" value="99b3a9bb-6871-42c4-9f7d-e83afdae661b" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/99b3a9bb-6871-42c4-9f7d-e83afdae661b/console_1.sql" value="99b3a9bb-6871-42c4-9f7d-e83afdae661b" />
+    <file url="file://$PROJECT_DIR$/src/main/java/uz/pdp/water_delivery/model/repo/TelegramUserRepository.java" value="99b3a9bb-6871-42c4-9f7d-e83afdae661b" />
   </component>
 </project>

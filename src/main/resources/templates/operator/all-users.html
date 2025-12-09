@@ -140,7 +140,7 @@
             </tr>
             </thead>
             <tbody id="userTable">
-            <tr th:each="telegramUser : ${users}" th:if="${telegramUser != null && telegramUser.district != null}">
+            <tr th:each="telegramUser : ${users}" th:if="${telegramUser != null }">
                 <td th:if="${telegramUser.user != null}"
                     th:text="${telegramUser.user.firstName} + ' ' + ${telegramUser.user.lastName}"></td>
                 <td th:if="${telegramUser.district != null}"
