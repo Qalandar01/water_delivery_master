@@ -121,7 +121,7 @@
 <!--                        <a th:href="@{/admin/bottle/delete/{id}(id=${product.id})}" class="btn btn-danger">-->
 <!--                            <i class="fa-solid fa-trash"></i> O'chirish-->
 <!--                        </a>-->
-                        <form th:action="@{/templates/admin/product/delete/{id}(id=${product.id})}"
+                        <form th:action="@{/admin/product/delete/{id}(id=${product.id})}"
                               method="post"
                               style="display:inline;">
                             <input type="hidden" name="_method" value="DELETE"/>

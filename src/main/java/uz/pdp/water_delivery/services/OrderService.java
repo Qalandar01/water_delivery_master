@@ -9,7 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uz.pdp.water_delivery.bot.BotService;
+import uz.pdp.water_delivery.bot.service.BotNavigationService;
+import uz.pdp.water_delivery.bot.service.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.model.dto.OrderSummaryDTO;
 import uz.pdp.water_delivery.model.dto.UpdateOrderPageDTO;
@@ -38,8 +39,9 @@ public class OrderService {
     private final TelegramBot telegramBot;
     private final DeleteMessageService deleteMessageService;
     private final BotService botService;
+    private final BotNavigationService botNavigationService;
 
-    public OrderService(OrderRepository orderRepository, CourierRepository courierRepository, CurrentOrdersRepository currentOrdersRepository, OrderProductRepository orderProductRepository, TelegramBot telegramBot, DeleteMessageService deleteMessageService, BotService botService) {
+    public OrderService(OrderRepository orderRepository, CourierRepository courierRepository, CurrentOrdersRepository currentOrdersRepository, OrderProductRepository orderProductRepository, TelegramBot telegramBot, DeleteMessageService deleteMessageService, BotService botService, BotNavigationService botNavigationService) {
         this.orderRepository = orderRepository;
         this.courierRepository = courierRepository;
         this.currentOrdersRepository = currentOrdersRepository;
@@ -47,6 +49,7 @@ public class OrderService {
         this.telegramBot = telegramBot;
         this.deleteMessageService = deleteMessageService;
         this.botService = botService;
+        this.botNavigationService = botNavigationService;
     }
 
     @Transactional
@@ -145,7 +148,7 @@ public class OrderService {
 
         // Reset user state and update cabinet
         tgUser.setState(TelegramState.CABINET);
-        botService.sendCabinet(tgUser);
+        botNavigationService.sendCabinet(tgUser);
     }
 
     public Page<Order> getAllOrders(int page, int size) {

@@ -3,7 +3,8 @@ package uz.pdp.water_delivery.bot.commands;
 import com.pengrad.telegrambot.model.Message;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotService;
+import uz.pdp.water_delivery.bot.service.BotNavigationService;
+import uz.pdp.water_delivery.bot.service.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.model.enums.TelegramState;
 import uz.pdp.water_delivery.model.repo.TelegramUserRepository;
@@ -16,12 +17,14 @@ public class BackCommand implements BotCommand {
     private final TelegramUserRepository telegramUserRepository;
     private final DeleteMessageService deleteMessageService;
     private final BotService botService;
+    private final BotNavigationService botNavigationService;
 
-    public BackCommand(TelegramUserRepository telegramUserRepository, DeleteMessageService deleteMessageService, BotService botService) {
+    public BackCommand(TelegramUserRepository telegramUserRepository, DeleteMessageService deleteMessageService, BotService botService, BotNavigationService botNavigationService) {
         this.command = BotConstant.BACK;
         this.telegramUserRepository = telegramUserRepository;
         this.deleteMessageService = deleteMessageService;
         this.botService = botService;
+        this.botNavigationService = botNavigationService;
     }
 
     @Override
@@ -35,7 +38,7 @@ public class BackCommand implements BotCommand {
             telegramUser.setState(TelegramState.CABINET);
             telegramUserRepository.save(telegramUser);
             deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), BotConstant.BACK);
-            botService.sendCabinet(telegramUser);
+            botNavigationService.sendCabinet(telegramUser);
         } else if (telegramUser.getState().equals(TelegramState.SAVE_NEW_LOCATION)) {
             telegramUser.setState(TelegramState.SETTING);
             telegramUserRepository.save(telegramUser);

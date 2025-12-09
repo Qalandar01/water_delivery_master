@@ -10,8 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import uz.pdp.water_delivery.bot.BotService;
+import uz.pdp.water_delivery.bot.service.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
+import uz.pdp.water_delivery.bot.service.UserBotService;
 import uz.pdp.water_delivery.exception.CourierNotFoundException;
 import uz.pdp.water_delivery.exception.OrderNotFoundException;
 import uz.pdp.water_delivery.exception.TelegramUserNotFoundException;
@@ -38,13 +39,12 @@ import java.util.Optional;
 public class OperatorController {
 
     private final TelegramUserRepository telegramUserRepository;
-    private final BotService botService;
     private final CourierRepository courierRepository;
     private final LogErrorFile logErrorFile;
     private final OperatorService operatorService;
     private final TelegramUserService telegramUserService;
     private final OrderService orderService;
-    private final ObjectMapper jacksonObjectMapper;
+    private final UserBotService userBotService;
 
     public String ApiKey = "23c60e9b-0d03-4854-b8cc-b1ef6ae33d78";
 
@@ -119,7 +119,7 @@ public class OperatorController {
         }
     }
 
-    @PostMapping("/operator/wronglocation")
+    @PostMapping("/operator/wrong/location")
     public String wrongLocation(@RequestParam("userId") Long tgUserId) {
         Optional<TelegramUser> tgUserOpt = telegramUserRepository.findById(tgUserId);
 
@@ -129,7 +129,7 @@ public class OperatorController {
         }
 
         try {
-            botService.sendLocationButton(tgUserOpt.get());
+            userBotService.sendLocationButton(tgUserOpt.get());
             return "redirect:/operator";
         } catch (Exception e) {
             logErrorFile.logError(e, "wrongLocation", tgUserId);

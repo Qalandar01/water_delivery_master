@@ -4,20 +4,20 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
+import uz.pdp.water_delivery.bot.service.BotNavigationService;
 import uz.pdp.water_delivery.model.enums.TelegramState;
 
 @Service
 public class CabinetCommand implements BotCommand {
     private final String command;
-    private final BotService botService;
     private final TelegramBot telegramBot;
+    private final BotNavigationService botNavigationService;
 
-    public CabinetCommand(BotService botService, TelegramBot telegramBot) {
+    public CabinetCommand( TelegramBot telegramBot, BotNavigationService botNavigationService) {
         this.command = BotConstant.CABINET;
-        this.botService = botService;
         this.telegramBot = telegramBot;
+        this.botNavigationService = botNavigationService;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class CabinetCommand implements BotCommand {
     @Override
     public void execute(Message message, TelegramUser telegramUser) {
         if (telegramUser.getState().equals(TelegramState.SETTING)) {
-            botService.sendCabinet(message, telegramUser);
+            botNavigationService.sendCabinet(message, telegramUser);
         } else {
             telegramUser.deleteMessage(telegramBot, message.messageId());
         }

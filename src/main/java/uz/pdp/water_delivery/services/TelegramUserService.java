@@ -3,7 +3,8 @@ package uz.pdp.water_delivery.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uz.pdp.water_delivery.bot.BotService;
+import uz.pdp.water_delivery.bot.service.BotNavigationService;
+import uz.pdp.water_delivery.bot.service.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
 import uz.pdp.water_delivery.model.dto.Location;
 import uz.pdp.water_delivery.model.dto.VerifyUserDTO;
@@ -22,6 +23,7 @@ public class TelegramUserService {
     private final TelegramUserRepository telegramUserRepository;
     private final LogErrorFile logErrorFile;
     private final BotService botService;
+    private final BotNavigationService botNavigationService;
 
     public TelegramUser getUserById(Long id) {
         return telegramUserRepository.findById(id)
@@ -62,7 +64,7 @@ public class TelegramUserService {
         telegramUserRepository.save(tgUser);
 
         // Notify user
-        botService.sendCabinet(tgUser);
+        botNavigationService.sendCabinet(tgUser);
     }
 
     @Transactional
@@ -85,7 +87,7 @@ public class TelegramUserService {
         telegramUserRepository.save(tgUser);
 
         // Notify user
-        botService.sendUserDidNotAnswerPhone(tgUser);
+        botNavigationService.sendUserDidNotAnswerPhone(tgUser);
     }
 
     public List<TelegramUser> getAllUsersWithRoleUser() {

@@ -1,28 +1,26 @@
 package uz.pdp.water_delivery.bot.commands;
 
 import com.pengrad.telegrambot.model.Message;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.pdp.water_delivery.bot.BotConstant;
-import uz.pdp.water_delivery.bot.BotService;
+import uz.pdp.water_delivery.bot.service.BotService;
 import uz.pdp.water_delivery.bot.TelegramUser;
+import uz.pdp.water_delivery.bot.service.UserBotService;
 
 @Service
+@RequiredArgsConstructor
 public class StartCommand implements BotCommand {
-    private final BotService botService;
-    private final String command;
+    private final UserBotService botUserService;
 
-    public StartCommand(BotService botService) {
-        this.botService = botService;
-        this.command = BotConstant.START;
-    }
 
     @Override
     public String getCommand() {
-        return command;
+        return BotConstant.START;
     }
 
     @Override
     public void execute(Message message, TelegramUser telegramUser) {
-        botService.acceptStartSendShareContact(message, telegramUser);
+        botUserService.acceptStartSendShareContact(message, telegramUser);
     }
 }
