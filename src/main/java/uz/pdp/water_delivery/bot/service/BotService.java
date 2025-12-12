@@ -81,105 +81,6 @@ public class BotService {
     }
 
 
-//    public void acceptStartSendShareContact(Message message, TelegramUser telegramUser) {
-
-    /// /        telegramStateDispatcher.dispatch(message, telegramUser);
-//        if (telegramUser.getState().equals(TelegramState.HAS_ORDER)) {
-//
-//        } else if (telegramUser.getState().equals(TelegramState.WAITING_OPERATOR) || telegramUser.getState().equals(TelegramState.WAITING_OPERATOR_CHANGE_LOCATION)) {
-//
-//        } else if (telegramUser.getState().equals(TelegramState.SHARE_LOCATION)) {
-//
-//        } else if (telegramUser.getUser() != null && telegramUser.getUser().getPhone() != null) {
-//            if (isDeliveryUser(telegramUser.getUser())) {
-//                handleDeliveryUser(message, telegramUser);
-//            } else if (isUser(telegramUser.getUser())) {
-//                telegramUser.setState(TelegramState.CABINET);
-//                telegramUserRepository.save(telegramUser);
-//                sendCabinet(telegramUser);
-//            }
-//        } else {
-//            SendMessage sendMessage = new SendMessage(telegramUser.getChatId(), uz.pdp.water_delivery.bot.BotConstant.PLEASE_SHARE_CONTACT);
-//            sendMessage.replyMarkup(BotUtils.getGeneratedContactButton());
-//            SendResponse sendResponse = telegramBot.execute(sendMessage);
-//            Integer messageId = sendResponse.message().messageId();
-//            deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), uz.pdp.water_delivery.bot.BotConstant.START);
-//            deleteMessageService.archivedForDeletingMessages(telegramUser, messageId, uz.pdp.water_delivery.bot.BotConstant.PLEASE_SHARE_CONTACT);
-//            telegramUser.setState(TelegramState.SHARE_CONTACT);
-//            telegramUserRepository.save(telegramUser);
-//        }
-//    }
-
-
-//    public void saveContactSendMessage(Message message, TelegramUser telegramUser) {
-//        String contact = PhoneRepairUtil.repair(message.contact().phoneNumber());
-//        User user = userService.createdOrFindUser(contact);
-//        telegramUser.setRegion("Toshkent");
-//        deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), "Please share contact");
-//        if (user != null) {
-//            user.setFirstName(message.contact().firstName());
-//            user.setLastName(message.contact().lastName());
-//            telegramUser.setUser(user);
-//            telegramUserRepository.save(telegramUser);
-//            userRepository.save(user);
-//        }
-//        if (isDeliveryUser(telegramUser.getUser())) {
-//            handleDeliveryUser(message, telegramUser);
-//        } else if (isUser(telegramUser.getUser())) {
-//            telegramUser.setState(TelegramState.CABINET);
-//            telegramUser.getUser().setNewUser(false);
-//            telegramUserRepository.save(telegramUser);
-//            sendCabinet(telegramUser);
-//        } else {
-//            handleRegularUser(message, telegramUser, contact);
-//        }
-//    }
-
-//    private boolean isUser(User user) {
-//        return user.getRoles() != null &&
-//                user.getRoles().stream()
-//                        .anyMatch(role -> role.getRoleName().equals(RoleName.ROLE_USER));
-//    }
-//
-//    private boolean isDeliveryUser(User user) {
-//        return user.getRoles() != null &&
-//                user.getRoles().stream()
-//                        .anyMatch(role -> role.getRoleName().equals(RoleName.ROLE_DELIVERY));
-//    }
-//
-//    private void handleDeliveryUser(Message message, TelegramUser telegramUser) {
-//        deleteMessageService.archivedForDeletingMessages(telegramUser, message.messageId(), "Please share contact");
-//        SendMessage sendMessage = new SendMessage(
-//                telegramUser.getChatId(),
-//                telegramUser.getUser().getPassword() != null ? uz.pdp.water_delivery.bot.BotConstant.PLEASE_ENTER_PASSWORD : uz.pdp.water_delivery.bot.BotConstant.NEW_PASSWORD
-//        );
-//        sendMessage.replyMarkup(new ReplyKeyboardRemove(true));
-//        telegramUser.setState(telegramUser.getUser().getPassword() != null ? TelegramState.ENTER_OLD_PASSWORD_DELIVERY : TelegramState.ENTER_PASSWORD_DELIVERY);
-//        telegramUserRepository.save(telegramUser);
-//        SendResponse sendResponse = telegramBot.execute(sendMessage);
-//        Integer messageId = sendResponse.message().messageId();
-//        deleteMessageService.archivedForDeletingMessages(telegramUser, messageId, telegramUser.getUser().getPassword() != null ? uz.pdp.water_delivery.bot.BotConstant.PLEASE_ENTER_PASSWORD : uz.pdp.water_delivery.bot.BotConstant.NEW_PASSWORD);
-//    }
-//
-//    private void handleRegularUser(Message message, TelegramUser telegramUser, String contact) {
-//        telegramUser.getUser().setPhone(contact);
-//        telegramUser.setUser(telegramUser.getUser());
-//        sendLocationButton(telegramUser);
-//        //sendRegionSelectionMessage(telegramUser);
-//    }
-
-   /* private void sendRegionSelectionMessage(TelegramUser telegramUser) {
-        SendMessage sendMessage = new SendMessage(
-                telegramUser.getChatId(),
-                BotConstant.PLEASE_CHOOSE_REGION
-        );
-        sendMessage.replyMarkup(botUtils.getGeneratedRegionButtons());
-        SendResponse sendResponse = telegramBot.execute(sendMessage);
-        Integer messageId = sendResponse.message().messageId();
-        deleteMessageService.archivedForDeletingMessages(telegramUser, messageId, BotConstant.PLEASE_CHOOSE_REGION);
-        telegramUser.setState(TelegramState.SHARE_REGION);
-        telegramUserRepository.save(telegramUser);
-    }*/
     public void sendMessage(TelegramUser chatId, String messageText) {
         SendMessage sendMessage = new SendMessage(chatId.getChatId(), messageText);
         SendResponse sendResponse = telegramBot.execute(sendMessage);
@@ -210,15 +111,6 @@ public class BotService {
         telegramUserRepository.save(telegramUser);
         deleteMessageService.archivedForDeletingMessages(telegramUser, messageId, "Select bottle number");
     }
-
-
-//    public LocalDate getDate(String day) {
-//        if (day.equals("TODAY")) {
-//            return LocalDate.now();
-//        } else {
-//            return LocalDate.now().plusDays(1);
-//        }
-//    }
 
 
     public void acceptOrderTimeAndShowConfirmation(CallbackQuery callbackQuery, TelegramUser tgUser) {
@@ -325,71 +217,12 @@ public class BotService {
         }
     }
 
-//
-//    public void decreaseBasketAmount(Integer basketId, TelegramUser telegramUser) {
-//        Optional<Basket> basketOptional = basketRepository.findById(basketId);
-//
-//        if (basketOptional.isPresent()) {
-//            Basket basket = basketOptional.get();
-//
-//            if (basket.getAmount() > 1) {
-//                basket.setAmount(basket.getAmount() - 1);
-//                basketRepository.save(basket);
-//                updateBasketMessage(telegramUser, basket, basket.getMessageId());
-//            } else {
-//                basketRepository.delete(basket);
-//                return;
-//            }
-//        }
-//    }
-
-
-//
-//    public void increaseBasketAmount(Integer uuid, TelegramUser telegramUser) {
-//        Optional<Basket> basket = basketRepository.findById(uuid);
-//
-//        if (basket.isPresent()) {
-//            Basket currentBasket = basket.get();
-//
-//            currentBasket.setAmount(currentBasket.getAmount() + 1);
-//            basketRepository.save(currentBasket);
-//
-//            Integer messageId = currentBasket.getMessageId();
-//            if (messageId != null) {
-//                updateBasketMessage(telegramUser, currentBasket, messageId);
-//            }
-//        }
-//    }
-
-
-
 
 
     @Autowired
     public void setBasketRepository(BasketRepository basketRepository) {
         this.basketRepository = basketRepository;
     }
-
-//
-//    public void updateBasketAmount(String data, TelegramUser telegramUser) {
-//        String[] splitData = data.contains("_") ? data.split("_") : new String[]{data};
-//        String action = splitData[0];
-//        String basketId = splitData.length > 1 ? splitData[1] : null;
-//
-//        if (basketId != null) {
-//            Optional<Basket> basketOptional = basketRepository.findById(Integer.valueOf(basketId));
-//            basketOptional.ifPresent(basket -> {
-//                if (BotConstant.PLUS.equalsIgnoreCase(action)) {
-//                    increaseBasketAmount(basket.getId(), telegramUser);
-//                } else if (BotConstant.MINUS.equalsIgnoreCase(action) && basket.getAmount() > 0) {
-//                    decreaseBasketAmount(basket.getId(), telegramUser);
-//                }
-//                updateBasketMessage(telegramUser, basket, basket.getMessageId());
-//            });
-//        }
-//
-//    }
-
 
 
 

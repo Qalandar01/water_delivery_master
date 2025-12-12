@@ -24,7 +24,7 @@ public class SecurityConfig {
         http
                 .securityMatcher(request -> !request.getRequestURI().startsWith("/api/webhook"))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/login", "/change-password", "/forgot-password", "/change-password-phone", "/css/**", "/static/**", "/js/**", "/registration", "/topic").permitAll()
+                        .requestMatchers("/login", "/change-password", "/forgot-password", "/change-password-phone", "/css/**", "/static/**", "/static/js/**", "/registration", "/topic").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/user/**").hasRole("USER")
                         .requestMatchers("/operator/**").hasRole("OPERATOR")

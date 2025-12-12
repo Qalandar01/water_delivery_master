@@ -1,0 +1,17 @@
+/* order-page.css - extracted styles from inline <style> */
+:root{--sidebar-width:280px;--map-height:820px}
+body{font-family:Arial,Helvetica,sans-serif;background:#f5f5f5}
+.page-container{min-height:100vh}
+.row.no-gutters{margin:0}
+.col-left{width:var(--sidebar-width);flex:0 0 var(--sidebar-width);border-right:1px solid #e6e6e6;overflow-y:auto}
+.col-right{flex:1;padding:24px}
+.map{width:100%;height:var(--map-height);border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);background:#fff}
+.sidebar-title{font-size:18px;font-weight:700;text-align:center;margin-bottom:12px}
+.courier-card{transition:all .25s ease;margin-bottom:8px;padding:8px;border-radius:8px;cursor:pointer}
+.courier-card:hover{transform:translateX(4px);box-shadow:0 6px 16px rgba(0,0,0,0.06)}
+.courier-card.selected{border:2px solid #198754;background:#e6f7ec}
+.legend-item{margin-bottom:6px;padding:6px 8px;background:white;border-radius:6px;font-size:14px}
+.route-info{background:#fff;padding:12px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.04)}
+.hide{display:none}
+#alert-message{position:fixed;top:80px;right:20px;z-index:1000;min-width:300px}
+.badge-route{margin-right:6px}
