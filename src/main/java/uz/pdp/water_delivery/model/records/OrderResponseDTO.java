@@ -9,7 +9,6 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import uz.pdp.water_delivery.model.dto.Location;
-import uz.pdp.water_delivery.model.dto.OrderProductDto;
 import uz.pdp.water_delivery.model.enums.OrderStatus;
 
 import java.time.LocalDate;

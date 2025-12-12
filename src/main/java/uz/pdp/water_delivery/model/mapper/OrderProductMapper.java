@@ -1,6 +1,6 @@
 package uz.pdp.water_delivery.model.mapper;
 
-import uz.pdp.water_delivery.model.dto.OrderProductDto;
+import uz.pdp.water_delivery.model.records.OrderProductDto;
 import uz.pdp.water_delivery.model.entity.Order;
 import uz.pdp.water_delivery.model.entity.OrderProduct;
 import uz.pdp.water_delivery.model.records.OrderResponseDTO;
